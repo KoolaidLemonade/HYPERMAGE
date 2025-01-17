@@ -10,12 +10,12 @@ namespace HYPERMAGE.UI
 {
     public class UIElement
     {
-        public Texture2D _texture;
+        public Texture2D texture;
         public Vector2 position;
 
         public UIElement(Texture2D texture, Vector2 position)
         {
-            _texture = texture;
+            this.texture = texture;
             this.position = position;
         }
         public UIElement(Vector2 position)
@@ -27,9 +27,9 @@ namespace HYPERMAGE.UI
 
         }
 
-        public virtual void Draw(Player player, SpriteFont spriteFont)
+        public virtual void Draw()
         {
-            Globals.SpriteBatch.Draw(_texture, position, Color.White);
+            Globals.SpriteBatch.Draw(texture, position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
         }
     }
 }

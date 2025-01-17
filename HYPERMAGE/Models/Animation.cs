@@ -5,63 +5,63 @@ namespace HYPERMAGE.Models;
 
 public class Animation
 {
-    private readonly Texture2D _texture;
-    private readonly List<Rectangle> _sourceRectangles = [];
-    private readonly int _frames;
-    private int _frame;
-    private readonly float _frameTime;
-    private float _frameTimeLeft;
-    private bool _active = true;
+    private readonly Texture2D texture;
+    private readonly List<Rectangle> sourceRectangles = [];
+    private readonly int frames;
+    private int frame;
+    private readonly float frameTime;
+    private float frameTimeLeft;
+    private bool active = true;
 
     public int frameWidth;
     public int frameHeight;
 
     public Animation(Texture2D texture, int framesX, int framesY, float frameTime, int row = 1)
     {
-        _texture = texture;
-        _frameTime = frameTime;
-        _frameTimeLeft = _frameTime;
-        _frames = framesX;
-        frameWidth = _texture.Width / framesX;
-        frameHeight = _texture.Height / framesY;
+        this.texture = texture;
+        this.frameTime = frameTime;
+        frameTimeLeft = frameTime;
+        frames = framesX;
+        frameWidth = texture.Width / framesX;
+        frameHeight = texture.Height / framesY;
 
-        for (int i = 0; i < _frames; i++)
+        for (int i = 0; i < frames; i++)
         {
-            _sourceRectangles.Add(new(i * frameWidth, (row - 1) * frameHeight, frameWidth, frameHeight));
+            sourceRectangles.Add(new(i * frameWidth, (row - 1) * frameHeight, frameWidth, frameHeight));
         }
     }
 
     public void Stop()
     {
-        _active = false;
+        active = false;
     }
 
     public void Start()
     {
-        _active = true;
+        active = true;
     }
 
     public void Reset()
     {
-        _frame = 0;
-        _frameTimeLeft = _frameTime;
+        frame = 0;
+        frameTimeLeft = frameTime;
     }
 
     public void Update()
     {
-        if (!_active) return;
+        if (!active) return;
 
-        _frameTimeLeft -= Globals.TotalSeconds;
+        frameTimeLeft -= Globals.TotalSeconds;
 
-        if (_frameTimeLeft <= 0)
+        if (frameTimeLeft <= 0)
         {
-            _frameTimeLeft += _frameTime;
-            _frame = (_frame + 1) % _frames;
+            frameTimeLeft += frameTime;
+            frame = (frame + 1) % frames;
         }
     }
 
     public void Draw(Vector2 pos)
     {
-        Globals.SpriteBatch.Draw(_texture, pos, _sourceRectangles[_frame], Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
+        Globals.SpriteBatch.Draw(texture, pos, sourceRectangles[frame], Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.81f);
     }
 }

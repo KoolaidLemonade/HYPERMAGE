@@ -5,8 +5,8 @@ namespace HYPERMAGE.Particles
     // from https://github.com/LubiiiCZ/DevQuickie/tree/master/Quickie003-ParticleSystem
     public struct ParticleData
     {
-        private static Texture2D _defaultTexture;
-        public Texture2D texture = _defaultTexture ??= Globals.Content.Load<Texture2D>("particle");
+        private static Texture2D defaultTexture;
+        public Texture2D texture = defaultTexture ??= Globals.Content.Load<Texture2D>("particle");
         public float lifespan = 2f;
         public Color colorStart = Color.Yellow;
         public Color colorEnd = Color.Red;

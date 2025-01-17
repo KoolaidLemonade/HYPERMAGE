@@ -15,7 +15,49 @@ public static class Globals
     public static SpriteBatch SpriteBatch { get; set; }
     public static Random Random { get; set; } = new();
 
-    private static Texture2D _blankTexture;
+    private static Texture2D blankTexture;
+
+    public static float Distance(Vector2 pos1, Vector2 pos2)
+    {
+        return (float)Math.Sqrt(Math.Pow(Math.Abs(pos1.X - pos2.X), 2) + Math.Pow(Math.Abs(pos1.Y - pos2.Y), 2));
+    }
+    public static int GetWeightedRandomInt(List<Vector2> intsProbs)
+    {
+        List<float> probabilites = [];
+        List<int> ints = [];
+
+        float totalProb = 0;
+        float rand = RandomFloat(0, 100);
+
+        for (int i = 0; i < intsProbs.Count; i++)
+        {
+            probabilites.Add(intsProbs[i].Y);
+            ints.Add((int)intsProbs[i].X);
+        }
+
+        if (probabilites.Sum() != 100)
+        {
+            return 0;
+        }
+
+        for (int i = 0; i < probabilites.Count; i++)
+        {
+            if (rand < probabilites[i] + totalProb && rand > totalProb)
+            {
+                Debug.WriteLine(ints[i]);
+                return ints[i];
+            }
+
+            totalProb += probabilites[i];
+        }
+
+        return 0;
+    }
+
+    public static SpriteFont GetPixelFont()
+    {
+        return Content.Load<SpriteFont>("font");
+    }
 
     public static void Update(GameTime gt)
     {
@@ -23,12 +65,13 @@ public static class Globals
     }
     public static Texture2D GetBlankTexture()
     {
-        if (_blankTexture == null)
+        if (blankTexture == null)
         {
-            _blankTexture = new Texture2D(SpriteBatch.GraphicsDevice, 1, 1);
-            _blankTexture.SetData(new[] { Color.White });
+            blankTexture = new Texture2D(SpriteBatch.GraphicsDevice, 1, 1);
+            blankTexture.SetData(new[] { Color.White });
         }
-        return _blankTexture;
+
+        return blankTexture;
     }
     public static float RandomFloat(float min, float max)
     {
@@ -52,20 +95,67 @@ public static class Globals
         float sizeX = hitbox.GetVerticesX().Max<float>() - hitbox.GetVerticesX().Min<float>();
         float sizeY = hitbox.GetVerticesY().Max<float>() - hitbox.GetVerticesY().Min<float>();
 
-        Debug.WriteLine(sizeX);
-        Debug.WriteLine(sizeY);
-
-        if (hitbox.IntersectsWith(PolygonFactory.CreateRectangle((int)(0 + sizeX), (int)(33 + sizeY), (int)(320 - sizeX * 2), (int)(180 - 33 - sizeY * 2), 0, Vector2.Zero)))
+        if (hitbox.IntersectsWith(PolygonFactory.CreateRectangle((int)(0 + sizeX), (int)(sizeY), (int)(320 - sizeX * 2), (int)(180 - sizeY * 2), 0, Vector2.Zero)))
         {
             return true;
         }
 
         return false;
     }
+    public static Polygon GetBounds(Polygon hitbox)
+    {
 
+        float sizeX = hitbox.GetVerticesX().Max<float>() - hitbox.GetVerticesX().Min<float>();
+        float sizeY = hitbox.GetVerticesY().Max<float>() - hitbox.GetVerticesY().Min<float>();
+
+        return PolygonFactory.CreateRectangle((int)(0 + sizeX), (int)(sizeY), (int)(320 - sizeX * 2), (int)(180 - sizeY * 2), 0, Vector2.Zero);
+    }
     public static float NonLerp(float value1, float value2, float amount)
     {
-        return (float)(value1 + (value2 - value1) * Math.Sin(Math.Pow(amount, 2)));
+        return (float)(value1 + (value2 - value1) * Math.Pow(amount, 2));
+    }
+
+    public static List<string> LineBreakText(string text, SpriteFont font, float maxWidth, bool breakOnWord = true)
+    {
+        List<string> lines = new List<string>();
+        string[] words = text.Split(' ');
+        string currentLine = "";
+
+        foreach (string word in words)
+        {
+            string testLine = currentLine.Length > 0 ? currentLine + " " + word : word;
+            Vector2 size = font.MeasureString(testLine);
+
+            if (size.X <= maxWidth)
+            {
+                currentLine = testLine;
+            }
+            else
+            {
+                if (breakOnWord)
+                {
+                    if (currentLine.Length > 0)
+                        lines.Add(currentLine);
+                    currentLine = word;
+                }
+                else
+                {
+                    while (currentLine.Length > 0 && font.MeasureString(currentLine + "-").X > maxWidth)
+                    {
+                        int lastChar = currentLine.Length - 1;
+                        lines.Add(currentLine[..lastChar] + "-");
+                        currentLine = currentLine[lastChar..];
+                    }
+                    currentLine += " ";
+                    currentLine += word;
+                }
+            }
+        }
+
+        if (currentLine.Length > 0)
+            lines.Add(currentLine);
+
+        return lines;
     }
 }
 

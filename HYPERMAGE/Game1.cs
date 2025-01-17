@@ -3,6 +3,8 @@ using HYPERMAGE.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace HYPERMAGE
 {
@@ -14,22 +16,25 @@ namespace HYPERMAGE
         private RenderTarget2D renderTarget;
         private RenderTarget2D renderTarget2;
         private RenderTarget2D renderTarget3;
+        private RenderTarget2D renderTarget4;
+        private RenderTarget2D renderTarget5;
+        private RenderTarget2D renderTarget6;
 
         private Effect blur;
         private Effect waves;
+        private Effect transition;
+        private Effect shake;
+
+        private float time;
+        private float time2;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.IsFullScreen = false;
+            graphics.IsFullScreen = true;
+            graphics.HardwareModeSwitch = false;
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-        }
-
-        protected override void LoadContent()
-        {
-            blur = Content.Load<Effect>("blur");
-            waves = Content.Load<Effect>("waves");
         }
 
         protected override void Initialize()
@@ -38,6 +43,9 @@ namespace HYPERMAGE
             renderTarget = new RenderTarget2D(GraphicsDevice, 320, 180);
             renderTarget2 = new RenderTarget2D(GraphicsDevice, 320, 180);
             renderTarget3 = new RenderTarget2D(GraphicsDevice, 320, 180);
+            renderTarget4 = new RenderTarget2D(GraphicsDevice, 320, 180);
+            renderTarget5 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
+            renderTarget6 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
 
             graphics.PreferredBackBufferWidth = 1920;
             graphics.PreferredBackBufferHeight = 1080;
@@ -50,35 +58,81 @@ namespace HYPERMAGE
 
             GameManager.Init();
 
+
             base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            waves = Content.Load<Effect>("waves");
+            blur = Content.Load<Effect>("blur");
+            transition = Content.Load<Effect>("transition");
+            shake = Content.Load<Effect>("shake");
         }
 
         protected override void Update(GameTime gameTime)
         {
+            if (GameManager.exit)
+            {
+                Exit();
+            }
+
             Globals.Update(gameTime);
 
             GameManager.Update();
 
             base.Update(gameTime);
-        }
 
-        public static BlendState LightenBlend = new BlendState
-        {
-            AlphaBlendFunction = BlendFunction.Max,
-            ColorBlendFunction = BlendFunction.Max,
-            ColorSourceBlend = Blend.One,
-            ColorDestinationBlend = Blend.One,
-            AlphaSourceBlend = Blend.One,
-            AlphaDestinationBlend = Blend.One
-        };
+            time += Globals.TotalSeconds;
+
+            waves.Parameters["power"].SetValue(GameManager.wavesPower);
+            waves.Parameters["time"].SetValue(time);
+
+            if (GameManager.fadeout)
+            {
+                time2 += Globals.TotalSeconds;
+                transition.Parameters["time"].SetValue(time2);
+            }
+
+            else
+            {
+                time2 = 0;
+            }
+
+            if (GameManager.screenShakeTime > 0)
+            {
+                Matrix view = Matrix.CreateTranslation(Globals.RandomFloat(-GameManager.screenShakePower, GameManager.screenShakePower), Globals.RandomFloat(-GameManager.screenShakePower, GameManager.screenShakePower), 0);
+
+                int width = GraphicsDevice.Viewport.Width;
+                int height = GraphicsDevice.Viewport.Height;
+
+                Matrix projection = Matrix.CreateOrthographicOffCenter(0, width, height, 0, 0, 1);
+
+                shake.Parameters["WorldViewProjection"].SetValue(view * projection);
+
+                GameManager.screenShakeTime -= Globals.TotalSeconds;
+            }
+
+            else
+            {
+                Matrix view = Matrix.Identity;
+
+                int width = GraphicsDevice.Viewport.Width;
+                int height = GraphicsDevice.Viewport.Height;
+
+                Matrix projection = Matrix.CreateOrthographicOffCenter(0, width, height, 0, 0, 1);
+
+                shake.Parameters["WorldViewProjection"].SetValue(view * projection);
+            }
+        }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.SetRenderTarget(renderTarget);
             GraphicsDevice.Clear(Color.Black);
 
-            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
-            GameManager.Draw();
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode : SpriteSortMode.FrontToBack);
+            SceneManager.GetScene().Draw();
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(renderTarget2);
@@ -97,14 +151,41 @@ namespace HYPERMAGE
             spriteBatch.Draw(renderTarget2, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
 
+            GraphicsDevice.SetRenderTarget(renderTarget4);
+
+            if (GameManager.waves)
+            {
+                spriteBatch.Begin(samplerState: SamplerState.PointClamp, effect: waves);
+                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, 180), Color.White * 0.0f);
+                spriteBatch.End();
+            }
+
             GraphicsDevice.SetRenderTarget(null);
+
+            GraphicsDevice.SetRenderTarget(renderTarget5);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
+            spriteBatch.Draw(renderTarget4, new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0));
+            spriteBatch.End();
 
             spriteBatch.Begin(blendState: LightenBlend);
             spriteBatch.Draw(renderTarget3, new Rectangle(0, 0, 1920, 1080), new Color(Color.SlateBlue, 0.5f) * 0.4f);
             spriteBatch.End();
 
-            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: shake);
             spriteBatch.Draw(renderTarget, new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0));
+            spriteBatch.End();
+
+            GraphicsDevice.SetRenderTarget(renderTarget6);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: GameManager.fadeout ? transition : null);
+            spriteBatch.Draw(renderTarget5, Vector2.Zero, new Color(Color.White, 0));
+            spriteBatch.End();
+
+            GraphicsDevice.SetRenderTarget(null);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: shake);
+            spriteBatch.Draw(renderTarget6, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend);
@@ -113,5 +194,15 @@ namespace HYPERMAGE
 
             base.Draw(gameTime);
         }
+
+        public static BlendState LightenBlend = new BlendState
+        {
+            AlphaBlendFunction = BlendFunction.Max,
+            ColorBlendFunction = BlendFunction.Max,
+            ColorSourceBlend = Blend.One,
+            ColorDestinationBlend = Blend.One,
+            AlphaSourceBlend = Blend.One,
+            AlphaDestinationBlend = Blend.One
+        };
     }
 }

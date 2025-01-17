@@ -1,4 +1,5 @@
 ﻿using HYPERMAGE.Helpers;
+using HYPERMAGE.Managers;
 using HYPERMAGE.Models;
 using Microsoft.Xna.Framework.Content;
 using System;
@@ -16,11 +17,11 @@ namespace HYPERMAGE.UI.UIElements
 
         }
 
-        public override void Draw(Player player, SpriteFont spriteFont)
+        public override void Draw()
         {
-            Globals.SpriteBatch.DrawString(spriteFont, $"{player.mana}", new(180 - new string($"{player.mana}").Length * 4, 13), Color.White);
+            Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), $"{GameManager.GetPlayer().mana}", position, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
 
-            base.Draw(player, spriteFont);
+            Globals.SpriteBatch.Draw(texture, new(position.X + Globals.GetPixelFont().MeasureString(new string(GameManager.GetPlayer().mana.ToString())).X + 1, position.Y + 1) , null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
         }
     }
 }

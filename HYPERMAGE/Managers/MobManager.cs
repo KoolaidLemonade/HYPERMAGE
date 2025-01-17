@@ -8,24 +8,28 @@ public static class MobManager
 {
     public static readonly List<Mob> mobs = [];
 
+    public static void SpawnMob(int id, Vector2 pos)
+    {
+        AddMob(new Mob(pos, id));
+    }
     public static void AddMob(Mob mob)
     {
         mobs.Add(mob);
     }
 
-    public static void UpdateMobs(Player player)
+    public static void UpdateMobs()
     {
         foreach (var mob in mobs)
         {
-            mob.Update(player);
+            mob.Update();
         }
 
         mobs.RemoveAll(mob => !mob.active);
     }
 
-    public static void Update(Player player)
+    public static void Update()
     {
-        UpdateMobs(player);
+        UpdateMobs();
     }
 
     public static void Draw()

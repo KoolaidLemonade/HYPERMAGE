@@ -10,16 +10,24 @@ namespace HYPERMAGE.Managers
 {
     public static class UIManager
     {
-        public static readonly List<UIElement> _ui = [];
-
+        public static readonly List<UIElement> uiList = [];
+        public static void Clear()
+        {
+            uiList.Clear();
+        }
         public static void AddElement(UIElement ui)
         {
-            _ui.Add(ui);
+            uiList.Add(ui);
+        }
+
+        public static void RemoveElement(UIElement ui)
+        {
+            uiList.Remove(ui);
         }
 
         public static void UpdateUI()
         {
-            foreach (var ui in _ui)
+            foreach (var ui in uiList.ToList())
             {
                 ui.Update();
             }
@@ -30,11 +38,11 @@ namespace HYPERMAGE.Managers
             UpdateUI();
         }
 
-        public static void Draw(Player player, SpriteFont spriteFont)
+        public static void Draw()
         {
-            foreach (var ui in _ui)
+            foreach (var ui in uiList.ToList())
             {
-                ui.Draw(player, spriteFont);
+                ui.Draw();
             }
         }
     }

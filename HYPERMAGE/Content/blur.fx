@@ -1,10 +1,10 @@
 ﻿#if OPENGL
-	#define SV_POSITION POSITION
-	#define VS_SHADERMODEL vs_3_0
-	#define PS_SHADERMODEL ps_3_0
+	#define SVPOSITION POSITION
+	#define VSSHADERMODEL vs_3_0	
+	#define PSSHADERMODEL ps_3_0
 #else
-	#define VS_SHADERMODEL vs_4_0_level_9_1
-	#define PS_SHADERMODEL ps_4_0_level_9_1
+	#define VSSHADERMODEL vs_4_0level91
+	#define PSSHADERMODEL ps_4_0level91
 #endif
 
 float2 offset;
@@ -18,26 +18,26 @@ sampler2D SpriteTextureSampler = sampler_state
 
 struct VertexShaderOutput
 {
-	float4 Position : SV_POSITION;
+	float4 Position : SVPOSITION;
 	float4 Color : COLOR0;
-	float2 TextureCoordinates : TEXCOORD0;
+    float2 UV : TEXCOORD0;
 };
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-    float4 color = tex2D(SpriteTextureSampler, input.TextureCoordinates + offset * 6) * 0.05 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates + offset * 5) * 0.05 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates + offset * 4) * 0.1 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates + offset * 3) * 0.1 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates + offset * 2) * 0.2 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates + offset * 1) * 0.3 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates) * 0.5 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates - offset * 1) * 0.3 +
-	               tex2D(SpriteTextureSampler, input.TextureCoordinates - offset * 2) * 0.2 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates - offset * 3) * 0.1 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates - offset * 4) * 0.1 +
-	               tex2D(SpriteTextureSampler, input.TextureCoordinates - offset * 5) * 0.05 +
-				   tex2D(SpriteTextureSampler, input.TextureCoordinates - offset * 6) * 0.05;
+    float4 color = tex2D(SpriteTextureSampler, input.UV + offset * 6) * 0.05 +
+				   tex2D(SpriteTextureSampler, input.UV + offset * 5) * 0.05 +
+				   tex2D(SpriteTextureSampler, input.UV + offset * 4) * 0.1 +
+				   tex2D(SpriteTextureSampler, input.UV + offset * 3) * 0.1 +
+				   tex2D(SpriteTextureSampler, input.UV + offset * 2) * 0.2 +
+				   tex2D(SpriteTextureSampler, input.UV + offset * 1) * 0.3 +
+				   tex2D(SpriteTextureSampler, input.UV) * 0.5 +
+				   tex2D(SpriteTextureSampler, input.UV - offset * 1) * 0.3 +
+	               tex2D(SpriteTextureSampler, input.UV - offset * 2) * 0.2 +
+				   tex2D(SpriteTextureSampler, input.UV - offset * 3) * 0.1 +
+				   tex2D(SpriteTextureSampler, input.UV - offset * 4) * 0.1 +
+	               tex2D(SpriteTextureSampler, input.UV - offset * 5) * 0.05 +
+				   tex2D(SpriteTextureSampler, input.UV - offset * 6) * 0.05;
 	
     return color;
 }
@@ -46,6 +46,6 @@ technique SpriteDrawing
 {
 	pass P0
 	{
-		PixelShader = compile PS_SHADERMODEL MainPS();
+		PixelShader = compile PSSHADERMODEL MainPS();
 	}
 };

@@ -13,58 +13,114 @@ namespace HYPERMAGE.Spells
     // i love megaclassing
     public class Spell
     {
-        public int _cooldown;
+        public static int totalSpellTypes = 5;
 
-        public int _spellTrait;
-        public int _spellTrait2;
-        public int _spellTrait3;
+        public float cooldown;
 
-        public int _spellType;
-        public int _rank;
-        public int _count;
-        public int _cost;
+        public List<int> spellTraits = [];
+        public List<int> boons = [];
 
-        public bool secondary = true;
+        public int position;
+        public int index;
 
-        //add chaining
-        public Spell(int spellType, int spellTrait, int spellTrait2, int spellTrait3, int rank, int count, int cost, int cooldown)
+        public int spellType;
+        public int rank;
+        public int cost;
+
+        public float damage;
+        public float speed = 1f;
+        public float size = 1f;
+        public float lifespan = 10f;
+
+        public string description;
+        public string name;
+
+        public Texture2D icon;
+
+        public Spell(int spellType, int rank) : this(spellType, rank, [])
         {
-            _spellType = spellType;
-            _cooldown = cooldown;
-            _spellTrait = spellTrait;
-            _spellTrait2 = spellTrait2;
-            _spellTrait3 = spellTrait3;
-            _rank = rank;
-            _count = count;
-            _cost = cost;
-            _cooldown = cooldown;
+
         }
-        public Spell(int spellType, int spellTrait, int spellTrait2, int rank, int count, int cost, int cooldown)
+        public Spell(int spellType, int rank, List<int> boons)
         {
-            _spellType = spellType;
-            _cooldown = cooldown;
-            _spellTrait = spellTrait;
-            _spellTrait2 = spellTrait2;
-            _rank = rank;
-            _count = count;
-            _cost = cost;
-            _cooldown = cooldown;
-        }
-        public void Cast(Vector2 center, float spread, Player player)
-        {
-            switch (_spellType)
+            this.spellType = spellType;
+            this.rank = rank;
+            this.boons = boons;
+
+            UpdateRankStats();
+
+            switch (spellType)
             {
                 case 0:
                     return;
                 case 1: //firebolt
-                    Projectile firebolt = new(Globals.Content.Load<Texture2D>("particle"), center, 1, 1.5f, 1f, Vector2.Normalize(InputManager.MousePosition - center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 300, 600, 0f, 2f, true, 0, 0);
-                    ProjectileManager.AddProjectile(firebolt);
+                    cost = 2;
+
+                    spellTraits.Add(1);
+                    spellTraits.Add(14);
+
+                    icon = Globals.Content.Load<Texture2D>("firebolticon");
+                    description = "LAUNCHES A BOLT OF FIERY MAGIC";
+                    name = "FIREBOLT";
                     return;
                 case 2: //fireball
-                    Projectile fireball = new(Globals.Content.Load<Texture2D>("particle"), center, 2, 0.5f, 3f, Vector2.Normalize(InputManager.MousePosition - center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 300, 600, 0f, 5f, true, 0, 0);
-                    ProjectileManager.AddProjectile(fireball);
+                    cost = 4;
+
+                    spellTraits.Add(1);
+                    spellTraits.Add(15);
+
+                    icon = Globals.Content.Load<Texture2D>("fireballicon");
+                    description = "WILLS FORTH A DESTRUCTIVE FORCE OF EXPLOSIVE ARCANE FIRE";
+                    name = "FIREBALL";
                     return;
                 case 3: //kindle
+                    cost = 1;
+
+                    spellTraits.Add(1);
+                    spellTraits.Add(25);
+
+                    icon = Globals.Content.Load<Texture2D>("kindleicon");
+                    description = "SUMMONS A SMALL KINDLING OF FLAME";
+                    name = "KINDLE";
+                    return;
+                case 4: //blade of flame
+                    cost = 3;
+
+                    spellTraits.Add(1);
+                    spellTraits.Add(21);
+
+                    icon = Globals.Content.Load<Texture2D>("bladeofflameicon");
+                    description = "SUMMONS A LARGE BLADE OF ARCANE FIRE";
+                    name = "BLADE OF FLAME";
+                    return;
+                case 5: //disintigrate
+                    cost = 5;
+
+                    spellTraits.Add(1);
+                    spellTraits.Add(20);
+                    spellTraits.Add(25);
+
+                    icon = Globals.Content.Load<Texture2D>("disintegrateicon");
+                    description = "CALL UPON THE SUN TO SUMMON A PILLAR OF PURE ELEMENTAL FIRE";
+                    name = "DISINTEGRATE";
+                    return;
+            }
+        }
+        public void Cast(float spread, Player player)
+        {
+            switch (spellType)
+            {
+                case 0:
+                    return;
+                case 1: // firebolt
+                    Projectile firebolt = new(player.center, 1, speed, damage, 0, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
+                    ProjectileManager.AddProjectile(firebolt);
+                    return;
+                case 2: // fireball
+                    Projectile fireball = new(player.center, 2, speed, damage, 0, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
+                    ProjectileManager.AddProjectile(fireball);
+                    return;
+                case 3: // kindle
                     for (int i = 0; i < 5; i++)
                     {
                         ParticleData kindleParticleData = new()
@@ -84,25 +140,148 @@ namespace HYPERMAGE.Spells
                         ParticleManager.AddParticle(kindleParticle);
                     }
 
-                    Projectile kindle = new(Globals.Content.Load<Texture2D>("particle"), InputManager.MousePosition, 3, 1f, 3f, Vector2.Zero, 90, 0f, 1f, true, 0, 0);
+                    Projectile kindle = new(InputManager.MousePosition, 3, speed, damage, -1, lifespan, 1, size);
                     ProjectileManager.AddProjectile(kindle);
                     return;
 
-                case 4: //bladeofflame
-
-                    if (secondary)
-                    {
-                        Projectile bladeofflame = new(Globals.Content.Load<Texture2D>("bladeofflame"), player.center, 4, 1f, 7f, Vector2.Zero, 15, 0f, 1f, true, 0, 1);
-                        ProjectileManager.AddProjectile(bladeofflame);
-                    }
-
-                    else
-                    {
-                        Projectile bladeofflame = new(Globals.Content.Load<Texture2D>("bladeofflame"), player.center, 4, 1f, 7f, Vector2.Zero, 15, 0f, 1f, true, 0, 0);
-                        ProjectileManager.AddProjectile(bladeofflame);
-                    }
+                case 4: // bladeofflame
+                    Projectile bladeofflame = new(player.center, 4, speed, damage, -1, size);
+                    ProjectileManager.AddProjectile(bladeofflame);
                     return;
+
+                case 5: // disintegrate
+                    Projectile disintegrate = new(new Vector2(InputManager.MousePosition.X, -10), 5, speed, damage, -1, lifespan, 10, size);
+                    ProjectileManager.AddProjectile(disintegrate);
+                    return;
+
             }
+        }
+
+        public void UpdateRankStats()
+        {
+            switch (spellType)
+            {
+                case 1: // firebolt
+                    switch (rank)
+                    {
+                        case 1:
+                            cooldown = 0.9f;
+                            damage = 1f;
+                            break;
+                        case 2:
+                            cooldown = 0.65f;
+                            damage = 2f;
+                            speed = 1.5f;
+                            break;
+                        case 3:
+                            cooldown = 0.4f;
+                            damage = 4f;
+                            speed = 2.5f;
+                            break;
+                    }
+                    break;
+                case 2: // fireball
+                    switch (rank)
+                    {
+                        case 1:
+                            cooldown = 1.25f;
+                            damage = 5f;
+                            speed = 0.75f;
+                            size = 4f;
+                            break;
+                        case 2:
+                            cooldown = 1f;
+                            damage = 8f;
+                            speed = 0.65f;
+                            size = 6f;
+                            break;
+                        case 3:
+                            cooldown = 0.75f;
+                            damage = 15f;
+                            speed = 0.4f;
+                            size = 8f;
+                            break;
+                    }
+                    break;
+                case 3: // kindle
+                    switch (rank)
+                    {
+                        case 1:
+                            cooldown = 1.25f;
+                            damage = 0.25f;
+                            speed = 0.75f;
+                            lifespan = 2f;
+                            break;
+                        case 2:
+                            cooldown = 1f;
+                            damage = 0.5f;
+                            speed = 1f;
+                            size = 1.5f;
+                            lifespan = 3f;
+                            break;
+                        case 3:
+                            cooldown = 0.75f;
+                            damage = 0.75f;
+                            speed = 1.5f;
+                            size = 2f;
+                            lifespan = 5f;
+                            break;
+                    }
+                    break;
+                case 4: // blade of flame
+                    switch (rank)
+                    {
+                        case 1:
+                            cooldown = 0.75f;
+                            damage = 5f;
+                            speed = 0.75f;
+                            lifespan = 1f;
+                            break;
+                        case 2:
+                            cooldown = 0.45f;
+                            damage = 8f;
+                            speed = 1f;
+                            size = 1.25f;
+                            lifespan = 0.75f;
+                            break;
+                        case 3:
+                            cooldown = 0.2f;
+                            damage = 15f;
+                            speed = 1.5f;
+                            size = 1.5f;
+                            lifespan = 0.5f;
+                            break;
+                    }
+                    break;
+                case 5: // disintegrate
+                    switch (rank)
+                    {
+                        case 1:
+                            cooldown = 1.5f;
+                            damage = 20f;
+                            lifespan = 0.5f;
+                            break;
+                        case 2:
+                            cooldown = 0.8f;
+                            damage = 30f;
+                            size = 1.5f;
+                            lifespan = 0.25f;
+                            break;
+                        case 3:
+                            cooldown = 0.2f;
+                            damage = 60f;
+                            size = 3f;
+                            lifespan = 0.1f;
+                            break;
+                    }
+                    break;
+
+            }
+        }
+        public void RankUp()
+        {
+            rank++;
+            UpdateRankStats();
         }
     }
 }

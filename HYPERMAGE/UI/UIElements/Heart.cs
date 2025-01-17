@@ -16,14 +16,14 @@ namespace HYPERMAGE.UI.UIElements
 
         }
 
-        public override void Draw(Player player, SpriteFont spriteFont)
+        public override void Draw()
         {
-            for (int i = 0; i < player.health; i++)
+            for (int i = 0; i < GameManager.GetPlayer().health; i++)
             {
-                Globals.SpriteBatch.Draw(_texture, new Vector2(position.X + 7 * i, position.Y), Color.White);
+                Globals.SpriteBatch.Draw(texture, new Vector2(position.X + 7 * i, position.Y), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
             }
 
-            Globals.SpriteBatch.DrawString(spriteFont, $"{player.lives} x", new(122, 13), Color.White);
+            Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), $"{GameManager.GetPlayer().lives} x", new(position.X - 10, position.Y - 2), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
         }
     }
 }

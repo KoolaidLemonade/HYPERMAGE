@@ -1,44 +1,36 @@
 ﻿using HYPERMAGE.Models;
 using HYPERMAGE.Particles;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HYPERMAGE.Managers;
 
 public static class ProjectileManager
 {
     public static readonly List<Projectile> projectiles = [];
-
     public static void AddProjectile(Projectile projectile)
     {
         projectiles.Add(projectile);
     }
 
-    public static void UpdateProjectiles(Player player)
+    public static void UpdateProjectiles()
     {
-        for (int i = 0; i < projectiles.Count; i++)
+        foreach (var projectile in projectiles.ToList())
         {
-            if (i > 100)
-            {
-                projectiles.Remove(projectiles[i]);
-            }
-        }
-
-        foreach (var projectile in projectiles)
-        {
-            projectile.Update(player);
+            projectile.Update();
         }
 
         projectiles.RemoveAll(projectile => !projectile.active);
     }
 
-    public static void Update(Player player)
+    public static void Update()
     {
-        UpdateProjectiles(player);
+        UpdateProjectiles();
     }
 
     public static void Draw()
     {
-        foreach (var projectile in projectiles)
+        foreach (var projectile in projectiles.ToList())
         {
             projectile.Draw();
         }

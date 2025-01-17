@@ -1,46 +1,62 @@
 ﻿using HYPERMAGE.Particles;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HYPERMAGE;
-
-//from https://github.com/LubiiiCZ/DevQuickie/tree/master/Quickie003-ParticleSystem
 public static class ParticleManager
 {
-    private static readonly List<Particle> _particles = [];
+    private static readonly List<Particle> particles = [];
+    private static readonly List<TextPopup> textPopups = [];
 
-    public static void AddParticle(Particle p)
+    public static void Clear()
     {
-        _particles.Add(p);
+        particles.Clear();
+        textPopups.Clear();
     }
-
+    public static void AddParticle(Particle particle)
+    {
+        particles.Add(particle);
+    }
+    public static void AddTextPopup(TextPopup textPopup)
+    {
+        textPopups.Add(textPopup);
+    }
     public static void UpdateParticles()
     {
-        for (int i = 0; i < _particles.Count; i++)
-        {
-            if (i > 100)
-            {
-                _particles.Remove(_particles[i]);
-            }
-        }
-
-        foreach (var particle in _particles)
+        foreach (var particle in particles.ToList())
         {
             particle.Update();
         }
 
-        _particles.RemoveAll(p => p.isFinished);
+        particles.RemoveAll(p => p.isFinished);
+    }
+
+    public static void UpdateTextPopups()
+    {
+        foreach (var textPopup in textPopups.ToList())
+        {
+            textPopup.Update();
+        }
+
+        textPopups.RemoveAll(p => p.isFinished);
     }
 
     public static void Update()
     {
         UpdateParticles();
+        UpdateTextPopups();
     }
 
     public static void Draw()
     {
-        foreach (var particle in _particles)
+        foreach (var particle in particles.ToList())
         {
             particle.Draw();
+        }
+
+        foreach (var textPopup in textPopups.ToList())
+        {
+            textPopup.Draw();
         }
     }
 }

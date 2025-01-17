@@ -9,33 +9,33 @@ namespace HYPERMAGE.Managers
 {
     public class AnimationManager
     {
-        private readonly Dictionary<object, Animation> _anims = [];
-        private object _lastKey;
+        private readonly Dictionary<object, Animation> anims = [];
+        private object lastKey;
 
         public void AddAnimation(object key, Animation animation)
         {
-            _anims.Add(key, animation);
-            _lastKey ??= key;
+            anims.Add(key, animation);
+            lastKey ??= key;
         }
 
         public void Update(object key)
         {
-            if (_anims.TryGetValue(key, out Animation value))
+            if (anims.TryGetValue(key, out Animation value))
             {
                 value.Start();
-                _anims[key].Update();
-                _lastKey = key;
+                anims[key].Update();
+                lastKey = key;
             }
             else
             {
-                _anims[_lastKey].Stop();
-                _anims[_lastKey].Reset();
+                anims[lastKey].Stop();
+                anims[lastKey].Reset();
             }
         }
 
         public void Draw(Vector2 position)
         {
-            _anims[_lastKey].Draw(position);
+            anims[lastKey].Draw(position);
         }
     }
 }

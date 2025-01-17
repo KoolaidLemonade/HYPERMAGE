@@ -8,19 +8,19 @@ namespace HYPERMAGE.Particles
     // from https://github.com/LubiiiCZ/DevQuickie/tree/master/Quickie003-ParticleSystem
     public class Particle
     {
-        private readonly ParticleData _data;
-        private Vector2 _position;
-        private Vector2 _velocity;
-        private float _lifespanLeft;
-        private float _lifespanAmount;
-        private Color _color;
-        private float _opacity;
+        private readonly ParticleData data;
+        private Vector2 position;
+        private Vector2 velocity;
+        private float lifespanLeft;
+        private float lifespanAmount;
+        private Color color;
+        private float opacity;
         public bool isFinished = false;
-        private float _scale;
-        private Vector2 _origin;
-        private float _resistance;
-        private float _rotation;
-        private float _rotationSpeed;
+        private float scale;
+        private Vector2 origin;
+        private float resistance;
+        private float rotation;
+        private float rotationSpeed;
 
         private Rectangle hitbox;
         private int width;
@@ -28,47 +28,46 @@ namespace HYPERMAGE.Particles
 
         public Particle(Vector2 pos, ParticleData data)
         {
-            _data = data;
-            _lifespanLeft = data.lifespan;
-            _lifespanAmount = 1f;
-            _position = pos;
-            _color = data.colorStart;
-            _opacity = data.opacityStart;
-            _origin = new(_data.texture.Width / 2, _data.texture.Height / 2);
-            _resistance = data.resistance;
-            _velocity = data.velocity;
-            _rotation = data.rotation;
-            _rotationSpeed = data.rotationSpeed;
+            this.data = data;
+            lifespanLeft = data.lifespan;
+            lifespanAmount = 1f;
+            position = pos;
+            color = data.colorStart;
+            opacity = data.opacityStart;
+            origin = new(data.texture.Width / 2, data.texture.Height / 2);
+            resistance = data.resistance;
+            velocity = data.velocity;
+            rotation = data.rotation;
+            rotationSpeed = data.rotationSpeed;
 
             width = data.texture.Width;
             height = data.texture.Height;
-
         }
         public void Update()
         {
-            hitbox = new Rectangle((int)_position.X, (int)_position.Y, width, height);
+            hitbox = new Rectangle((int)position.X, (int)position.Y, width, height);
 
-            _lifespanLeft -= Globals.TotalSeconds;
-            if (_lifespanLeft <= 0f)
+            lifespanLeft -= Globals.TotalSeconds;
+            if (lifespanLeft <= 0f)
             {
                 isFinished = true;
                 return;
             }
 
-            _lifespanAmount = MathHelper.Clamp(_lifespanLeft / _data.lifespan, 0, 1);
-            _color = Color.Lerp(_data.colorEnd, _data.colorStart, _lifespanAmount);
-            _opacity = MathHelper.Clamp(MathHelper.Lerp(_data.opacityEnd, _data.opacityStart, _lifespanAmount), 0, 1);
-            _scale = MathHelper.Lerp(_data.sizeEnd, _data.sizeStart, _lifespanAmount) / _data.texture.Width;
-            _position += _velocity * Globals.TotalSeconds;
+            lifespanAmount = MathHelper.Clamp(lifespanLeft / data.lifespan, 0, 1);
+            color = Color.Lerp(data.colorEnd, data.colorStart, lifespanAmount);
+            opacity = MathHelper.Clamp(MathHelper.Lerp(data.opacityEnd, data.opacityStart, lifespanAmount), 0, 1);
+            scale = MathHelper.Lerp(data.sizeEnd, data.sizeStart, lifespanAmount) / data.texture.Width;
+            position += velocity * Globals.TotalSeconds;
 
-            _velocity /= _resistance;
+            velocity /= resistance;
 
-            _rotation += _rotationSpeed;
+            rotation += rotationSpeed;
         }
 
         public void Draw()
         {
-            Globals.SpriteBatch.Draw(_data.texture, _position, null, _color * _opacity, _rotation, _origin, _scale, SpriteEffects.None, 1f);
+            Globals.SpriteBatch.Draw(data.texture, position, null, color * opacity, rotation, origin, scale, SpriteEffects.None, 0.7f);
         }
     }
 }
