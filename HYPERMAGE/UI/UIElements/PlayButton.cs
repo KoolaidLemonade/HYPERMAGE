@@ -13,34 +13,9 @@ namespace HYPERMAGE.UI.UIElements
     public class PlayButton : Button
     {
         private bool transition = false;
-        private int transitionTimer;
         public PlayButton(Vector2 position, SpriteFont font, String text, Color color) : base(position, font, text, color)
         {
 
-        }
-
-        public override void Update()
-        {
-            if (transition)
-            {
-                transitionTimer++;
-            }
-
-            if (transitionTimer >= 180)
-            {
-
-                UIManager.Clear();
-                ParticleManager.Clear();
-
-                GameManager.wavesPower = 0.0f;
-                GameManager.waves = false;
-                GameManager.fadeout = false;
-
-                SceneManager.RemoveScene();
-                SceneManager.AddScene(new IntroCutscene());
-            }
-
-            base.Update();
         }
         public override void Clicked()
         {
@@ -50,7 +25,7 @@ namespace HYPERMAGE.UI.UIElements
                 SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("select"), 0.5f, 0f, 0f);
 
                 transition = true;
-                GameManager.fadeout = true;
+                GameManager.TransitionScene(new IntroCutscene());
             }
 
             base.Clicked();

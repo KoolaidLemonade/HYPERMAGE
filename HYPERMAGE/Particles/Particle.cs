@@ -9,6 +9,7 @@ namespace HYPERMAGE.Particles
     public class Particle
     {
         private readonly ParticleData data;
+        private Texture2D texture;
         private Vector2 position;
         private Vector2 velocity;
         private float lifespanLeft;
@@ -22,7 +23,9 @@ namespace HYPERMAGE.Particles
         private float rotation;
         private float rotationSpeed;
 
-        private Rectangle hitbox;
+        private bool flashing;
+        private float flashingTimer;
+
         private int width;
         private int height;
 
@@ -39,14 +42,14 @@ namespace HYPERMAGE.Particles
             velocity = data.velocity;
             rotation = data.rotation;
             rotationSpeed = data.rotationSpeed;
-
+            texture = data.texture;
+            flashing = data.flashing;
+            
             width = data.texture.Width;
             height = data.texture.Height;
         }
         public void Update()
         {
-            hitbox = new Rectangle((int)position.X, (int)position.Y, width, height);
-
             lifespanLeft -= Globals.TotalSeconds;
             if (lifespanLeft <= 0f)
             {
@@ -57,12 +60,27 @@ namespace HYPERMAGE.Particles
             lifespanAmount = MathHelper.Clamp(lifespanLeft / data.lifespan, 0, 1);
             color = Color.Lerp(data.colorEnd, data.colorStart, lifespanAmount);
             opacity = MathHelper.Clamp(MathHelper.Lerp(data.opacityEnd, data.opacityStart, lifespanAmount), 0, 1);
-            scale = MathHelper.Lerp(data.sizeEnd, data.sizeStart, lifespanAmount) / data.texture.Width;
+            scale = MathHelper.Lerp(data.sizeEnd, data.sizeStart, lifespanAmount);
             position += velocity * Globals.TotalSeconds;
 
             velocity /= resistance;
 
             rotation += rotationSpeed;
+
+            if (flashing)
+            {
+                flashingTimer += Globals.TotalSeconds;
+                
+                if (flashingTimer > 0.1f)
+                {
+                    color = Color.White;
+                }
+
+                if (flashingTimer > 0.2f)
+                {
+                    flashingTimer = 0;
+                }
+            }
         }
 
         public void Draw()

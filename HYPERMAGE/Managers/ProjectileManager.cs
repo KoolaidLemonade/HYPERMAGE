@@ -35,4 +35,9 @@ public static class ProjectileManager
             projectile.Draw();
         }
     }
+
+    public static void Clear()
+    {
+        projectiles.Clear();
+    }
 }

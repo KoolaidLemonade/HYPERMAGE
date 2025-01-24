@@ -1,5 +1,6 @@
 ﻿using HYPERMAGE.Helpers;
 using HYPERMAGE.Managers;
+using HYPERMAGE.Particles;
 using HYPERMAGE.Spells;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,12 @@ namespace HYPERMAGE.Models
         public float rotation = 0;
         public float scale = 1f;
 
+        public float knockbackResist;
+        public int spawnCost;
+
+        public bool spawning;
+        public float spawnTimer;
+
         private List <Projectile> projectileImmunity = [];
         public Mob(Vector2 position, int aiType)
         {
@@ -48,6 +55,16 @@ namespace HYPERMAGE.Models
                     anim = new Animation(Globals.Content.Load<Texture2D>("bat"), 2, 1, 0.2f);
                     speed = 1f;
                     health = 2f;
+                    knockbackResist = 0.6f;
+                    spawnCost = 1;
+                    break;
+                case 2: //wisp
+                    texture = Globals.Content.Load<Texture2D>("particle");
+                    speed = 1f;
+                    scale = 2f;
+                    health = 3f;
+                    knockbackResist = 0.6f;
+                    spawnCost = 5;
                     break;
             }
 
@@ -63,32 +80,71 @@ namespace HYPERMAGE.Models
                 height = texture.Height;
             }
 
-            origin = new Vector2(width / 2, height / 2);
+            origin = new Vector2(width / scale / 2, height / scale / 2) ;
+
+            center = position + origin;
 
             active = true;
         }
         public void Draw()
         {
+            if (spawning)
+            {
+                return;
+            }
+
             if (anim != null)
             {
-                anim.Draw(position);
+                anim.Draw(new((int)position.X, (int)position.Y));
             }
 
             else
             {
-                Globals.SpriteBatch.Draw(texture, position, null, Color.White, rotation, origin, scale, SpriteEffects.None, 1f);
+                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, 1f);
             }
         }
 
-        private int timer = 0;
+        private float timer = 0;
+
         private bool charging = false;
         public void Update()
         {
+            if (spawning)
+            {
+                spawnTimer += Globals.TotalSeconds;
+
+                if (spawnTimer > 2f)
+                {
+                    spawning = false;
+
+                    for (int i = 0; i < Globals.Random.Next(5) + 5; i++)
+                    {
+                        ParticleData particleData = new()
+                        {
+                            lifespan = Globals.RandomFloat(0.1f, 0.3f),
+                            sizeStart = 1f,
+                            opacityEnd = 0f,
+                            rotationSpeed = 0.15f,
+                            velocity = new(Globals.RandomFloat(-100f, 100f), Globals.RandomFloat(-100f, 100f)),
+                            resistance = Globals.RandomFloat(1, 1.25f)
+                        };
+
+                        Particle spawnParticle = new(center, particleData);
+                        ParticleManager.AddParticle(spawnParticle);
+                    }
+                }    
+
+                return;
+            }
+
+            if (anim != null)
+            {
+                anim.Update();
+            }
+
             center = position + origin;
 
-            hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, width, height);
-
-            timer++;
+            hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, width, height);
 
             if (projectileImmunity != null)
             {
@@ -115,6 +171,7 @@ namespace HYPERMAGE.Models
                 {
                     projectileImmunity.Add(p);
 
+                    HitByProj(p);
                     p.HitEnemy();
 
                     if (p.pierce == 0)
@@ -131,6 +188,10 @@ namespace HYPERMAGE.Models
                 }
             }
 
+            position += velocity * speed * Globals.TotalSeconds * 30;
+
+            timer += Globals.TotalSeconds;
+
             switch (aiType)
             {
                 case 0:
@@ -139,7 +200,7 @@ namespace HYPERMAGE.Models
 
                     if (Math.Abs(GameManager.GetPlayer().center.X - center.X) < 20 && Math.Abs(GameManager.GetPlayer().center.Y - center.Y) < 20)
                     {
-                        if (!charging && timer > 200)
+                        if (!charging && timer > 3)
                         {
                             charging = true;
                             timer = 0;
@@ -150,7 +211,7 @@ namespace HYPERMAGE.Models
                     {
                         velocity += Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 6;
 
-                        if(timer > 15)
+                        if(timer > 0.15)
                         {
                             charging = false;
                             timer = 0;
@@ -163,10 +224,16 @@ namespace HYPERMAGE.Models
 
                     velocity /= 1.05f;
 
-                    position += velocity;
+                    return;
+                case 2: //wisp
+                    if (timer > 2)
+                    {
+                        Projectile projectile = new(center, -1, 1f, Vector2.Normalize(GameManager.GetPlayer().center - center) * 50f, 10f, center.DirectionTo(GameManager.GetPlayer().center).ToRotation() + MathHelper.ToRadians(90f));
+                        ProjectileManager.AddProjectile(projectile);
 
-                    anim.Update();
-
+                        timer = 0;
+                    }
+                    
                     return;
 
             }
@@ -188,6 +255,24 @@ namespace HYPERMAGE.Models
             }
 
             return true;
+        }
+
+        public void HitByProj(Projectile p)
+        {
+            velocity += Vector2.Normalize(p.velocity) * p.knockback / knockbackResist;
+
+            switch (aiType)
+            {
+                case 1: //bat
+
+                    break;
+            }
+        }
+
+        public void Spawn()
+        {
+            MobManager.AddMob(this);
+            spawning = true;
         }
     }
 }

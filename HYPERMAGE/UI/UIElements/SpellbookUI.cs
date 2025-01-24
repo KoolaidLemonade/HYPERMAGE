@@ -30,25 +30,50 @@ namespace HYPERMAGE.UI.UIElements
         public static List<SpellbookSpellBorder> spellsPrimaryBorders = [];
         public static List<SpellbookSpellBorder> spellsSecondaryBorders = [];
         public static List<SpellbookSpellBorder> spellsMemoryBorders = [];
+
+        public static bool init = false;
         public SpellbookUI(Vector2 position, Texture2D texture) : base(texture, position)
         {
             originalPosition = position;
 
-
-            for (int i = 0; i < Spellbook.spellsPrimary.Count; i++)
+            if (!init)
             {
-                spellsPrimary.Add(new SpellbookSpell(i, 1, Spellbook.spellsPrimary[i], Spellbook.spellsPrimary[i].icon, new Vector2(-100, -100)));
+                for (int i = 0; i < Spellbook.spellsPrimary.Count; i++)
+                {
+                    spellsPrimary.Add(new SpellbookSpell(i, 1, Spellbook.spellsPrimary[i], Spellbook.spellsPrimary[i].icon, new Vector2(-100, -100)));
+                }
+
+                for (int i = 0; i < Spellbook.spellsSecondary.Count; i++)
+                {
+                    spellsSecondary.Add(new SpellbookSpell(i, 2, Spellbook.spellsSecondary[i], Spellbook.spellsSecondary[i].icon, new Vector2(-100, -100)));
+                }
+
+                for (int i = 0; i < Spellbook.spellMemory.Count; i++)
+                {
+                    spellsMemory.Add(new SpellbookSpell(i, 3, Spellbook.spellMemory[i], Spellbook.spellMemory[i].icon, new Vector2(-100, -100)));
+                }
+
+                //
+
+                for (int i = 0; i < Spellbook.spellCountPrimary; i++)
+                {
+                    spellsPrimaryBorders.Add(new SpellbookSpellBorder(i, 1, Globals.Content.Load<Texture2D>("ui2"), new Vector2(-100, -100)));
+                }
+
+                for (int i = 0; i < Spellbook.spellCountSecondary; i++)
+                {
+                    spellsSecondaryBorders.Add(new SpellbookSpellBorder(i, 2, Globals.Content.Load<Texture2D>("ui2"), new Vector2(-100, -100)));
+                }
+
+                for (int i = 0; i < Spellbook.spellMemoryMax; i++)
+                {
+                    spellsMemoryBorders.Add(new SpellbookSpellBorder(i, 3, Globals.Content.Load<Texture2D>("ui2"), new Vector2(-100, -100)));
+                }
+
+                init = true;
             }
 
-            for (int i = 0; i < Spellbook.spellsSecondary.Count; i++)
-            {
-                spellsSecondary.Add(new SpellbookSpell(i, 2, Spellbook.spellsSecondary[i], Spellbook.spellsSecondary[i].icon, new Vector2(-100, -100)));
-            }
 
-            for (int i = 0; i < Spellbook.spellMemory.Count; i++)
-            {
-                spellsMemory.Add(new SpellbookSpell(i, 3, Spellbook.spellMemory[i], Spellbook.spellMemory[i].icon, new Vector2(-100, -100)));
-            }
 
             for (int i = 0; i < spellsMemory.Count; i++)
             {
@@ -67,21 +92,6 @@ namespace HYPERMAGE.UI.UIElements
 
             //
 
-            for (int i = 0; i < Spellbook.spellCountPrimary; i++)
-            {
-                spellsPrimaryBorders.Add(new SpellbookSpellBorder(i, 1, Globals.Content.Load<Texture2D>("ui2"), new Vector2(-100, -100)));
-            }
-
-            for (int i = 0; i < Spellbook.spellCountSecondary; i++)
-            {
-                spellsSecondaryBorders.Add(new SpellbookSpellBorder(i, 2, Globals.Content.Load<Texture2D>("ui2"), new Vector2(-100, -100)));
-            }
-
-            for (int i = 0; i < Spellbook.spellMemoryMax; i++)
-            {
-                spellsMemoryBorders.Add(new SpellbookSpellBorder(i, 3, Globals.Content.Load<Texture2D>("ui2"), new Vector2(-100, -100)));
-            }
-
             for (int i = 0; i < spellsMemoryBorders.Count; i++)
             {
                 UIManager.AddElement(spellsMemoryBorders[i]);
@@ -97,7 +107,6 @@ namespace HYPERMAGE.UI.UIElements
                 UIManager.AddElement(spellsSecondaryBorders[i]);
             }
         }
-
         public override void Update()
         {
             UpdateButtonHitbox();
@@ -417,6 +426,7 @@ namespace HYPERMAGE.UI.UIElements
 
             if (grabbed && InputManager.LeftMouseDown)
             {
+                Debug.WriteLine(grabOffset);
                 position = new Vector2((int)InputManager.MousePosition.X, (int)InputManager.MousePosition.Y) - new Vector2((int)grabOffset.X, (int)grabOffset.Y);
             }
 

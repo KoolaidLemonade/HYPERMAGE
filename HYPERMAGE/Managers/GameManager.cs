@@ -23,6 +23,10 @@ namespace HYPERMAGE.Managers
         public static float screenShakeTime;
         public static float screenShakePower;
 
+        private static float transitionTimer;
+        private static IScene nextScene;
+        private static bool transition;
+
         public static bool exit;
         public static void Init()
         {
@@ -36,6 +40,28 @@ namespace HYPERMAGE.Managers
         public static void Update()
         {
             SceneManager.GetScene().Update();
+
+            if (transition)
+            {
+                transitionTimer++;
+            }
+
+            if (transitionTimer >= 180)
+            {
+
+                UIManager.Clear();
+                ParticleManager.Clear();
+
+                GameManager.wavesPower = 0.0f;
+                GameManager.waves = false;
+                GameManager.fadeout = false;
+
+                SceneManager.RemoveScene();
+                SceneManager.AddScene(nextScene);
+
+                transition = false;
+                transitionTimer = 0;   
+            }
         }
 
         public static void Draw()
@@ -52,6 +78,13 @@ namespace HYPERMAGE.Managers
         {
             screenShakeTime = time;
             screenShakePower = power;
+        }
+
+        public static void TransitionScene(IScene scene)
+        {
+            fadeout = true;
+            nextScene = scene;
+            transition = true;
         }
     }
 }

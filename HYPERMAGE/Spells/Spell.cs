@@ -31,6 +31,7 @@ namespace HYPERMAGE.Spells
         public float speed = 1f;
         public float size = 1f;
         public float lifespan = 10f;
+        public float knockback = 0f;
 
         public string description;
         public string name;
@@ -113,11 +114,11 @@ namespace HYPERMAGE.Spells
                 case 0:
                     return;
                 case 1: // firebolt
-                    Projectile firebolt = new(player.center, 1, speed, damage, 0, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
+                    Projectile firebolt = new(player.center, 1, speed, damage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
                     ProjectileManager.AddProjectile(firebolt);
                     return;
                 case 2: // fireball
-                    Projectile fireball = new(player.center, 2, speed, damage, 0, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
+                    Projectile fireball = new(player.center, 2, speed, damage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
                     ProjectileManager.AddProjectile(fireball);
                     return;
                 case 3: // kindle
@@ -140,17 +141,17 @@ namespace HYPERMAGE.Spells
                         ParticleManager.AddParticle(kindleParticle);
                     }
 
-                    Projectile kindle = new(InputManager.MousePosition, 3, speed, damage, -1, lifespan, 1, size);
+                    Projectile kindle = new(InputManager.MousePosition, 3, speed, damage, -1, knockback, lifespan, 1, size);
                     ProjectileManager.AddProjectile(kindle);
                     return;
 
                 case 4: // bladeofflame
-                    Projectile bladeofflame = new(player.center, 4, speed, damage, -1, size);
+                    Projectile bladeofflame = new(player.center, 4, speed, damage, -1, knockback, size);
                     ProjectileManager.AddProjectile(bladeofflame);
                     return;
 
                 case 5: // disintegrate
-                    Projectile disintegrate = new(new Vector2(InputManager.MousePosition.X, -10), 5, speed, damage, -1, lifespan, 10, size);
+                    Projectile disintegrate = new(new Vector2(InputManager.MousePosition.X, -10), 5, speed, damage, -1, knockback, lifespan, 10, size);
                     ProjectileManager.AddProjectile(disintegrate);
                     return;
 
@@ -167,16 +168,22 @@ namespace HYPERMAGE.Spells
                         case 1:
                             cooldown = 0.9f;
                             damage = 1f;
+                            knockback = 1f;
+                            size = 2f;
                             break;
                         case 2:
                             cooldown = 0.65f;
                             damage = 2f;
                             speed = 1.5f;
+                            knockback = 1.25f;
+                            size = 3f;
                             break;
                         case 3:
                             cooldown = 0.4f;
                             damage = 4f;
                             speed = 2.5f;
+                            knockback = 1.5f;
+                            size = 4f;
                             break;
                     }
                     break;
@@ -187,19 +194,22 @@ namespace HYPERMAGE.Spells
                             cooldown = 1.25f;
                             damage = 5f;
                             speed = 0.75f;
-                            size = 4f;
+                            size = 6f;
+                            knockback = 2f;
                             break;
                         case 2:
                             cooldown = 1f;
                             damage = 8f;
                             speed = 0.65f;
-                            size = 6f;
+                            size = 8f;
+                            knockback = 3f;
                             break;
                         case 3:
                             cooldown = 0.75f;
                             damage = 15f;
                             speed = 0.4f;
-                            size = 8f;
+                            size = 10f;
+                            knockback = 4f;
                             break;
                     }
                     break;
@@ -236,6 +246,7 @@ namespace HYPERMAGE.Spells
                             damage = 5f;
                             speed = 0.75f;
                             lifespan = 1f;
+                            knockback = 1f;
                             break;
                         case 2:
                             cooldown = 0.45f;
@@ -243,6 +254,7 @@ namespace HYPERMAGE.Spells
                             speed = 1f;
                             size = 1.25f;
                             lifespan = 0.75f;
+                            knockback = 1.25f;
                             break;
                         case 3:
                             cooldown = 0.2f;
@@ -250,6 +262,7 @@ namespace HYPERMAGE.Spells
                             speed = 1.5f;
                             size = 1.5f;
                             lifespan = 0.5f;
+                            knockback = 1.5f;
                             break;
                     }
                     break;

@@ -26,7 +26,6 @@ public static class MobManager
 
         mobs.RemoveAll(mob => !mob.active);
     }
-
     public static void Update()
     {
         UpdateMobs();
@@ -38,5 +37,10 @@ public static class MobManager
         {
             mob.Draw();
         }
+    }
+
+    public static void Clear()
+    {
+        mobs.Clear  ();
     }
 }

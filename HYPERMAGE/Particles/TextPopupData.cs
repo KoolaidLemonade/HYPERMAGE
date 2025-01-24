@@ -9,9 +9,9 @@ namespace HYPERMAGE.Particles
         public Color colorStart = Color.White;
         public Color colorEnd = Color.White;
         public float opacityStart = 1f;
-        public float opacityEnd = 0f;
-        public float sizeStart = 5f;
-        public float sizeEnd = 2f;
+        public float opacityEnd = 1f;
+        public float sizeStart = 1f;
+        public float sizeEnd = 1f;
         public Vector2 velocity = Vector2.Zero;
         public float resistance = 1.15f;
         public float rotation = 0f;

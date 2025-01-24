@@ -66,6 +66,9 @@ namespace HYPERMAGE
             GameManager.GetPlayer().position = new(160, 90);
 
             GameManager.bounds = new(0, 0, 320, 180);
+
+            LevelManager.NextLevel();
+            LevelManager.GetNextSpawnWave();
         }
         public void Update()
         {
@@ -320,11 +323,6 @@ namespace HYPERMAGE
         private static RerollButton rerollButton;
         private static LockButton lockButton;
         private static SpellbookUI spellbook;
-
-        private static float transitionTimer;
-        private static bool transition;
-
-        private int dialogueCooldown = 0;
         public Shop()
         {
         }
@@ -363,56 +361,12 @@ namespace HYPERMAGE
             {
                 ShopManager.Reroll();
             }
-
-            Spellbook.AddSpellPrimary(new Spell(5, 1));
         }
         public void Update()
         {
-            dialogueCooldown++;
-
             if (GameManager.GetPlayer().position.Y > 180 + 10 || GameManager.GetPlayer().position.Y < 0 - 10 || GameManager.GetPlayer().position.X > 320 + 10 || GameManager.GetPlayer().position.X < 0 - 10)
             {
-                GameManager.fadeout = true;
-                transition = true;
-            }
-
-            if (transition)
-            {
-                transitionTimer++;
-            }
-
-            if (transitionTimer >= 180)
-            {
-
-                UIManager.Clear();
-                ParticleManager.Clear();
-
-                GameManager.wavesPower = 0.0f;
-                GameManager.waves = false;
-                GameManager.fadeout = false;
-
-                SceneManager.RemoveScene();
-                SceneManager.AddScene(new GameScene());
-            }
-
-            if (Globals.Random.Next(300) == 0 && dialogueCooldown >= 300)
-            {
-                TextPopupData TextPopupData = new()
-                {
-                    text = GetRandomDialogue(),
-                    sizeStart = 1.2f,
-                    sizeEnd = 1.5f,
-                    velocity = Vector2.Zero,
-                    rotationSpeed = Globals.RandomFloat(-0.005f, 0.005f),
-                    lifespan = 3f,
-                    colorStart = Color.Gray,
-                    colorEnd = Color.Purple
-                };
-
-                TextPopup textPopup = new(new(160 + Globals.RandomFloat(-30, 30), 40 + Globals.RandomFloat(-30, 30)), TextPopupData);
-                ParticleManager.AddTextPopup(textPopup);
-
-                dialogueCooldown = 0;
+                GameManager.TransitionScene(new GameScene());
             }
 
             if (SpellbookUI.open || SpellbookUI.closing)
@@ -456,63 +410,6 @@ namespace HYPERMAGE
             ProjectileManager.Draw();
 
             UIManager.Draw();
-        }
-
-        private string GetRandomDialogue()
-        {
-            switch (Globals.Random.Next(13 + 1))
-            {
-                case 0:
-                    return "I CAN MAKE YOU \n STRONGER...";
-                case 1:
-                    return "I CAN GRANT YOU \n STRENGTH...";
-                case 2:
-                    return "ALLOW ME TO TEACH \n YOU...";            
-                case 3:
-                    return "I CAN TRAIN YOUR  \n MIND...";
-                case 4:
-                    return "YOU DONT KNOW...";
-                case 5:
-                    return "THE ARCANE SPEAKS...";
-                case 6:
-                    return "CAN YOU HEAR IT... ?";
-                case 7:
-                    return "THE PAIN...";
-                case 8:
-                    return "IT HURTS...";
-                case 9:
-                    return "ALLOW THESE SECRETS TO \n ENTER YOUR MIND...";
-                case 10:
-                    return "THERE IS NO CURE";
-                case 11:
-                    return "THERE IS NO SURFACE";
-                case 12:
-                    return "PLEASE...";
-                case 13:
-                    return "HOW LONG... ?";
-            }
-
-            return " ";
-        }
-        private string GetRandomBuyDialogue()
-        {
-            switch (Globals.Random.Next(5 + 1))
-            {
-                case 0:
-                    return "AHH...";
-                case 1:
-                    return "YES...";
-                case 2:
-                    return "...";
-                case 3:
-                    return "YOU MUST LISTEN...";
-                case 4:
-                    return "IT FLOWS BETWEEN US...";
-                case 5:
-                    return "A VAST EXPANSE...";
-            }
-
-            return " ";
         }
     }
 

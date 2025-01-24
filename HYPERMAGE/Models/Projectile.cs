@@ -40,48 +40,63 @@ namespace HYPERMAGE.Models
         public float lifespan;
         public float scale;
         public int pierce;
+        public float knockback;
 
         private float ai;
         private float ai2;
 
         private double angle = 0;
 
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float lifespan) : this(position, aiType, speed, damage, pierce, Vector2.Zero, lifespan, 60, 0f, 1f, true, 0, 0)
+        public Projectile(Vector2 position, int aiType, float speed, Vector2 velocity, float lifespan) : this(position, aiType, speed, 1, -1, 0f, velocity, lifespan, 60, 0f, 1f, false, 0, 0)
         {
 
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, Vector2 velocity, float lifespan) : this(position, aiType, speed, damage, 0, velocity, lifespan, 60, 0f, 1f, true, 0, 0)
+        public Projectile(Vector2 position, int aiType, float speed, Vector2 velocity, float lifespan, float rotation) : this(position, aiType, speed, 1, -1, 0f, velocity, lifespan, 60, rotation, 1f, false, 0, 0)
         {
 
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, Vector2 velocity, float lifespan) : this(position, aiType, speed, damage, pierce, velocity, lifespan, 60, 0f, 1f, true, 0, 0)
+        public Projectile(Vector2 position, int aiType, float speed, float damage, Vector2 velocity, float lifespan) : this(position, aiType, speed, damage, -1, 0f, velocity, lifespan, 60, 0f, 1f, false, 0, 0)
         {
 
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, Vector2 velocity, float lifespan, float size) : this(position, aiType, speed, damage, pierce, velocity, lifespan, 60, 0f, size, true, 0, 0)
+
+        /*-------------------------------------------*/
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, float lifespan) : this(position, aiType, speed, damage, pierce, knockback, Vector2.Zero, lifespan, 60, 0f, 1f, true, 0, 0)
         {
 
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float lifespan, int immunityFrames) : this(position, aiType, speed, damage, pierce, Vector2.Zero, lifespan, immunityFrames, 0f, 1f, true, 0, 0)
+        public Projectile(Vector2 position, int aiType, float speed, float damage, float knockback, Vector2 velocity, float lifespan) : this(position, aiType, speed, damage, 0, knockback, velocity, lifespan, 60, 0f, 1f, true, 0, 0)
         {
 
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float lifespan, int immunityFrames, float scale) : this(position, aiType, speed, damage, pierce, Vector2.Zero, lifespan, immunityFrames, 0f, scale, true, 0, 0)
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, Vector2 velocity, float lifespan) : this(position, aiType, speed, damage, pierce, knockback, velocity, lifespan, 60, 0f, 1f, true, 0, 0)
         {
 
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, Vector2 velocity, float lifespan, int immunityFrames) : this(position, aiType, speed, damage, pierce, velocity, lifespan, immunityFrames, 0f, 1f, true, 0, 0)
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, Vector2 velocity, float lifespan, float size) : this(position, aiType, speed, damage, pierce, knockback, velocity, lifespan, 60, 0f, size, true, 0, 0)
         {
 
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, Vector2 velocity, float lifespan, int immunityFrames, float scale) : this(position, aiType, speed, damage, pierce, velocity, lifespan, immunityFrames, 0f, scale, true, 0, 0)
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, float lifespan, int immunityFrames) : this(position, aiType, speed, damage, pierce, knockback, Vector2.Zero, lifespan, immunityFrames, 0f, 1f, true, 0, 0)
         {
 
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, Vector2 velocity, float lifespan, int immunityFrames, float rotation, float scale) : this(position, aiType, speed, damage, pierce, velocity, lifespan, immunityFrames, rotation, scale, true, 0, 0)
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, float lifespan, int immunityFrames, float scale) : this(position, aiType, speed, damage, pierce, knockback, Vector2.Zero, lifespan, immunityFrames, 0f, scale, true, 0, 0)
+        {
+
+        }
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, Vector2 velocity, float lifespan, int immunityFrames) : this(position, aiType, speed, damage, pierce, knockback, velocity, lifespan, immunityFrames, 0f, 1f, true, 0, 0)
+        {
+
+        }
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, Vector2 velocity, float lifespan, int immunityFrames, float scale) : this(position, aiType, speed, damage, pierce, knockback, velocity, lifespan, immunityFrames, 0f, scale, true, 0, 0)
+        {
+
+        }
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, Vector2 velocity, float lifespan, int immunityFrames, float rotation, float scale) : this(position, aiType, speed, damage, pierce, knockback, velocity, lifespan, immunityFrames, rotation, scale, true, 0, 0)
         {
         }
-        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, Vector2 velocity, float lifespan, int immunityFrames, float rotation, float scale, bool friendly, float ai, float ai2)
+        public Projectile(Vector2 position, int aiType, float speed, float damage, int pierce, float knockback, Vector2 velocity, float lifespan, int immunityFrames, float rotation, float scale, bool friendly, float ai, float ai2)
         {
             this.position = position;
             this.aiType = aiType;
@@ -95,6 +110,7 @@ namespace HYPERMAGE.Models
             this.pierce = pierce;
             this.friendly = friendly;
             this.immunityFrames = immunityFrames;
+            this.knockback = knockback;
 
             this.ai = ai;
             this.ai2 = ai2;
@@ -103,8 +119,13 @@ namespace HYPERMAGE.Models
 
             switch (aiType)
             {
+                // enemy projectiles
+                case -1:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
+                    break;
                 case 0:
                     break;
+                // friendly projectiles
                 case 1: //firebolt
                     texture = Globals.Content.Load<Texture2D>("particle");
                     break;
@@ -121,6 +142,7 @@ namespace HYPERMAGE.Models
                     texture = Globals.GetBlankTexture();
                     break;
 
+
             }
 
             if (anim != null)
@@ -135,20 +157,19 @@ namespace HYPERMAGE.Models
                 height = texture.Height;
             }
 
-            origin = new(width / 2, height / 2);
+            origin = new(width / scale / 2, height / scale / 2);
 
             active = true;
 
             hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
         }
-
-        // ****************************************** //
         public void Draw()
         {
             if (anim != null)
             {
                 anim.Draw(position);
             }
+
             else
             {
                 if (aiType == 5 && ai == 1)
@@ -158,7 +179,7 @@ namespace HYPERMAGE.Models
                     return;
                 }
 
-                Globals.SpriteBatch.Draw(texture, position, null, Color.White, rotation, origin, scale, SpriteEffects.None, 1f);
+                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? 0.8f : 1f);
             }
         }
 
@@ -166,6 +187,9 @@ namespace HYPERMAGE.Models
         List<float> mobDist = [];
         public void Update()
         {
+
+            Debug.WriteLine(lifespan);
+
             hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
             center = position + origin;
 
@@ -175,7 +199,9 @@ namespace HYPERMAGE.Models
             {
                 for (int i = 0; i < MobManager.mobs.Count; i++)
                 {
+
                     mobDist.Add(Globals.Distance(MobManager.mobs[i].center, center));
+
                     mobDist.Sort();
 
                     if (Globals.Distance(MobManager.mobs[i].center, center) == mobDist[0])
@@ -197,10 +223,16 @@ namespace HYPERMAGE.Models
 
             switch (aiType)
             {
+                //enemy projectiles
+                case -1: //wisp
+                    position += velocity * Globals.TotalSeconds * speed;
+
+                    break;
                 case 0:
                     break;
+                //friendly projectiles
                 case 1: //firebolt
-                    position += ((velocity * Globals.TotalSeconds) * speed);
+                    position += velocity * Globals.TotalSeconds * speed;
 
                     rotation += 1.05f;
 
@@ -278,7 +310,6 @@ namespace HYPERMAGE.Models
                     break;  
 
                 case 3: //kindle
-
                     if (closestMob != null)
                     {
                         if (Globals.Distance(closestMob.center, center) <= 15)
@@ -497,6 +528,43 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 case 1: //firebolt
+                    for (int i = 0; i < Globals.Random.Next(5) + 5; i++)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 8,
+                            sizeEnd = 0,
+                            colorStart = Color.Gold,
+                            colorEnd = Color.Red,
+                            velocity = (velocity * Globals.RandomFloat(0f, 1.5f)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-45, 45))),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+                    }
+
+                    for (int i = 0; i < Globals.Random.Next(2) + 3; i++)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 5,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = (velocity * Globals.RandomFloat(0f, 1.5f)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-45, 45))) * 1.5f,
+                            lifespan = 0.25f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+                    }
 
                     break;
                 case 2: //fireball
@@ -506,7 +574,7 @@ namespace HYPERMAGE.Models
                     {
                         if (ai == 0)
                         {
-                            Projectile projectile = new(new(position.X, InputManager.MousePosition.Y), 5, speed, damage, -1, Vector2.Zero, 1f, 10, 0f, scale, true, 1, 0);
+                            Projectile projectile = new(new(position.X, InputManager.MousePosition.Y), 5, speed, damage, -1, 0f, Vector2.Zero, 1f, 10, 0f, scale, true, 1, 0);
                             ProjectileManager.AddProjectile(projectile);
 
                             GameManager.AddScreenShake(0.2f, 15f);
