@@ -5,6 +5,7 @@ using HYPERMAGE.Spells;
 using HYPERMAGE.UI;
 using HYPERMAGE.UI.UIElements;
 using System.Net.Mime;
+using static System.Formats.Asn1.AsnWriter;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace HYPERMAGE.Managers
@@ -27,6 +28,9 @@ namespace HYPERMAGE.Managers
         private static IScene nextScene;
         private static bool transition;
 
+        public static bool death;
+        public static int t;
+
         public static bool exit;
         public static void Init()
         {
@@ -39,7 +43,22 @@ namespace HYPERMAGE.Managers
 
         public static void Update()
         {
-            SceneManager.GetScene().Update();
+            if (!death)
+            {
+                SceneManager.GetScene().Update();
+            }
+
+            else
+            {
+                t++;
+
+                if (t >= 4)
+                {
+                    SceneManager.GetScene().Update();
+
+                    t = 0;
+                }
+            }
 
             if (transition)
             {
@@ -48,9 +67,10 @@ namespace HYPERMAGE.Managers
 
             if (transitionTimer >= 180)
             {
-
                 UIManager.Clear();
                 ParticleManager.Clear();
+                MobManager.Clear();
+                ProjectileManager.Clear();
 
                 GameManager.wavesPower = 0.0f;
                 GameManager.waves = false;
@@ -58,6 +78,17 @@ namespace HYPERMAGE.Managers
 
                 SceneManager.RemoveScene();
                 SceneManager.AddScene(nextScene);
+
+                if (death)
+                {
+                    player.health = 3;
+                    player.lives--;
+
+                    player.immune = false;
+                    player.flashing = false;
+
+                    death = false;
+                }
 
                 transition = false;
                 transitionTimer = 0;   
@@ -80,11 +111,22 @@ namespace HYPERMAGE.Managers
             screenShakePower = power;
         }
 
+        public static void PlayerDeath()
+        {
+            fadeout = true;
+            nextScene = new Shop();
+            transition = true;
+            death = true;
+
+            SoundManager.ClearSong();
+        }
         public static void TransitionScene(IScene scene)
         {
             fadeout = true;
             nextScene = scene;
             transition = true;
+
+            SoundManager.ClearSong();
         }
     }
 }

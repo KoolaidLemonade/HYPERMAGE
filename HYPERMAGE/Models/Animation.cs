@@ -60,8 +60,8 @@ public class Animation
         }
     }
 
-    public void Draw(Vector2 pos)
+    public void Draw(Vector2 pos, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffect, float layerDepth)
     {
-        Globals.SpriteBatch.Draw(texture, pos, sourceRectangles[frame], Color.White, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.81f);
+        Globals.SpriteBatch.Draw(texture, pos, sourceRectangles[frame], color, rotation, origin, scale, spriteEffect, layerDepth);
     }
 }

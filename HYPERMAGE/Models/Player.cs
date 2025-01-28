@@ -24,6 +24,16 @@ public class Player
     public float speed = 1.7f;
     public float acceleration = 150f;
 
+    public float immunityTime = 1f;
+    public float immunityTimer;
+    public bool immune;
+
+    public bool flashing;
+    public float flashingTimer;
+    public Color flashColor;
+    public Color flashColor1;
+    public Color flashColor2;
+
     public int mana = 555;
     public int health = 3;
     public int lives = 3;
@@ -174,16 +184,105 @@ public class Player
 
         //
 
+        if (!immune)
+        {
+            foreach (Mob mob in MobManager.mobs)
+            {
+                if (mob.hitbox.IntersectsWith(hitbox) && mob.contactDamage && !immune)
+                {
+                    Damage(1);
+                }
+            }
+
+            foreach (Projectile projectile in ProjectileManager.projectiles)
+            {
+                if (projectile.hitbox.IntersectsWith(hitbox) && !projectile.friendly && !immune)
+                {
+                    Damage((int)projectile.damage);
+                    projectile.HitPlayer();
+                }
+            }
+        }
+
+        if (immune)
+        {
+            immunityTimer += Globals.TotalSeconds;
+        }
+
+        if (immunityTimer > immunityTime)
+        {
+            immune = false;
+            immunityTimer = 0;
+
+            flashing = false;
+        }
+
+        //
+
+        if (flashing)
+        {
+            flashingTimer += Globals.TotalSeconds;
+
+            if (flashingTimer > 0.1f)
+            {
+                flashColor = flashColor1;
+            }
+
+            if (flashingTimer > 0.2f)
+            {
+                flashingTimer = 0;
+                flashColor = flashColor2;
+            }
+        }
+
+        //
+
         anim.Update();
     }
 
+    public void Damage(int damage)
+    {
+        health -= damage;
+        GameManager.AddScreenShake(0.2f, 5f);
+
+        if (health <= 0)
+        {
+            GameManager.PlayerDeath();
+
+            for (int i = 0; i < 20; i++)
+            {
+                ParticleData ParticleData = new()
+                {
+                    opacityStart = 1f,
+                    opacityEnd = 0f,
+                    sizeStart = 3,
+                    sizeEnd = 1,
+                    colorStart = Color.White,
+                    colorEnd = Color.White,
+                    velocity = new(Globals.RandomFloat(-300, 300), Globals.RandomFloat(-300, 300)),
+                    lifespan = 0.2f,
+                    rotationSpeed = 1f,
+                    resistance = 1.2f
+                };
+
+                Particle particle = new(center, ParticleData);
+                ParticleManager.AddParticle(particle);
+            }
+        }
+
+        immune = true;
+        flashing = true;
+
+        flashColor1 = Color.Red;
+        flashColor2 = Color.White;
+    }
     public void Draw()
     {
         Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)hitbox.GetPosition().X - 1, (int)hitbox.GetPosition().Y - 1, 3, 3), null, Color.Black * 0.5f, 0f, Vector2.Zero, SpriteEffects.None, 0.9999f);
 
         Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)hitbox.GetPosition().X, (int)hitbox.GetPosition().Y, 1, 1), null, Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
-        anim.Draw(new((int)position.X, (int)position.Y));
+        anim.Draw(new((int)position.X, (int)position.Y), flashing ? flashColor : Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.8f);
     }
 
     public void AddXP(int xp)

@@ -9,6 +9,7 @@ using HYPERMAGE.Particles;
 using System.Runtime.ExceptionServices;
 using System.Diagnostics;
 using HYPERMAGE.UI.UIElements;
+using Microsoft.Xna.Framework.Media;
 
 namespace HYPERMAGE.Managers
 {
@@ -28,19 +29,73 @@ namespace HYPERMAGE.Managers
 
         private static Vector2 spawnPos;
 
+        private static Song song;
+
+        private static Texture2D bg;
+        private static Texture2D bg2;
+        private static Texture2D bg3;
+
+        private static Vector2 bgPos = Vector2.Zero;
+        private static Vector2 bgPos2 = Vector2.Zero;
+
+        private static float bgScrollTimer;
+        public static void DrawBG()
+        {
+            Globals.SpriteBatch.Draw(bg3, Vector2.Zero, Color.White);
+
+            Globals.SpriteBatch.Draw(bg, bgPos, Color.White);
+            Globals.SpriteBatch.Draw(bg, bgPos + new Vector2(bg.Width, 0), Color.White);
+
+            Globals.SpriteBatch.Draw(bg2, bgPos2, Color.White);
+            Globals.SpriteBatch.Draw(bg2, bgPos2 + new Vector2(bg2.Width, 0), Color.White);
+        }
         public static void Update()
         {
+            if (bgScrollTimer == 0)
+            {
+                SoundManager.PlaySong(song, 1f);
+            }
+
+            if (bgScrollTimer < 3)
+            {
+                bgScrollTimer += Globals.TotalSeconds;
+            }
+
+            bgPos.X -= bgScrollTimer / 8;
+
+            if (bgPos.X < -bg.Width)
+            {
+                bgPos.X = 0;
+            }
+
+            bgPos2.X -= bgScrollTimer / 4;
+
+            if (bgPos2.X < -bg2.Width)
+            {
+                bgPos2.X = 0;
+            }
+
             creditsTimer += Globals.TotalSeconds;
 
             if (creditsTimer >= 1 && levelCredits > 0)
             {
                 creditsTimer = 0;
 
-                levelCredits--;
-                credits++; 
+
+                if (MobManager.mobs.Count == 0)
+                {
+                    levelCredits -= 2;
+                    credits += 2;
+                }
+
+                else
+                {
+                    levelCredits--;
+                    credits++;
+                }
             }
 
-            if (Globals.Random.Next(200) == 0 && credits >= spawnWaveCost)
+            if (MobManager.mobs.Count == 0 ? Globals.Random.Next(100) == 0 && credits >= spawnWaveCost : Globals.Random.Next(200) == 0 && credits >= spawnWaveCost)
             {
                 SpawnNextWave();
             }
@@ -114,21 +169,38 @@ namespace HYPERMAGE.Managers
             endCred = false;
             level++;
 
+            bgScrollTimer = 0;
+
             switch (level)
             {
                 case 1:
+                    bg = Globals.Content.Load<Texture2D>("bg");
+                    bg2 = Globals.Content.Load<Texture2D>("bg2");
+                    bg3 = Globals.Content.Load<Texture2D>("stars");
+                    song = Globals.Content.Load<Song>("stage3");
+
                     levelCredits = 20;
                     //
                     mobTypes.Add(1);
                     mobTypes.Add(2);
                     return;
                 case 2:
+                    bg = Globals.Content.Load<Texture2D>("bg");
+                    bg2 = Globals.Content.Load<Texture2D>("bg2");
+                    bg3 = Globals.Content.Load<Texture2D>("stars");
+                    song = Globals.Content.Load<Song>("stage3");
+
                     levelCredits = 30;
                     //
                     mobTypes.Add(1);
                     mobTypes.Add(2);
                     return;
                 case 3:
+                    bg = Globals.Content.Load<Texture2D>("bg");
+                    bg2 = Globals.Content.Load<Texture2D>("bg2");
+                    bg3 = Globals.Content.Load<Texture2D>("stars");
+                    song = Globals.Content.Load<Song>("stage3");
+
                     levelCredits = 40;
                     //
                     mobTypes.Add(1);

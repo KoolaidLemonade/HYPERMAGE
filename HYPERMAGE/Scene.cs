@@ -5,6 +5,7 @@ using HYPERMAGE.Particles;
 using HYPERMAGE.Spells;
 using HYPERMAGE.UI;
 using HYPERMAGE.UI.UIElements;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using System;
@@ -23,6 +24,7 @@ namespace HYPERMAGE
         public void Load();
         public void Update();
         public void Draw();
+        public void DrawVFX();
     }
 
     public static class SceneManager
@@ -91,15 +93,20 @@ namespace HYPERMAGE
 
             UIManager.Update();
         }
-        public void Draw()
+
+        public void DrawVFX()
         {
-            GameManager.player.Draw();
+            ProjectileManager.Draw();
 
             ParticleManager.Draw();
+        }
+        public void Draw()
+        {
+            LevelManager.DrawBG();
+
+            GameManager.player.Draw();
 
             MobManager.Draw();
-
-            ProjectileManager.Draw();
 
             UIManager.Draw();
         }
@@ -206,9 +213,13 @@ namespace HYPERMAGE
             InputManager.Update();
             ParticleManager.Update();
         }
-        public void Draw()
+
+        public void DrawVFX()
         {
             ParticleManager.Draw();
+        }
+        public void Draw()
+        {
             UIManager.Draw();
         }
     }
@@ -216,7 +227,7 @@ namespace HYPERMAGE
     public class IntroCutscene : IScene
     {
         private float introTimer;
-        private static readonly int introStep = 4;
+        private static readonly float introStep = 4.5f;
 
         private static SpriteFont spriteFont;
 
@@ -224,6 +235,8 @@ namespace HYPERMAGE
         private static readonly string text2 = "TEARING MIND AND SOUL IN TWAIN";
         private static readonly string text3 = "JOURNEY TO THE SEALED DOMAIN";
         private static readonly string text4 = "CRACK THE LOCKS AND BREAK MY CHAINS";
+
+        private static bool voice = false;
         public IntroCutscene()
         {
         }
@@ -253,61 +266,54 @@ namespace HYPERMAGE
                 GameManager.waves = false;
 
                 UIManager.Clear();
+                SoundManager.ClearSounds();
 
                 SceneManager.RemoveScene();
                 SceneManager.AddScene(new Shop());
             }
         }
+        public void DrawVFX()
+        {
+        }
         public void Draw()
         {
+            if (introTimer >= introStep)
+            {
+                if (!voice)
+                {
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("introvoice"), 1f, 0f, 0f);
+                    voice = true;
+                }
+
+                Globals.SpriteBatch.DrawString(spriteFont, text1, new(235 - spriteFont.MeasureString(text1).X / 2, 60), Color.White);
+            }
+
+            if (introTimer >= introStep * 2)
+            {
+                Globals.SpriteBatch.DrawString(spriteFont, text2, new(235 - spriteFont.MeasureString(text1).X / 2, 80), Color.White);
+            }
+
+            if (introTimer >= introStep * 3)
+            {
+                Globals.SpriteBatch.DrawString(spriteFont, text3, new(235 - spriteFont.MeasureString(text1).X / 2, 100), Color.White);
+            }
+
+            if (introTimer >= introStep * 4)
+            {
+                Globals.SpriteBatch.DrawString(spriteFont, text4, new(235 - spriteFont.MeasureString(text1).X / 2, 120), Color.White);
+            }
+
             if (introTimer <= introStep * 5)
             {
-                if (introTimer >= introStep)
-                {
-                    Globals.SpriteBatch.DrawString(spriteFont, text1, new(160 - spriteFont.MeasureString(text1).X / 2, 30), Color.White);
-                }
-
-                if (introTimer >= introStep * 2)
-                {
-                    Globals.SpriteBatch.DrawString(spriteFont, text2, new(160 - spriteFont.MeasureString(text1).X / 2, 50), Color.White);
-                }
-
-                if (introTimer >= introStep * 3)
-                {
-                    Globals.SpriteBatch.DrawString(spriteFont, text3, new(160 - spriteFont.MeasureString(text1).X / 2, 110), Color.White);
-                }
-
-                if (introTimer >= introStep * 4)
-                {
-                    Globals.SpriteBatch.DrawString(spriteFont, text4, new(160 - spriteFont.MeasureString(text1).X / 2, 130), Color.White);
-                }
-
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye1"), new Vector2(60 + Globals.RandomFloat(-1f, 1f) * introTimer / 18, 85 + Globals.RandomFloat(-1f, 1f) * introTimer / 18), null, Color.White * (introTimer / 15), 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye1"), new Vector2((260 - 42) + Globals.RandomFloat(-1f, 1f) * introTimer / 18, 85 + Globals.RandomFloat(-1f, 1f) * introTimer / 18), null, Color.White * (introTimer / 15), 0f, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 1f);
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye1"), new Vector2(30 + Globals.RandomFloat(-1f, 1f) * introTimer / 18, 85 + Globals.RandomFloat(-1f, 1f) * introTimer / 18), null, Color.White * (introTimer / 10), 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye1"), new Vector2((150 - 42) + Globals.RandomFloat(-1f, 1f) * introTimer / 18, 85 + Globals.RandomFloat(-1f, 1f) * introTimer / 18), null, Color.White * (introTimer / 10), 0f, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 1f);
             }
 
             else
             {
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye2"), new Vector2(60 , 75), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye2"), new Vector2(260 - 40, 75), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 1f);
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye2"), new Vector2(30, 88), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye2"), new Vector2(150 - 40, 88), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 1f);
             }
-        }
-    }
-
-    public class PauseMenu : IScene
-    {
-        public PauseMenu()
-        {
-        }
-        public void Load()
-        {
-        }
-        public void Update()
-        {
-
-        }
-        public void Draw()
-        {
         }
     }
 
@@ -396,26 +402,28 @@ namespace HYPERMAGE
 
             UIManager.Update();
         }
+
+        public void DrawVFX()
+        {
+            ParticleManager.Draw();
+            ProjectileManager.Draw();
+        }
         public void Draw()
         {
 
-            shopkeep.Draw(new(160 - shopkeep.frameWidth / 2, 0));
+            shopkeep.Draw(new(160 - shopkeep.frameWidth / 2, 0), Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.8f);
 
             GameManager.player.Draw();
 
-            ParticleManager.Draw();
-
             MobManager.Draw();
-
-            ProjectileManager.Draw();
 
             UIManager.Draw();
         }
     }
 
-    public class StageTransition : IScene
+    public class Death : IScene
     {
-        public StageTransition()
+        public Death()
         {
         }
         public void Load()
@@ -426,6 +434,10 @@ namespace HYPERMAGE
 
         }
         public void Draw()
+        {
+        }
+
+        public void DrawVFX()
         {
         }
     }

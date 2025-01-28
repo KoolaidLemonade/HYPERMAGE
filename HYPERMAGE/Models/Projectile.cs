@@ -157,7 +157,9 @@ namespace HYPERMAGE.Models
                 height = texture.Height;
             }
 
-            origin = new(width / scale / 2, height / scale / 2);
+            origin = new(width / 2, height / 2);
+
+            center = position + origin;
 
             active = true;
 
@@ -167,7 +169,7 @@ namespace HYPERMAGE.Models
         {
             if (anim != null)
             {
-                anim.Draw(position);
+                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, origin, Vector2.One, SpriteEffects.None, 1f);
             }
 
             else
@@ -187,34 +189,8 @@ namespace HYPERMAGE.Models
         List<float> mobDist = [];
         public void Update()
         {
-
-            Debug.WriteLine(lifespan);
-
             hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
             center = position + origin;
-
-            mobDist.Clear();
-
-            if (MobManager.mobs.Count > 0)
-            {
-                for (int i = 0; i < MobManager.mobs.Count; i++)
-                {
-
-                    mobDist.Add(Globals.Distance(MobManager.mobs[i].center, center));
-
-                    mobDist.Sort();
-
-                    if (Globals.Distance(MobManager.mobs[i].center, center) == mobDist[0])
-                    {
-                        closestMob = MobManager.mobs[i];
-                    }
-                }
-            }
-
-            else
-            {
-                closestMob = null;
-            }
 
             if (lifespan <= 0)
             {
@@ -226,6 +202,25 @@ namespace HYPERMAGE.Models
                 //enemy projectiles
                 case -1: //wisp
                     position += velocity * Globals.TotalSeconds * speed;
+
+                    if (Globals.Random.Next(3) == 0)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 2,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.Gray,
+                            velocity = new(Globals.RandomFloat(-50, 50), Globals.RandomFloat(-50, 50)),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+                    }
 
                     break;
                 case 0:
@@ -310,6 +305,9 @@ namespace HYPERMAGE.Models
                     break;  
 
                 case 3: //kindle
+
+                    UpdateMobPositions();
+
                     if (closestMob != null)
                     {
                         if (Globals.Distance(closestMob.center, center) <= 15)
@@ -329,8 +327,8 @@ namespace HYPERMAGE.Models
                         {
                             opacityStart = 1f,
                             opacityEnd = 0f,
-                            sizeStart = 5 * scale,
-                            sizeEnd = 2,
+                            sizeStart = 2 * scale,
+                            sizeEnd = 1,
                             colorStart = Color.White,
                             colorEnd = Color.Gold,
                             velocity = new(Globals.RandomFloat(-30, 30), Globals.RandomFloat(-100, 0)),
@@ -351,7 +349,7 @@ namespace HYPERMAGE.Models
                             ai++;
                         }
 
-                        float radius = 30;
+                        float radius = ai2;
 
                         Vector2 newCenter = new Vector2((float)(GameManager.GetPlayer().center.X + radius * Math.Cos(angle * Math.PI / 180)), (float)(GameManager.GetPlayer().center.Y + radius * Math.Sin(angle * Math.PI / 180)));
 
@@ -366,7 +364,7 @@ namespace HYPERMAGE.Models
                             opacityStart = 1f,
                             opacityEnd = 0f,
                             sizeStart = 2,
-                            sizeEnd = 1,
+                            sizeEnd = 0,
                             colorStart = Color.Yellow,
                             colorEnd = Color.Red,
                             velocity = new Vector2(Globals.RandomFloat(-20, 20), Globals.RandomFloat(-20, 20)),
@@ -378,8 +376,8 @@ namespace HYPERMAGE.Models
                         {
                             opacityStart = 0.2f,
                             opacityEnd = 0f,
-                            sizeStart = 3,
-                            sizeEnd = 10,
+                            sizeStart = 1,
+                            sizeEnd = 5,
                             colorStart = Color.Gray,
                             colorEnd = Color.DarkRed,
                             velocity = new Vector2(Globals.RandomFloat(-5, 5), Globals.RandomFloat(-5, 5)),
@@ -389,12 +387,12 @@ namespace HYPERMAGE.Models
 
                         for (int i = 0; i < 3; i++)
                         {
-                            Vector2 particleCenter = new Vector2((float)(GameManager.GetPlayer().center.X + ((radius - 7) * Globals.RandomFloat(1, 2f)) * Math.Cos(angle * Math.PI / 180)), (float)(GameManager.GetPlayer().center.Y + ((radius - 7) * Globals.RandomFloat(1, 2f)) * Math.Sin(angle * Math.PI / 180)));
+                            Vector2 particleCenter = new Vector2((float)(GameManager.GetPlayer().center.X + ((radius - (scale * 9)) * Globals.RandomFloat(1, 2f)) * Math.Cos(angle * Math.PI / 180)), (float)(GameManager.GetPlayer().center.Y + ((radius - (scale * 9)) * Globals.RandomFloat(1, 2f)) * Math.Sin(angle * Math.PI / 180)));
                             Particle projParticle = new(particleCenter.RotatedBy(MathHelper.ToRadians(Globals.NonLerp(-90, 120, lifespan / maxLifespan)), GameManager.GetPlayer().center), projParticleData);
                             Particle projParticle2 = new(particleCenter.RotatedBy(MathHelper.ToRadians(Globals.NonLerp(-90, 120, lifespan / maxLifespan)), GameManager.GetPlayer().center), projParticleData2);
                             ParticleManager.AddParticle(projParticle);
 
-                            if (i == 0 && lifespan % 2 == 0)
+                            if (Globals.Random.Next(5) == 0)
                             {
                                 ParticleManager.AddParticle(projParticle2);
                             }
@@ -625,6 +623,61 @@ namespace HYPERMAGE.Models
             }
 
             active = false;
+        }
+
+        public void HitPlayer()
+        {
+            switch (aiType)
+            {
+                case -1:
+                    for (int i = 0; i < 5; i++)
+                    {
+                        ParticleData particleData = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 5,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.Gray,
+                            velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200)),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle particle = new(center, particleData);
+                        ParticleManager.AddParticle(particle);
+                    }
+
+                    Kill();
+                    return;
+            }
+        }
+
+        public void UpdateMobPositions()
+        {
+            mobDist.Clear();
+
+            if (MobManager.mobs.Count > 0)
+            {
+                for (int i = 0; i < MobManager.mobs.Count; i++)
+                {
+
+                    mobDist.Add(Globals.Distance(MobManager.mobs[i].center, center));
+
+                    mobDist.Sort();
+
+                    if (Globals.Distance(MobManager.mobs[i].center, center) == mobDist[0])
+                    {
+                        closestMob = MobManager.mobs[i];
+                    }
+                }
+            }
+
+            else
+            {
+                closestMob = null;
+            }
         }
     }
 }

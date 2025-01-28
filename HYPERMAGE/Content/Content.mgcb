@@ -25,6 +25,30 @@
 /processorParam:TextureFormat=Color
 /build:bat.png
 
+#begin bg.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bg.png
+
+#begin bg2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bg2.png
+
 #begin bigexplosion.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -290,6 +314,18 @@
 /processorParam:Quality=Best
 /build:hit2.wav
 
+#begin introvoice.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:introvoice.wav
+
+#begin invert.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:invert.fx
+
 #begin kindleicon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -487,6 +523,18 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:stage3.mp3
+
+#begin stars.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:stars.png
 
 #begin title.mp3
 /importer:Mp3Importer

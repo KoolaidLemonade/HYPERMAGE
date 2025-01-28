@@ -13,6 +13,8 @@ namespace HYPERMAGE
         private readonly GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
+        private RenderTarget2D vfx;
+        private RenderTarget2D game;
         private RenderTarget2D renderTarget;
         private RenderTarget2D renderTarget2;
         private RenderTarget2D renderTarget3;
@@ -24,6 +26,7 @@ namespace HYPERMAGE
         private Effect waves;
         private Effect transition;
         private Effect shake;
+        private Effect invert;
 
         private float time;
         private float time2;
@@ -32,13 +35,15 @@ namespace HYPERMAGE
             graphics = new GraphicsDeviceManager(this);
             graphics.IsFullScreen = true;
             graphics.HardwareModeSwitch = false;
-
+            
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
 
         protected override void Initialize()
         {
+            vfx = new RenderTarget2D(GraphicsDevice, 320, 180);
+            game = new RenderTarget2D(GraphicsDevice, 320, 180);
 
             renderTarget = new RenderTarget2D(GraphicsDevice, 320, 180);
             renderTarget2 = new RenderTarget2D(GraphicsDevice, 320, 180);
@@ -68,10 +73,25 @@ namespace HYPERMAGE
             blur = Content.Load<Effect>("blur");
             transition = Content.Load<Effect>("transition");
             shake = Content.Load<Effect>("shake");
+            invert = Content.Load<Effect>("invert");
         }
 
+        float t;
+        float tt;
         protected override void Update(GameTime gameTime)
         {
+            t += Globals.TotalSeconds;
+            tt++;
+
+            if (t >= 1)
+            {
+                Debug.WriteLine(tt);
+
+                t = 0;
+                tt = 0;
+            }
+
+
             if (GameManager.exit)
             {
                 Exit();
@@ -128,12 +148,29 @@ namespace HYPERMAGE
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.SetRenderTarget(renderTarget);
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.SetRenderTarget(vfx);
+            GraphicsDevice.Clear(Color.Transparent);
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+            SceneManager.GetScene().DrawVFX();
+            spriteBatch.End();
 
-            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode : SpriteSortMode.FrontToBack);
+            GraphicsDevice.SetRenderTarget(game);
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
             SceneManager.GetScene().Draw();
             spriteBatch.End();
+
+            invert.Parameters["InvertTex"].SetValue(game);
+
+            GraphicsDevice.SetRenderTarget(renderTarget);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+            spriteBatch.Draw(game, Vector2.Zero, new Color(Color.White, 0));
+            spriteBatch.End();
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode : SpriteSortMode.FrontToBack, effect: invert);
+            spriteBatch.Draw(vfx, Vector2.Zero, new Color(Color.White, 0));
+            spriteBatch.End();
+
 
             GraphicsDevice.SetRenderTarget(renderTarget2);
 
@@ -155,8 +192,8 @@ namespace HYPERMAGE
 
             if (GameManager.waves)
             {
-                spriteBatch.Begin(samplerState: SamplerState.PointClamp, effect: waves);
-                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, 180), Color.White * 0.0f);
+                spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: waves);
+                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, 180), Color.Transparent);
                 spriteBatch.End();
             }
 

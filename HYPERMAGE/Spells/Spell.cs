@@ -146,7 +146,7 @@ namespace HYPERMAGE.Spells
                     return;
 
                 case 4: // bladeofflame
-                    Projectile bladeofflame = new(player.center, 4, speed, damage, -1, knockback, size);
+                    Projectile bladeofflame = new(player.center, 4, speed, damage, -1, knockback, Vector2.Zero, lifespan, 20, 0f, size, true, 0, 25 + (5 * rank));
                     ProjectileManager.AddProjectile(bladeofflame);
                     return;
 
@@ -226,14 +226,14 @@ namespace HYPERMAGE.Spells
                             cooldown = 1f;
                             damage = 0.5f;
                             speed = 1f;
-                            size = 1.5f;
+                            size = 2f;
                             lifespan = 3f;
                             break;
                         case 3:
                             cooldown = 0.75f;
                             damage = 0.75f;
                             speed = 1.5f;
-                            size = 2f;
+                            size = 4f;
                             lifespan = 5f;
                             break;
                     }
@@ -244,24 +244,21 @@ namespace HYPERMAGE.Spells
                         case 1:
                             cooldown = 0.75f;
                             damage = 5f;
-                            speed = 0.75f;
-                            lifespan = 1f;
+                            lifespan = 0.75f;
                             knockback = 1f;
                             break;
                         case 2:
                             cooldown = 0.45f;
                             damage = 8f;
-                            speed = 1f;
                             size = 1.25f;
-                            lifespan = 0.75f;
+                            lifespan = 0.55f;
                             knockback = 1.25f;
                             break;
                         case 3:
                             cooldown = 0.2f;
                             damage = 15f;
-                            speed = 1.5f;
                             size = 1.5f;
-                            lifespan = 0.5f;
+                            lifespan = 0.4f;
                             knockback = 1.5f;
                             break;
                     }
