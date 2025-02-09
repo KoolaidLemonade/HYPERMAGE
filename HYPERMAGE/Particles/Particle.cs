@@ -22,6 +22,7 @@ namespace HYPERMAGE.Particles
         private float resistance;
         private float rotation;
         private float rotationSpeed;
+        private bool fastScale;
 
         private bool flashing;
         private float flashingTimer;
@@ -44,6 +45,7 @@ namespace HYPERMAGE.Particles
             rotationSpeed = data.rotationSpeed;
             texture = data.texture;
             flashing = data.flashing;
+            fastScale = data.fastScale;
             
             width = data.texture.Width;
             height = data.texture.Height;
@@ -51,6 +53,7 @@ namespace HYPERMAGE.Particles
         public void Update()
         {
             lifespanLeft -= Globals.TotalSeconds;
+
             if (lifespanLeft <= 0f)
             {
                 isFinished = true;
@@ -58,9 +61,21 @@ namespace HYPERMAGE.Particles
             }
 
             lifespanAmount = MathHelper.Clamp(lifespanLeft / data.lifespan, 0, 1);
+
             color = Color.Lerp(data.colorEnd, data.colorStart, lifespanAmount);
             opacity = MathHelper.Clamp(MathHelper.Lerp(data.opacityEnd, data.opacityStart, lifespanAmount), 0, 1);
-            scale = MathHelper.Lerp(data.sizeEnd, data.sizeStart, lifespanAmount);
+
+            if (fastScale)
+            {
+                scale = Globals.NonLerp(data.sizeEnd, data.sizeStart, lifespanAmount);
+
+            }
+
+            else
+            {
+                scale = MathHelper.Lerp(data.sizeEnd, data.sizeStart, lifespanAmount);
+            }
+
             position += velocity * Globals.TotalSeconds;
 
             velocity /= resistance;

@@ -17,9 +17,10 @@ namespace HYPERMAGE.Managers
     {
         public static int level = 0;
 
-        public static List<int> mobTypes = [];
         public static List<Mob> spawnWave = [];
         public static int spawnWaveCost;
+
+        public static List<int> validSpawns = [];
 
         public static int levelCredits;
         public static int credits;
@@ -61,38 +62,38 @@ namespace HYPERMAGE.Managers
                 bgScrollTimer += Globals.TotalSeconds;
             }
 
-            bgPos.X -= bgScrollTimer / 8;
+            bgPos.X -= bgScrollTimer / 12;
 
             if (bgPos.X < -bg.Width)
             {
                 bgPos.X = 0;
             }
 
-            bgPos2.X -= bgScrollTimer / 4;
+            bgPos2.X -= bgScrollTimer / 8;
 
             if (bgPos2.X < -bg2.Width)
             {
                 bgPos2.X = 0;
             }
 
-            creditsTimer += Globals.TotalSeconds;
+
+            if (MobManager.mobs.Count == 0)
+            {
+                creditsTimer += Globals.TotalSeconds;
+            }
+
+            else
+            {
+                creditsTimer += Globals.TotalSeconds / 2;
+            }
 
             if (creditsTimer >= 1 && levelCredits > 0)
             {
                 creditsTimer = 0;
 
 
-                if (MobManager.mobs.Count == 0)
-                {
-                    levelCredits -= 2;
-                    credits += 2;
-                }
-
-                else
-                {
-                    levelCredits--;
-                    credits++;
-                }
+                levelCredits--;
+                credits++;
             }
 
             if (MobManager.mobs.Count == 0 ? Globals.Random.Next(100) == 0 && credits >= spawnWaveCost : Globals.Random.Next(200) == 0 && credits >= spawnWaveCost)
@@ -117,11 +118,12 @@ namespace HYPERMAGE.Managers
             ParticleData particleData = new()
             {
                 texture = Globals.Content.Load<Texture2D>("spawnindicator"),
-                sizeStart = 1f,
-                sizeEnd = 1.75f,
+                sizeStart = 0.1f,
+                sizeEnd = 1f,
                 flashing = true,
                 colorStart = Color.Red,
                 colorEnd = Color.Red,
+                fastScale = true,
             };
 
             Particle spawnIndicator = new(spawnPos, particleData);
@@ -133,29 +135,61 @@ namespace HYPERMAGE.Managers
                 mob.Spawn();
             }
 
-            GetNextSpawnWave();
+            GetNextSpawnWave(validSpawns[Globals.Random.Next(validSpawns.Count)]);
         }
 
-        public static void GetNextSpawnWave()
+        public static void GetNextSpawnWave(int type)
         {
-            int targetCredits = Globals.Random.Next(10) + 2;
-
-            spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 30, GameManager.bounds.Z - 30), Globals.RandomFloat(GameManager.bounds.Y + 30, GameManager.bounds.W - 30));
-
             spawnWave.Clear();
+            spawnWaveCost = 0;
 
-            while (targetCredits > 0)
+            if (type == 0)
             {
-                Mob nextMob = new(new(spawnPos.X + Globals.RandomFloat(-20, 20), spawnPos.Y + Globals.RandomFloat(-20, 20)), mobTypes.ElementAt(Globals.Random.Next(0, mobTypes.Count)));
+                spawnPos = new(Globals.RandomFloat(20, 300), 90);
 
-                if (nextMob.spawnCost <= targetCredits)
+                Mob wizard = new(spawnPos, 3);
+                spawnWave.Add(wizard);
+
+                for (int i = 0; i < 3; i++)
                 {
-                    spawnWave.Add(nextMob);
-                    targetCredits -= nextMob.spawnCost;
+                    Mob wisp = new(spawnPos + new Vector2(-10, -10).RotatedBy(MathHelper.ToRadians(45 * i)), 2);
+
+                    spawnWave.Add(wisp);
                 }
             }
 
-            spawnWaveCost = 0;
+            if (type == 1)
+            {
+                spawnPos = new(Globals.RandomFloat(20, 300), 140);
+
+                Mob wizard = new(spawnPos, 3);
+                spawnWave.Add(wizard);
+            }
+
+            if (type == 2)
+            {
+                spawnPos = new(Globals.RandomFloat(20, 300), 20);
+
+                for (int i = 0; i < 5; i++)
+                {
+                    Mob bat = new(spawnPos + new Vector2(Globals.RandomFloat(-10, 10), Globals.RandomFloat(-10, 10)), 1);
+
+                    spawnWave.Add(bat);
+                }
+            }
+
+            if (type == 3)
+            {
+                spawnPos = new(Globals.RandomFloat(20, 300), 30);
+
+                for (int i = 0; i < 2; i++)
+                {
+                    Mob wisp = new(spawnPos + new Vector2(Globals.RandomFloat(-10, 10), Globals.RandomFloat(-10, 10)), 2);
+
+                    spawnWave.Add(wisp);
+                }
+            }
+
 
             foreach (Mob mob in spawnWave)
             {
@@ -165,7 +199,7 @@ namespace HYPERMAGE.Managers
 
         public static void NextLevel()
         {
-            mobTypes.Clear();
+            validSpawns.Clear();
             endCred = false;
             level++;
 
@@ -179,34 +213,54 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars");
                     song = Globals.Content.Load<Song>("stage3");
 
-                    levelCredits = 20;
+                    GameManager.groundBounds = new(0, 60, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 40;
                     //
-                    mobTypes.Add(1);
-                    mobTypes.Add(2);
-                    return;
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+
+                    break;
                 case 2:
                     bg = Globals.Content.Load<Texture2D>("bg");
                     bg2 = Globals.Content.Load<Texture2D>("bg2");
                     bg3 = Globals.Content.Load<Texture2D>("stars");
                     song = Globals.Content.Load<Song>("stage3");
 
-                    levelCredits = 30;
+                    GameManager.groundBounds = new(0, 60, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 60;
                     //
-                    mobTypes.Add(1);
-                    mobTypes.Add(2);
-                    return;
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+
+                    break;
                 case 3:
                     bg = Globals.Content.Load<Texture2D>("bg");
                     bg2 = Globals.Content.Load<Texture2D>("bg2");
                     bg3 = Globals.Content.Load<Texture2D>("stars");
                     song = Globals.Content.Load<Song>("stage3");
 
-                    levelCredits = 40;
+                    GameManager.groundBounds = new(0, 60, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 80;
                     //
-                    mobTypes.Add(1);
-                    mobTypes.Add(2);
-                    return;
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+
+                    break;
             }
+
+            GetNextSpawnWave(validSpawns[Globals.Random.Next(validSpawns.Count)]);
         }
     }
 }

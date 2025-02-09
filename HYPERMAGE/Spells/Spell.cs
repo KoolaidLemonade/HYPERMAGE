@@ -218,23 +218,23 @@ namespace HYPERMAGE.Spells
                     {
                         case 1:
                             cooldown = 1.25f;
-                            damage = 0.25f;
+                            damage = 0.1f;
                             speed = 0.75f;
-                            lifespan = 2f;
+                            lifespan = 4f;
                             break;
                         case 2:
                             cooldown = 1f;
-                            damage = 0.5f;
+                            damage = 0.2f;
                             speed = 1f;
                             size = 2f;
-                            lifespan = 3f;
+                            lifespan = 6f;
                             break;
                         case 3:
                             cooldown = 0.75f;
-                            damage = 0.75f;
+                            damage = 0.5f;
                             speed = 1.5f;
                             size = 4f;
-                            lifespan = 5f;
+                            lifespan = 8f;
                             break;
                     }
                     break;

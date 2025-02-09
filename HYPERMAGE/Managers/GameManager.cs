@@ -18,6 +18,7 @@ namespace HYPERMAGE.Managers
         public static float wavesPower;
 
         public static Vector4 bounds;
+        public static Vector4 groundBounds;
 
         public static bool fadeout = false;
 

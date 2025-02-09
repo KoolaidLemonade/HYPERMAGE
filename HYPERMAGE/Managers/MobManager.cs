@@ -1,6 +1,7 @@
 ﻿using HYPERMAGE.Models;
 using HYPERMAGE.Particles;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HYPERMAGE.Managers;
 
@@ -19,7 +20,7 @@ public static class MobManager
 
     public static void UpdateMobs()
     {
-        foreach (var mob in mobs)
+        foreach (var mob in mobs.ToList())
         {
             mob.Update();
         }
@@ -33,7 +34,7 @@ public static class MobManager
 
     public static void Draw()
     {
-        foreach (var mob in mobs)
+        foreach (var mob in mobs.ToList())
         {
             mob.Draw();
         }
@@ -41,6 +42,6 @@ public static class MobManager
 
     public static void Clear()
     {
-        mobs.Clear  ();
+        mobs.Clear();
     }
 }

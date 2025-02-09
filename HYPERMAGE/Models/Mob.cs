@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,12 +18,17 @@ namespace HYPERMAGE.Models
     {
         public Texture2D texture;
         public Animation anim;
+        public AnimationManager anims = new();
 
         public Vector2 position;
         public Vector2 prevPosition;
 
+        private float timer = 0;
+        public float ai;
+        public float ai2;
+
         public int aiType;
-        public float speed;
+        public float speed = 1f;
         public float health;
         public bool active;
         public Vector2 origin;
@@ -37,9 +43,14 @@ namespace HYPERMAGE.Models
         public int height;
         public float rotation = 0;
         public float scale = 1f;
+
+        public bool turnToPlayer = true;
+        public int direction;
+
         public bool contactDamage = true;
-        public float knockbackResist;
+        public float knockbackResist = 1f;
         public int spawnCost;
+        public bool flying = false;
 
         public bool spawning;
         public float spawnTimer;
@@ -47,7 +58,6 @@ namespace HYPERMAGE.Models
         private List <Projectile> projectileImmunity = [];
         public Mob(Vector2 position, int aiType)
         {
-            this.position = position;
             this.aiType = aiType;
 
             switch (aiType)
@@ -56,22 +66,52 @@ namespace HYPERMAGE.Models
                     break;
                 case 1: //bat
                     anim = new Animation(Globals.Content.Load<Texture2D>("bat"), 2, 1, 0.2f);
-                    speed = 1f;
                     health = 2f;
                     knockbackResist = 0.6f;
                     spawnCost = 1;
+                    flying = true;
                     break;
                 case 2: //wisp
                     texture = Globals.Content.Load<Texture2D>("particle");
-                    speed = 1f;
                     scale = 2f;
                     health = 3f;
                     knockbackResist = 0.6f;
                     spawnCost = 5;
+                    flying = true;
+
+                    timer = Globals.RandomFloat(0, 2);
+                    break;
+                case 3: //wizard
+                    anims.AddAnimation(0, new(Globals.Content.Load<Texture2D>("wizard"), 2, 2, 0.5f, 1));
+                    anims.AddAnimation(1, new(Globals.Content.Load<Texture2D>("wizard"), 2, 2, 0.75f / 2, 2));
+                    contactDamage = false;
+
+                    health = 15f;
+                    spawnCost = 4;
+                    break;
+                case 4: //slime
+                    anim = new Animation(Globals.Content.Load<Texture2D>("slime"), 2, 1, 0.2f);
+                    health = 4f;
+                    knockbackResist = 0.8f;
+                    spawnCost = 1;
+
+                    break;
+                case 5: //mini slime
+                    anim = new Animation(Globals.Content.Load<Texture2D>("minislime"), 2, 1, 0.2f);
+                    health = 1f;
+                    knockbackResist = 0.4f;
+                    spawnCost = 1;
+
                     break;
             }
 
-            if (anim != null)
+            if (anims.getFirstAnim() != null)
+            {
+                width = anims.getFirstAnim().frameWidth;
+                height = anims.getFirstAnim().frameHeight;
+            }
+
+            else if (anim != null)
             {
                 width = anim.frameWidth;
                 height = anim.frameHeight;
@@ -83,7 +123,9 @@ namespace HYPERMAGE.Models
                 height = texture.Height;
             }
 
-            origin = new Vector2(width / scale / 2, height / scale / 2) ;
+            origin = new Vector2(width / 2, height / 2) ;
+
+            this.position = position - origin;
 
             center = position + origin;
 
@@ -91,53 +133,37 @@ namespace HYPERMAGE.Models
 
             active = true;
         }
-        public void Draw()
-        {
-            if (spawning)
-            {
-                return;
-            }
-
-            if (anim != null)
-            {
-                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.8f);
-            }
-
-            else
-            {
-                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, 1f);
-            }
-        }
-
-        private float timer = 0;
-
-        private bool charging = false;
         public void Update()
         {
+            center = position + origin;
+
             if (spawning)
             {
                 spawnTimer += Globals.TotalSeconds;
 
                 if (spawnTimer > 2f)
                 {
-                    spawning = false;
-
-                    for (int i = 0; i < Globals.Random.Next(5) + 5; i++)
+                    for (int i = 0; i < 10; i++)
                     {
-                        ParticleData particleData = new()
+                        ParticleData spawnParticleData = new()
                         {
-                            lifespan = Globals.RandomFloat(0.1f, 0.3f),
-                            sizeStart = 1f,
-                            opacityEnd = 0f,
-                            rotationSpeed = 0.15f,
-                            velocity = new(Globals.RandomFloat(-100f, 100f), Globals.RandomFloat(-100f, 100f)),
-                            resistance = Globals.RandomFloat(1, 1.25f)
+                            opacityStart = 1f,
+                            opacityEnd = 1f,
+                            sizeStart = 6,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-400, 200)),
+                            lifespan = 0.2f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
                         };
 
-                        Particle spawnParticle = new(center, particleData);
+                        Particle spawnParticle = new(center, spawnParticleData);
                         ParticleManager.AddParticle(spawnParticle);
                     }
-                }    
+
+                    spawning = false;
+                }
 
                 return;
             }
@@ -146,8 +172,6 @@ namespace HYPERMAGE.Models
             {
                 anim.Update();
             }
-
-            center = position + origin;
 
             hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, width, height);
 
@@ -170,7 +194,7 @@ namespace HYPERMAGE.Models
                 Kill();
             }
 
-            foreach (Projectile p in ProjectileManager.projectiles.ToList())
+            foreach (Projectile p in ProjectileManager.projectiles)
             {
                 if (p.hitbox.IntersectsWith(hitbox) && p.friendly && !projectileImmunity.Contains(p))
                 {
@@ -193,22 +217,66 @@ namespace HYPERMAGE.Models
                 }
             }
 
-            position += velocity * speed * Globals.TotalSeconds * 30;
+            foreach (Mob m in MobManager.mobs)
+            {
+                if (m.flying && flying || !m.flying && !flying)
+                {
+                    if (m.hitbox.IntersectsWith(hitbox) && m != this)
+                    {
+                        velocity += m.center.DirectionTo(center) / (40 * knockbackResist);
+                    }
+                }
+            }
 
             timer += Globals.TotalSeconds;
 
             prevPosition = position;
 
-            if (position.X < GameManager.bounds.X || position.X > GameManager.bounds.Z - width * scale)
+            position += velocity * speed * Globals.TotalSeconds * 30;
+
+            if (!flying)
             {
-                position.X = prevPosition.X;
-                velocity.X = 0f;
+                if (position.X < GameManager.groundBounds.X || position.X > GameManager.groundBounds.Z - width * scale)
+                {
+                    position.X = prevPosition.X;
+                    velocity.X = 0f;
+                }
+
+                if (position.Y < GameManager.groundBounds.Y || position.Y > GameManager.groundBounds.W - height * scale)
+                {
+                    position.Y = prevPosition.Y;
+                    velocity.Y = 0f;
+                }
             }
 
-            if (position.Y < GameManager.bounds.Y || position.Y > GameManager.bounds.W - height * scale)
+            else
             {
-                position.Y = prevPosition.Y;
-                velocity.Y = 0f;
+                if (position.X < GameManager.bounds.X || position.X > GameManager.bounds.Z - width * scale)
+                {
+                    position.X = prevPosition.X;
+                    velocity.X = 0f;
+                }
+
+                if (position.Y < GameManager.bounds.Y || position.Y > GameManager.bounds.W - height * scale)
+                {
+                    position.Y = prevPosition.Y;
+                    velocity.Y = 0f;
+                }
+            }
+
+            //
+
+            if (turnToPlayer)
+            {
+                if (GameManager.GetPlayer().center.X - center.X < 0)
+                {
+                    direction = -1; 
+                }
+
+                else
+                {
+                    direction = 1;
+                }    
             }
 
             switch (aiType)
@@ -217,28 +285,29 @@ namespace HYPERMAGE.Models
                     return;
                 case 1: //bat
 
-                    if (Math.Abs(GameManager.GetPlayer().center.X - center.X) < 20 && Math.Abs(GameManager.GetPlayer().center.Y - center.Y) < 20)
+                    if (Math.Abs(GameManager.GetPlayer().center.X - center.X) < 30 && Math.Abs(GameManager.GetPlayer().center.Y - center.Y) < 30)
                     {
-                        if (!charging && timer > 3)
+                        if (ai == 0 && timer > 3)
                         {
-                            charging = true;
+                            ai = 1;
                             timer = 0;
                         }
                     }
 
-                    if (charging)
+                    if (ai == 1)
                     {
-                        velocity += Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 6;
+                        velocity += Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 11;
 
-                        if(timer > 0.15)
+                        if(timer > 0.35)
                         {
-                            charging = false;
+                            ai = 0;
                             timer = 0;
                         }
                     }
+
                     else
                     {
-                        velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) + new Vector2(Globals.RandomFloat(-1.5f, 1.5f), Globals.RandomFloat(-1.5f, 1.5f))) * Globals.TotalSeconds * speed;
+                        velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) + new Vector2(Globals.RandomFloat(-1.5f, 1.5f), Globals.RandomFloat(-1.5f, 1.5f))) * Globals.TotalSeconds * speed * 3;
                     }
 
                     velocity /= 1.05f;
@@ -277,12 +346,145 @@ namespace HYPERMAGE.Models
                     }
                     
                     return;
+                case 3: //wizard
+
+                    anims.Update((int)ai);
+
+                    if (Globals.Distance(center, GameManager.GetPlayer().center) > 150f)
+                    {
+                        velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed);
+
+                    }
+
+                    if (timer >= 4)
+                    {
+                        if (ai <= 0)
+                        {
+                            for (int i = 0; i < 3; i++)
+                            {
+                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-25 + (i * 25))) * 60f;
+
+                                Projectile projectile = new(center, -2, 1f, projVelocity, 10f, projVelocity.ToRotation() + MathHelper.ToRadians(90f));
+                                ProjectileManager.AddProjectile(projectile);
+
+                                for (int j = 0; j < 3; j++)
+                                {
+                                    ParticleData projParticleData = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = 5,
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = projVelocity.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-20, 20))) * 2,
+                                        lifespan = 0.5f,
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                    };
+
+                                    Particle projParticle = new(center, projParticleData);
+                                    ParticleManager.AddParticle(projParticle);
+                                }
+                            }
+                        }
+
+                        ai = 1;
+
+                        ai2 += Globals.TotalSeconds;
+
+                        if (ai2 >= 0.75)
+                        {
+                            for (int i = 0; i < 3; i++)
+                            {
+                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-25 + (i * 25))) * 60f;
+
+                                Projectile projectile = new(center, -2, 1f, projVelocity, 10f, projVelocity.ToRotation() + MathHelper.ToRadians(90f));
+                                ProjectileManager.AddProjectile(projectile);
+
+                                for (int j = 0; j < 3; j++)
+                                {
+                                    ParticleData projParticleData = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = 5,
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = projVelocity.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-20, 20))) * 2,
+                                        lifespan = 0.5f,
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                    };
+
+                                    Particle projParticle = new(center, projParticleData);
+                                    ParticleManager.AddParticle(projParticle);
+                                }
+                            }
+
+                            ai2 = 0;
+                        }
+                    }
+
+                    if (timer >= 6)
+                    {
+                        timer = 0;
+                        ai2 = 0;
+                        ai = 0;
+                    }
+
+                    velocity /= 1.1f;
+
+                    return;
+
+                case 4: //slime
+                    velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 3);
+                    velocity /= 1.05f;
+
+                    return;
+                case 5: //minislime
+                    velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 5);
+                    velocity /= 1.05f;
+
+                    return;
             }
         }
 
+        public void Draw()
+        {
+            if (spawning)
+            {
+                return;
+            }
+
+            if (anims.getFirstAnim() != null)
+            {
+                anims.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, Vector2.One, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
+            }
+
+            else if (anim != null)
+            {
+                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, Vector2.One, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
+            }
+
+            else
+            {
+                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 1f);
+            }
+        }
         public void Kill()
         {
             active = false;
+
+            switch (aiType)
+            {
+                case 4: //slime
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Mob minislime = new Mob(center + new Vector2(Globals.RandomFloat(-5, 5), Globals.RandomFloat(-5, 5)), 5);
+                        MobManager.AddMob(minislime);
+                    }
+                    break;
+            }
         }
         public void DamagedBy(Projectile projectile)
         {

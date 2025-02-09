@@ -19,7 +19,7 @@ namespace HYPERMAGE.Particles
         public float rotation = 0f;
         public float rotationSpeed = 0f;
         public bool flashing = false;
-
+        public bool fastScale = false;
         public ParticleData()
         {
         }

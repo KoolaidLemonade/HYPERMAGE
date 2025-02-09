@@ -34,7 +34,7 @@ public class Player
     public Color flashColor1;
     public Color flashColor2;
 
-    public int mana = 555;
+    public int mana = 553;
     public int health = 3;
     public int lives = 3;
 
@@ -188,7 +188,7 @@ public class Player
         {
             foreach (Mob mob in MobManager.mobs)
             {
-                if (mob.hitbox.IntersectsWith(hitbox) && mob.contactDamage && !immune)
+                if (mob.hitbox.IntersectsWith(hitbox) && mob.contactDamage && !immune && !mob.spawning)
                 {
                     Damage(1);
                 }

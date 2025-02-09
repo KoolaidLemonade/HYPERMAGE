@@ -1,5 +1,4 @@
-﻿/*
-using HYPERMAGE.Models;
+﻿using HYPERMAGE.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,15 @@ namespace HYPERMAGE.Managers
         private readonly Dictionary<object, Animation> anims = [];
         private object lastKey;
 
+        public Animation getFirstAnim()
+        {
+            if (anims.Count == 0)
+            {
+                return null;
+            }
+
+            return anims[0];
+        }
         public void AddAnimation(object key, Animation animation)
         {
             anims.Add(key, animation);
@@ -34,10 +42,9 @@ namespace HYPERMAGE.Managers
             }
         }
 
-        public void Draw(Vector2 position)
+        public void Draw(Vector2 pos, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffect, float layerDepth)
         {
-            anims[lastKey].Draw(position);
+            anims[lastKey].Draw(pos, color, rotation, origin, scale, spriteEffect, layerDepth);
         }
     }
 }
-*/

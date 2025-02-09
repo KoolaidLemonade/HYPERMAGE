@@ -21,6 +21,9 @@ namespace HYPERMAGE.UI.UIElements
         public static float openingTimer;
         public static float openTime = 0.5f;
 
+        public static Vector2 handVelocity = Vector2.Zero;
+        public static Vector2 handPos = Vector2.Zero;
+
         private Vector2 originalPosition;
 
         public static List<SpellbookSpell> spellsPrimary = [];
@@ -110,6 +113,19 @@ namespace HYPERMAGE.UI.UIElements
         public override void Update()
         {
             UpdateButtonHitbox();
+
+            if (open || closing)
+            {
+                if (Globals.Distance(handPos, InputManager.MousePosition) > 5)
+                {
+                    handVelocity += handPos.DirectionTo(InputManager.MousePosition) * Globals.TotalSeconds * 3000;
+                }
+
+                handPos += handVelocity * Globals.TotalSeconds;
+
+                handVelocity /= 1.2f;
+            }
+
 
             if (buttonHitbox.Contains(InputManager.MousePosition))
             {
@@ -201,6 +217,11 @@ namespace HYPERMAGE.UI.UIElements
         }
         public override void Draw()
         {
+            if (open || closing)
+            {
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("hand"), handPos - new Vector2(2, 0), null, Color.White * openingTimer, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
+            }
+
             if (open || closing)
             {
                 int k = 0;
@@ -721,7 +742,7 @@ namespace HYPERMAGE.UI.UIElements
                 }
             }
 
-            Globals.SpriteBatch.Draw(texture, position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.991f);
+            Globals.SpriteBatch.Draw(texture, position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
         }
 
         public override void Clicked()

@@ -67,10 +67,7 @@ namespace HYPERMAGE
 
             GameManager.GetPlayer().position = new(160, 90);
 
-            GameManager.bounds = new(0, 0, 320, 180);
-
             LevelManager.NextLevel();
-            LevelManager.GetNextSpawnWave();
         }
         public void Update()
         {

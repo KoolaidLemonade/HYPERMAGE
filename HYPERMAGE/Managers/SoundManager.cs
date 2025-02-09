@@ -12,7 +12,7 @@ namespace HYPERMAGE.Managers
     {
         public static float musicVolume = 1f;
         public static float soundVolume = 1f;
-        public static float globalVolume = 0.01f;
+        public static float globalVolume = 0.0f;
 
         public static List<SoundEffectInstance> sounds = [];
         public static void PlaySound(SoundEffect effect, float volume, float pitch, float pan)

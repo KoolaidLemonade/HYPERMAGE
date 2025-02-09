@@ -15,6 +15,13 @@ namespace HYPERMAGE.Models
     {
         public Texture2D texture;
         public Animation anim;
+
+        public Texture2D underglow;
+        public int underglowWidth;
+        public int underglowHeight;
+        public Vector2 underglowOrigin;
+        public Color underglowColor;
+
         public Vector2 position;
         public int aiType;
         public float maxLifespan;
@@ -120,8 +127,15 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 // enemy projectiles
+                case -2:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet5");
+                    underglow = Globals.Content.Load<Texture2D>("enemybullet5underglow");
+                    underglowColor = Color.Red;
+                    break;
                 case -1:
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
+                    underglow = Globals.Content.Load<Texture2D>("enemybullet2underglow");
+                    underglowColor = Color.Red;
                     break;
                 case 0:
                     break;
@@ -143,6 +157,13 @@ namespace HYPERMAGE.Models
                     break;
 
 
+            }
+
+            if (underglow != null)
+            {
+                underglowWidth = underglow.Width;
+                underglowHeight = underglow.Height;
+                underglowOrigin = new(underglowWidth / 2, underglowHeight / 2);
             }
 
             if (anim != null)
@@ -182,6 +203,11 @@ namespace HYPERMAGE.Models
                 }
 
                 Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? 0.8f : 1f);
+
+                if (underglow != null)
+                {
+                    Globals.SpriteBatch.Draw(underglow, new((int)position.X, (int)position.Y), null, underglowColor, rotation, underglowOrigin, scale, SpriteEffects.None, friendly ? 0.8f - 0.01f : 1f - 0.01f);
+                }
             }
         }
 
@@ -200,6 +226,11 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 //enemy projectiles
+                case -2: //wizard
+                    position += velocity * Globals.TotalSeconds * speed;
+                    rotation += 3f * Globals.TotalSeconds;
+
+                    break;
                 case -1: //wisp
                     position += velocity * Globals.TotalSeconds * speed;
 
@@ -437,7 +468,7 @@ namespace HYPERMAGE.Models
                             {
                                 opacityStart = 1f,
                                 opacityEnd = 1f,
-                                sizeStart = 30,
+                                sizeStart = 10,
                                 sizeEnd = 0,
                                 colorStart = Color.White,
                                 colorEnd = Color.White,
@@ -454,7 +485,7 @@ namespace HYPERMAGE.Models
                             {
                                 opacityStart = 1f,
                                 opacityEnd = 1f,
-                                sizeStart = 15,
+                                sizeStart = 8,
                                 sizeEnd = 0,
                                 colorStart = Color.White,
                                 colorEnd = Color.White,
@@ -471,7 +502,7 @@ namespace HYPERMAGE.Models
                             {
                                 opacityStart = 1f,
                                 opacityEnd = 1f,
-                                sizeStart = 25,
+                                sizeStart = 10,
                                 sizeEnd = 0,
                                 colorStart = Color.White,
                                 colorEnd = Color.White,

@@ -16,7 +16,7 @@ public static class Globals
     public static Random Random { get; set; } = new();
 
     private static Texture2D blankTexture;
-
+    private static Texture2D longPixel;
     public static Vector2 DirectionTo(this Vector2 origin, Vector2 target) => Vector2.Normalize(target - origin);
 
     public static float ToRotation(this Vector2 vector2) => (float)Math.Atan2(vector2.Y, vector2.X);
