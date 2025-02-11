@@ -39,7 +39,8 @@ namespace HYPERMAGE.UI.UIElements
 
         public override void Update()
         {
-            timer += 0.05f;
+
+            timer += Globals.TotalSeconds * 3;
 
             drawOffset = (float)Math.Sin(timer) * 2.5f;
 

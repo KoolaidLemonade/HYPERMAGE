@@ -15,6 +15,7 @@ namespace HYPERMAGE
 
         private RenderTarget2D vfx;
         private RenderTarget2D game;
+
         private RenderTarget2D renderTarget;
         private RenderTarget2D renderTarget2;
         private RenderTarget2D renderTarget3;
@@ -22,11 +23,15 @@ namespace HYPERMAGE
         private RenderTarget2D renderTarget5;
         private RenderTarget2D renderTarget6;
 
+        private RenderTarget2D warpTarget;
+
         private Effect blur;
         private Effect waves;
         private Effect transition;
         private Effect shake;
         private Effect invert;
+        private Effect noise;
+        private Effect warp;
 
         private float time;
         private float time2;
@@ -35,7 +40,7 @@ namespace HYPERMAGE
             graphics = new GraphicsDeviceManager(this);
             graphics.IsFullScreen = true;
             graphics.HardwareModeSwitch = false;
-            
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -52,6 +57,8 @@ namespace HYPERMAGE
             renderTarget5 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
             renderTarget6 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
 
+            warpTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
+
             graphics.PreferredBackBufferWidth = 1920;
             graphics.PreferredBackBufferHeight = 1080;
             graphics.ApplyChanges();
@@ -63,10 +70,13 @@ namespace HYPERMAGE
 
             GameManager.Init();
 
-
             base.Initialize();
         }
 
+
+        List<float> scanlines = [];
+        int scanlineCount = 3;
+        int scanlineThickness = 200;
         protected override void LoadContent()
         {
             waves = Content.Load<Effect>("waves");
@@ -74,6 +84,17 @@ namespace HYPERMAGE
             transition = Content.Load<Effect>("transition");
             shake = Content.Load<Effect>("shake");
             invert = Content.Load<Effect>("invert");
+            noise = Content.Load<Effect>("noise");
+            warp = Content.Load<Effect>("warp");
+
+            noise.Parameters["power"].SetValue(0.85f);
+
+            warp.Parameters["resolution"].SetValue(new Vector2(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
+
+            for (int i = 0; i < scanlineCount; i++)
+            {
+                scanlines.Add(i * graphics.PreferredBackBufferHeight / scanlineCount - scanlineThickness);
+            }
         }
 
         float t;
@@ -82,6 +103,26 @@ namespace HYPERMAGE
         {
             t += Globals.TotalSeconds;
             tt++;
+
+            if (GameManager.damageStatic)
+            {
+                noise.Parameters["power"].SetValue(GameManager.staticPower);
+            }
+
+            for (int i = 0; i < scanlines.Count; i++)
+            {
+                if (scanlines[i] > graphics.PreferredBackBufferHeight - scanlineThickness)
+                {
+                    scanlines[i] = -scanlineThickness;
+                }
+
+                else
+                {
+
+                }
+
+                scanlines[i] += 25;
+            }
 
             if (t >= 1)
             {
@@ -107,6 +148,7 @@ namespace HYPERMAGE
 
             waves.Parameters["power"].SetValue(GameManager.wavesPower);
             waves.Parameters["time"].SetValue(time);
+            noise.Parameters["time"].SetValue(time);
 
             if (GameManager.fadeout)
             {
@@ -219,14 +261,29 @@ namespace HYPERMAGE
             spriteBatch.Draw(renderTarget5, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
 
-            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.SetRenderTarget(warpTarget);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: noise);
+            spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 1920, 1080), Color.White);
+            spriteBatch.End();
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: shake);
             spriteBatch.Draw(renderTarget6, Vector2.Zero, new Color(Color.White, 0));
+
+
+            for (int i = 0; i < scanlines.Count; i++)
+            {
+                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, (int)scanlines[i], 1920, scanlineThickness), new Color(Color.Black, 0.15f));
+
+            }
+
+            spriteBatch.Draw(Content.Load<Texture2D>("crt"), new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0.5f) * 0.7f);
             spriteBatch.End();
 
-            spriteBatch.Begin(blendState: BlendState.AlphaBlend);
-            spriteBatch.Draw(Content.Load<Texture2D>("crt"), new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0.5f) * 0.7f);
+            GraphicsDevice.SetRenderTarget(null);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: warp);
+            spriteBatch.Draw(warpTarget, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
 
             base.Draw(gameTime);

@@ -247,6 +247,18 @@
 /processorParam:TextureFormat=Color
 /build:enemybullet7.png
 
+#begin explosionicon.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:explosionicon.png
+
 #begin eye1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -319,6 +331,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:hand.png
+
+#begin hasteicon.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:hasteicon.png
 
 #begin heart.png
 /importer:TextureImporter
@@ -452,17 +476,11 @@
 /processorParam:TextureFormat=Color
 /build:mouse.png
 
-#begin noise.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:noise.png
+#begin noise.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:noise.fx
 
 #begin particle.png
 /importer:TextureImporter
@@ -553,6 +571,18 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:smallexplosion.wav
+
+#begin sparksicon.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:sparksicon.png
 
 #begin spawnflash.png
 /importer:TextureImporter
@@ -655,6 +685,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ui2.png
+
+#begin warp.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:warp.fx
 
 #begin waves.fx
 /importer:EffectImporter

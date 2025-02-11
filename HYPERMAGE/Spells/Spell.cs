@@ -94,7 +94,7 @@ namespace HYPERMAGE.Spells
                     description = "SUMMONS A LARGE BLADE OF ARCANE FIRE";
                     name = "BLADE OF FLAME";
                     return;
-                case 5: //disintigrate
+                case 5: //disintegrate
                     cost = 5;
 
                     spellTraits.Add(1);
@@ -105,6 +105,38 @@ namespace HYPERMAGE.Spells
                     description = "CALL UPON THE SUN TO SUMMON A PILLAR OF PURE ELEMENTAL FIRE";
                     name = "DISINTEGRATE";
                     return;
+                case 6: //sparks
+                    cost = 1;
+
+                    spellTraits.Add(1);
+                    spellTraits.Add(22);
+
+                    icon = Globals.Content.Load<Texture2D>("sparksicon");
+                    description = "SUMMONS A FORMATION OF DWINDLING SPARKS";
+                    name = "SPARKS";
+                    return;
+                case 7: // haste
+                    cost = 3;
+
+                    spellTraits.Add(1);
+                    spellTraits.Add(17);
+
+                    icon = Globals.Content.Load<Texture2D>("hasteicon");
+                    description = "IMBUES YOUR NEXT SPELL WITH HASTE";
+                    name = "HASTE";
+                    return;
+                case 8: // explosion
+                    cost = 4;
+
+                    spellTraits.Add(1);
+                    spellTraits.Add(23);
+                    spellTraits.Add(24);
+
+                    icon = Globals.Content.Load<Texture2D>("explosionicon");
+                    description = "CONJURES A MASSIVE FIERY EXPLOSION";
+                    name = "EXPLOSION";
+                    return;
+
             }
         }
         public void Cast(float spread, Player player)
@@ -166,20 +198,20 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-                            cooldown = 0.9f;
+                            cooldown = 0.25f;
                             damage = 1f;
                             knockback = 1f;
                             size = 2f;
                             break;
                         case 2:
-                            cooldown = 0.65f;
+                            cooldown = 0.2f;
                             damage = 2f;
                             speed = 1.5f;
                             knockback = 1.25f;
                             size = 3f;
                             break;
                         case 3:
-                            cooldown = 0.4f;
+                            cooldown = 0.15f;
                             damage = 4f;
                             speed = 2.5f;
                             knockback = 1.5f;
@@ -191,21 +223,21 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-                            cooldown = 1.25f;
+                            cooldown = 0.5f;
                             damage = 5f;
                             speed = 0.75f;
                             size = 6f;
                             knockback = 2f;
                             break;
                         case 2:
-                            cooldown = 1f;
+                            cooldown = 0.35f;
                             damage = 8f;
                             speed = 0.65f;
                             size = 8f;
                             knockback = 3f;
                             break;
                         case 3:
-                            cooldown = 0.75f;
+                            cooldown = 0.15f;
                             damage = 15f;
                             speed = 0.4f;
                             size = 10f;
@@ -217,20 +249,20 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-                            cooldown = 1.25f;
+                            cooldown = 0.5f;
                             damage = 0.1f;
                             speed = 0.75f;
                             lifespan = 4f;
                             break;
                         case 2:
-                            cooldown = 1f;
+                            cooldown = 0.25f;
                             damage = 0.2f;
                             speed = 1f;
                             size = 2f;
                             lifespan = 6f;
                             break;
                         case 3:
-                            cooldown = 0.75f;
+                            cooldown = 0.2f;
                             damage = 0.5f;
                             speed = 1.5f;
                             size = 4f;
@@ -242,13 +274,13 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-                            cooldown = 0.75f;
+                            cooldown = 0.4f;
                             damage = 5f;
                             lifespan = 0.75f;
                             knockback = 1f;
                             break;
                         case 2:
-                            cooldown = 0.45f;
+                            cooldown = 0.3f;
                             damage = 8f;
                             size = 1.25f;
                             lifespan = 0.55f;
@@ -267,18 +299,18 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-                            cooldown = 1.5f;
+                            cooldown = 0.5f;
                             damage = 20f;
                             lifespan = 0.5f;
                             break;
                         case 2:
-                            cooldown = 0.8f;
+                            cooldown = 0.4f;
                             damage = 30f;
                             size = 1.5f;
                             lifespan = 0.25f;
                             break;
                         case 3:
-                            cooldown = 0.2f;
+                            cooldown = 0.1f;
                             damage = 60f;
                             size = 3f;
                             lifespan = 0.1f;

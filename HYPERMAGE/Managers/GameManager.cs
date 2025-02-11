@@ -29,6 +29,10 @@ namespace HYPERMAGE.Managers
         private static IScene nextScene;
         private static bool transition;
 
+        public static bool damageStatic;
+        public static float staticPowerPrev;
+        public static float staticPower = 0.87f;
+
         public static bool death;
         public static int t;
 
@@ -61,12 +65,30 @@ namespace HYPERMAGE.Managers
                 }
             }
 
-            if (transition)
+            if (damageStatic)
             {
-                transitionTimer++;
+                if (staticPowerPrev <= 0)
+                {
+                    staticPowerPrev = staticPower;
+                    staticPower = 0.05f;
+                }
+
+                staticPower += Globals.TotalSeconds;
+
+                if (staticPower >= staticPowerPrev)
+                {
+                    staticPower = staticPowerPrev;
+                    damageStatic = false;
+                    staticPowerPrev = 0;
+                }
             }
 
-            if (transitionTimer >= 180)
+            if (transition)
+            {
+                transitionTimer += Globals.TotalSeconds;
+            }
+
+            if (transitionTimer >= 3)
             {
                 UIManager.Clear();
                 ParticleManager.Clear();

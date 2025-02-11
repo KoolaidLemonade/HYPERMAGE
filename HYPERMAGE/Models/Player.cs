@@ -3,6 +3,7 @@ using HYPERMAGE.Managers;
 using HYPERMAGE.Particles;
 using HYPERMAGE.Spells;
 using HYPERMAGE.UI.UIElements;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
@@ -243,7 +244,11 @@ public class Player
     public void Damage(int damage)
     {
         health -= damage;
-        GameManager.AddScreenShake(0.2f, 5f);
+
+        GameManager.AddScreenShake(0.2f, 8f);
+        GameManager.damageStatic = true;
+
+        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("death"), 1, 0, 0);
 
         if (health <= 0)
         {
