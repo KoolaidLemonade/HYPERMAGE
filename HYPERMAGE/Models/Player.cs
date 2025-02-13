@@ -147,11 +147,11 @@ public class Player
         velocity.X = Math.Clamp(velocity.X, -speed, speed);
         velocity.Y = Math.Clamp(velocity.Y, -speed, speed);
 
-        velocity /= 1.5f;
+        velocity *= Globals.TotalSeconds;
 
         prevPosition = position;
 
-        position += velocity;
+        position += velocity * Globals.TotalSeconds * (InputManager.slow ? 1000 : 2000);
 
         //
 
@@ -246,6 +246,8 @@ public class Player
         health -= damage;
 
         GameManager.AddScreenShake(0.2f, 8f);
+        GameManager.AddAbberationPowerForce(500, 50);
+
         GameManager.damageStatic = true;
 
         SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("death"), 1, 0, 0);

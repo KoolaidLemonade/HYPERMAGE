@@ -3,6 +3,7 @@ using HYPERMAGE.Managers;
 using HYPERMAGE.Models;
 using HYPERMAGE.Particles;
 using HYPERMAGE.Spells;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -131,6 +132,9 @@ namespace HYPERMAGE.UI.UIElements
                 ShopManager.RemoveSpell(this);
 
                 Spellbook.AddSpellMemory(spell);
+
+                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("ding"), 0.5f, 0.1f, 0f);
+
             }
 
             base.Clicked();

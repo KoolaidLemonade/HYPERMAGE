@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin abberation.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:abberation.fx
+
 #begin bat.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -103,6 +109,30 @@
 /processorParam:Quality=Best
 /build:bop.mp3
 
+#begin bwowop.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:bwowop.mp3
+
+#begin chirp.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:chirp.wav
+
+#begin cleric.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:cleric.png
+
 #begin crt.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -115,11 +145,23 @@
 /processorParam:TextureFormat=Color
 /build:crt.png
 
+#begin cry.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:cry.wav
+
 #begin death.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:death.wav
+
+#begin deepsynth.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:deepsynth.wav
 
 #begin ding.wav
 /importer:WavImporter
@@ -246,6 +288,60 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:enemybullet7.png
+
+#begin enemybullet8.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet8.png
+
+#begin enemybullet8underglow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet8underglow.png
+
+#begin enemybullet9.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet9.png
+
+#begin enemybullet9underglow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet9underglow.png
+
+#begin enemyspawning.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:enemyspawning.wav
 
 #begin explosionicon.png
 /importer:TextureImporter
@@ -440,6 +536,18 @@
 /processorParam:TextureFormat=Color
 /build:logoletters.png
 
+#begin magick.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:magick.wav
+
+#begin magick2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:magick2.wav
+
 #begin mana.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -572,6 +680,18 @@
 /processorParam:Quality=Best
 /build:smallexplosion.wav
 
+#begin sorcerer.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:sorcerer.png
+
 #begin sparksicon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -643,6 +763,18 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:title.mp3
+
+#begin totem.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:totem.png
 
 #begin traiticons.png
 /importer:TextureImporter

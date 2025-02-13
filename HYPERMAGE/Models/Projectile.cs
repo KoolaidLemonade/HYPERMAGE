@@ -1,6 +1,7 @@
 ﻿using HYPERMAGE.Helpers;
 using HYPERMAGE.Managers;
 using HYPERMAGE.Particles;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -127,6 +128,16 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 // enemy projectiles
+                case -4:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet9");
+                    underglow = Globals.Content.Load<Texture2D>("enemybullet9underglow");
+                    underglowColor = Color.Red;
+                    break;
+                case -3:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet8");
+                    underglow = Globals.Content.Load<Texture2D>("enemybullet8underglow");
+                    underglowColor = Color.Red;
+                    break;
                 case -2:
                     texture = Globals.Content.Load<Texture2D>("enemybullet5");
                     underglow = Globals.Content.Load<Texture2D>("enemybullet5underglow");
@@ -216,6 +227,7 @@ namespace HYPERMAGE.Models
         public void Update()
         {
             hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
+
             center = position + origin;
 
             if (lifespan <= 0)
@@ -226,6 +238,39 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 //enemy projectiles
+                case -4: //sorcerer
+                    position += velocity * Globals.TotalSeconds * speed;
+
+                    rotation = velocity.ToRotation() + MathHelper.ToRadians(90f);
+                    break;
+                case -3: //sorcerer
+                    position += velocity * Globals.TotalSeconds * speed;
+                    velocity /= 1.05f;
+
+                    if (lifespan <= 0.15 && ai == 0)
+                    {
+                        ai = 1;
+
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0.8f, 0f, 0f);
+
+                        for (int i = 0; i < Globals.Random.Next(4) + 8; i++)
+                        {
+                            ParticleData projParticleData = new()
+                            {
+                                sizeStart = 2,
+                                sizeEnd = 0,
+                                velocity = (Vector2.One * 100f).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360))),
+                                lifespan = 0.5f,
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                            };
+
+                            Particle projParticle = new(position, projParticleData);
+                            ParticleManager.AddParticle(projParticle);
+                        }
+
+                    }
+
+                    break;
                 case -2: //wizard
                     position += velocity * Globals.TotalSeconds * speed;
                     rotation += 3f * Globals.TotalSeconds;
@@ -238,8 +283,6 @@ namespace HYPERMAGE.Models
                     {
                         ParticleData projParticleData = new()
                         {
-                            opacityStart = .8f,
-                            opacityEnd = 0.1f,
                             sizeStart = 2,
                             sizeEnd = 0,
                             colorStart = Color.White,
@@ -556,6 +599,32 @@ namespace HYPERMAGE.Models
         {
             switch (aiType)
             {
+                case -3: //sorcerer
+                    for (int i = 0; i < Globals.Random.Next(5) + 5; i++)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            sizeStart = 8,
+                            sizeEnd = 0,
+                            velocity = (Vector2.One * 50f).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360))),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+                    }
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        Projectile projectile = new(position, -4, 1f, (Vector2.One * 70).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0, 360, i / (8f)))), 5f);
+                        ProjectileManager.AddProjectile(projectile);    
+                    }
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("smallexplosion"), 0.7f, 0f + Globals.RandomFloat(0, 0.5f), 0f);
+
+
+                    break;
                 case 1: //firebolt
                     for (int i = 0; i < Globals.Random.Next(5) + 5; i++)
                     {
@@ -595,9 +664,49 @@ namespace HYPERMAGE.Models
                         ParticleManager.AddParticle(projParticle);
                     }
 
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("smallexplosion"), 0.4f, Globals.RandomFloat(0.5f, 1f), 0f);
+
                     break;
                 case 2: //fireball
+                    for (int i = 0; i < Globals.Random.Next(5) + 5; i++)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 8,
+                            sizeEnd = 0,
+                            colorStart = Color.Gold,
+                            colorEnd = Color.Red,
+                            velocity = (velocity * Globals.RandomFloat(0f, 1.5f)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-45, 45))),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
 
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+                    }
+
+                    for (int i = 0; i < Globals.Random.Next(2) + 6; i++)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 5,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = (velocity * Globals.RandomFloat(0f, 1.5f)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-45, 45))) * 1.5f,
+                            lifespan = 0.25f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+                    }
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 0.4f, -0.2f, 0f);
                     break;
                 case 5: //disintegrate
                     {
@@ -607,6 +716,14 @@ namespace HYPERMAGE.Models
                             ProjectileManager.AddProjectile(projectile);
 
                             GameManager.AddScreenShake(0.2f, 15f);
+                            GameManager.AddAbberationPowerForce(500, 50);
+
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("cry"), 0.5f, 0f, 0f);
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lastingexplosion"), 0.7f, -1f, 0f);
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0.7f, 0f, 0f);
+
+
+
                         }
 
                         if (ai == 1)
@@ -647,6 +764,9 @@ namespace HYPERMAGE.Models
                                 Particle fadeParticle2 = new(new(position.X + Globals.RandomFloat(-20, 20), position.Y), fadeParticleData2);
                                 ParticleManager.AddParticle(fadeParticle2);
                             }
+
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 0.6f, 1f, 0);
+
                         }
 
                         break;
@@ -665,8 +785,6 @@ namespace HYPERMAGE.Models
                     {
                         ParticleData particleData = new()
                         {
-                            opacityStart = .8f,
-                            opacityEnd = 0.1f,
                             sizeStart = 5,
                             sizeEnd = 0,
                             colorStart = Color.White,

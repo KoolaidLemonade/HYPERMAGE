@@ -1,5 +1,6 @@
 ﻿using HYPERMAGE.Helpers;
 using HYPERMAGE.Managers;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,8 @@ namespace HYPERMAGE.UI.UIElements
         {
             if (active)
             {
+                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0.5f, 1f, 0f);
+
                 if (GameManager.GetPlayer().mana >= ShopManager.xpCost)
                 {
                     GameManager.GetPlayer().mana -= ShopManager.xpCost;

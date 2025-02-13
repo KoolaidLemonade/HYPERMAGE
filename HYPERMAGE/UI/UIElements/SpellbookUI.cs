@@ -1,6 +1,7 @@
 ﻿using HYPERMAGE.Helpers;
 using HYPERMAGE.Managers;
 using HYPERMAGE.Spells;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -118,7 +119,7 @@ namespace HYPERMAGE.UI.UIElements
             {
                 if (Globals.Distance(handPos, InputManager.MousePosition) > 5)
                 {
-                    handVelocity += handPos.DirectionTo(InputManager.MousePosition) * Globals.TotalSeconds * 3000;
+                    handVelocity += handPos.DirectionTo(InputManager.MousePosition) * Globals.TotalSeconds * 4000;
                 }
 
                 handPos += handVelocity * Globals.TotalSeconds;
@@ -202,6 +203,8 @@ namespace HYPERMAGE.UI.UIElements
 
         public override void Clicked()
         {
+            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bop"), 0.5f, 0f, 0f);
+
             if (!open)
             {
                 open = true;
@@ -686,6 +689,9 @@ namespace HYPERMAGE.UI.UIElements
                 }
 
                 grabbed = false;
+
+                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0.5f, -1f, 0f);
+
             }
 
             spellText.position = new((int)InputManager.MousePosition.X, (int)InputManager.MousePosition.Y);
@@ -747,6 +753,8 @@ namespace HYPERMAGE.UI.UIElements
 
         public override void Clicked()
         {
+            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0.5f, 0f, 0f);
+
             grabOffset = InputManager.MousePosition - position;
 
             grabbed = true;

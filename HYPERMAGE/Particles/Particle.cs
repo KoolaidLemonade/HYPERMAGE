@@ -1,4 +1,6 @@
 ﻿using HYPERMAGE.Helpers;
+using HYPERMAGE.Managers;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
@@ -57,6 +59,12 @@ namespace HYPERMAGE.Particles
             if (lifespanLeft <= 0f)
             {
                 isFinished = true;
+
+                if (texture == Globals.Content.Load<Texture2D>("spawnindicator"))
+                {
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("enemyspawning"), 1f, 0f, 0f);
+                }
+
                 return;
             }
 

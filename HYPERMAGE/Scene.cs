@@ -364,6 +364,8 @@ namespace HYPERMAGE
             {
                 ShopManager.Reroll();
             }
+
+            SoundManager.PlaySong(Globals.Content.Load<Song>("shop"), 1f);
         }
         public void Update()
         {

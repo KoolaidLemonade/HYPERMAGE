@@ -1,5 +1,6 @@
 ﻿using HYPERMAGE.Helpers;
 using HYPERMAGE.Managers;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,8 @@ namespace HYPERMAGE.UI.UIElements
 
         public override void Clicked()
         {
+            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0.5f, 1f, 0f);
+
             if (ShopManager.locked)
             {
                 ShopManager.locked = false;

@@ -34,8 +34,8 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
     color.r *= rand1(time + rand1(input.TextureCoordinates.x) + rand1(input.TextureCoordinates.y));
     color.g *= rand1(time + rand1(input.TextureCoordinates.x) + rand1(input.TextureCoordinates.y) + 1);
-    color.b *= rand1(time + rand1(input.TextureCoordinates.y) + 2);
-    color.a *= rand1(time + rand1(input.TextureCoordinates.y) + rand1(input.TextureCoordinates.y) + 3);
+    color.b *= rand1(time + rand1(input.TextureCoordinates.x) + rand1(input.TextureCoordinates.y) + 2);
+    color.a *= rand1(time + rand1(input.TextureCoordinates.x) + rand1(input.TextureCoordinates.y) + 3);
 	
     color.rgba -= power;
 	

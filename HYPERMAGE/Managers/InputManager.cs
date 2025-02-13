@@ -30,6 +30,7 @@ namespace HYPERMAGE.Managers
         public static bool buttonClickedHold;
 
         public static bool dashing;
+        public static bool slow;
 
         public static float dashCooldown = 100;
         public static void Update()
@@ -61,10 +62,20 @@ namespace HYPERMAGE.Managers
                 }
             }
 
-            if (keyboardState.IsKeyDown(Keys.LeftShift) && dashCooldown > 100f)
+            if (keyboardState.IsKeyDown(Keys.Space) && dashCooldown > 100f)
             {
                 dashCooldown = 0;
                 dashing = true;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.LeftShift))
+            {
+                slow = true;
+            }
+
+            else
+            {
+                slow = false;
             }
 
             if (buttonClicked && LeftMouseDown)

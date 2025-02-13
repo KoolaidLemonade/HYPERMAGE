@@ -96,7 +96,7 @@ namespace HYPERMAGE.Managers
                 credits++;
             }
 
-            if (MobManager.mobs.Count == 0 ? Globals.Random.Next(100) == 0 && credits >= spawnWaveCost : Globals.Random.Next(200) == 0 && credits >= spawnWaveCost)
+            if (MobManager.mobs.Count == 0 ? credits >= spawnWaveCost : Globals.Random.Next(200) == 0 && credits >= spawnWaveCost)
             {
                 SpawnNextWave();
             }
@@ -190,6 +190,14 @@ namespace HYPERMAGE.Managers
                 }
             }
 
+            if (type == 4)
+            {
+                spawnPos = new(Globals.RandomFloat(20, 300), 140);
+
+                Mob sorcerer = new(spawnPos, 6);
+                spawnWave.Add(sorcerer);
+            }
+
 
             foreach (Mob mob in spawnWave)
             {
@@ -218,10 +226,8 @@ namespace HYPERMAGE.Managers
 
                     levelCredits = 40;
                     //
-                    validSpawns.Add(0);
+
                     validSpawns.Add(1);
-                    validSpawns.Add(2);
-                    validSpawns.Add(3);
 
                     break;
                 case 2:

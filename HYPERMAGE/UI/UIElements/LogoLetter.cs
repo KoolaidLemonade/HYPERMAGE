@@ -119,6 +119,7 @@ namespace HYPERMAGE.UI.UIElements
                 if (Math.Abs(velocity.X) >= 350f)
                 {
                     GameManager.AddScreenShake(0.15f, 5);
+                    GameManager.AddAbberationPowerForce(500, 20);
                 }
 
                 position.X = prevPosition.X;
@@ -181,6 +182,7 @@ namespace HYPERMAGE.UI.UIElements
                 if (Math.Abs(velocity.Y) >= 350f)
                 {
                     GameManager.AddScreenShake(0.15f, 5);
+                    GameManager.AddAbberationPowerForce(500, 20);
                 }
 
                 position.Y = prevPosition.Y;

@@ -24,6 +24,7 @@ namespace HYPERMAGE
         private RenderTarget2D renderTarget6;
 
         private RenderTarget2D warpTarget;
+        private RenderTarget2D abberationTarget;
 
         private Effect blur;
         private Effect waves;
@@ -32,6 +33,7 @@ namespace HYPERMAGE
         private Effect invert;
         private Effect noise;
         private Effect warp;
+        private Effect abberation;
 
         private float time;
         private float time2;
@@ -58,6 +60,7 @@ namespace HYPERMAGE
             renderTarget6 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
 
             warpTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
+            abberationTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
 
             graphics.PreferredBackBufferWidth = 1920;
             graphics.PreferredBackBufferHeight = 1080;
@@ -86,6 +89,7 @@ namespace HYPERMAGE
             invert = Content.Load<Effect>("invert");
             noise = Content.Load<Effect>("noise");
             warp = Content.Load<Effect>("warp");
+            abberation = Content.Load<Effect>("abberation");
 
             noise.Parameters["power"].SetValue(0.85f);
 
@@ -103,6 +107,11 @@ namespace HYPERMAGE
         {
             t += Globals.TotalSeconds;
             tt++;
+
+            Vector2 mouseUV = new Vector2(0, 1) - (new Vector2(-InputManager.MousePosition.X, InputManager.MousePosition.Y) / new Vector2(320, 180));
+            abberation.Parameters["mousePosition"].SetValue(mouseUV);
+
+            abberation.Parameters["power"].SetValue(GameManager.abberationPower);
 
             if (GameManager.damageStatic)
             {
@@ -126,8 +135,6 @@ namespace HYPERMAGE
 
             if (t >= 1)
             {
-                Debug.WriteLine(tt);
-
                 t = 0;
                 tt = 0;
             }
@@ -273,18 +280,25 @@ namespace HYPERMAGE
 
             for (int i = 0; i < scanlines.Count; i++)
             {
-                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, (int)scanlines[i], 1920, scanlineThickness), new Color(Color.Black, 0.15f));
+                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, (int)scanlines[i], 1920, scanlineThickness), new Color(Color.Black, 0.08f));
 
             }
 
             spriteBatch.Draw(Content.Load<Texture2D>("crt"), new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0.5f) * 0.7f);
             spriteBatch.End();
 
-            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.SetRenderTarget(abberationTarget);
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: warp);
             spriteBatch.Draw(warpTarget, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
+
+            GraphicsDevice.SetRenderTarget(null);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: abberation);
+            spriteBatch.Draw(abberationTarget, Vector2.Zero, new Color(Color.White, 0));
+            spriteBatch.End();
+
 
             base.Draw(gameTime);
         }

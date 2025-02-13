@@ -4,6 +4,7 @@ using HYPERMAGE.Particles;
 using HYPERMAGE.Spells;
 using HYPERMAGE.UI;
 using HYPERMAGE.UI.UIElements;
+using Microsoft.Xna.Framework.Audio;
 using System.Net.Mime;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Net.Mime.MediaTypeNames;
@@ -31,7 +32,10 @@ namespace HYPERMAGE.Managers
 
         public static bool damageStatic;
         public static float staticPowerPrev;
-        public static float staticPower = 0.87f;
+        public static float staticPower = 0.95f;
+
+        public static float abberationPower = 1f;
+        public static float decayRate;
 
         public static bool death;
         public static int t;
@@ -65,6 +69,16 @@ namespace HYPERMAGE.Managers
                 }
             }
 
+            if (abberationPower > 1f)
+            {
+                abberationPower -= Globals.TotalSeconds * decayRate;
+            }
+
+            else
+            {
+                abberationPower = 1f;
+            }
+
             if (damageStatic)
             {
                 if (staticPowerPrev <= 0)
@@ -94,6 +108,9 @@ namespace HYPERMAGE.Managers
                 ParticleManager.Clear();
                 MobManager.Clear();
                 ProjectileManager.Clear();
+
+                SoundManager.ClearSounds();
+                SoundManager.ClearSong();
 
                 GameManager.wavesPower = 0.0f;
                 GameManager.waves = false;
@@ -150,6 +167,12 @@ namespace HYPERMAGE.Managers
             transition = true;
 
             SoundManager.ClearSong();
+        }
+
+        public static void AddAbberationPowerForce(float decay, float intensity)
+        {
+            decayRate = decay;
+            abberationPower += intensity;
         }
     }
 }

@@ -2,6 +2,7 @@
 using HYPERMAGE.Managers;
 using HYPERMAGE.Models;
 using HYPERMAGE.Particles;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace HYPERMAGE.Spells
     // i love megaclassing
     public class Spell
     {
-        public static int totalSpellTypes = 5;
+        public static int totalSpellTypes = 8;
 
         public float cooldown;
 
@@ -148,10 +149,14 @@ namespace HYPERMAGE.Spells
                 case 1: // firebolt
                     Projectile firebolt = new(player.center, 1, speed, damage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
                     ProjectileManager.AddProjectile(firebolt);
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0.6f, 0);
                     return;
                 case 2: // fireball
                     Projectile fireball = new(player.center, 2, speed, damage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
                     ProjectileManager.AddProjectile(fireball);
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("heavyhit"), 0.3f, -0.8f, 0);
                     return;
                 case 3: // kindle
                     for (int i = 0; i < 5; i++)
@@ -173,18 +178,26 @@ namespace HYPERMAGE.Spells
                         ParticleManager.AddParticle(kindleParticle);
                     }
 
-                    Projectile kindle = new(InputManager.MousePosition, 3, speed, damage, -1, knockback, lifespan, 1, size);
+                    Projectile kindle = new(InputManager.MousePosition, 3, speed, damage, -1, knockback, lifespan, 5, size);
                     ProjectileManager.AddProjectile(kindle);
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0, 0);
                     return;
 
                 case 4: // bladeofflame
                     Projectile bladeofflame = new(player.center, 4, speed, damage, -1, knockback, Vector2.Zero, lifespan, 20, 0f, size, true, 0, 25 + (5 * rank));
                     ProjectileManager.AddProjectile(bladeofflame);
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0, 0);
                     return;
 
                 case 5: // disintegrate
                     Projectile disintegrate = new(new Vector2(InputManager.MousePosition.X, -10), 5, speed, damage, -1, knockback, lifespan, 10, size);
                     ProjectileManager.AddProjectile(disintegrate);
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("smallexplosion"), 0.6f, 0.4f, 0);
+                    GameManager.AddScreenShake(0.1f, 3f);
+
                     return;
 
             }
@@ -199,20 +212,20 @@ namespace HYPERMAGE.Spells
                     {
                         case 1:
                             cooldown = 0.25f;
-                            damage = 1f;
+                            damage = 3f;
                             knockback = 1f;
                             size = 2f;
                             break;
                         case 2:
                             cooldown = 0.2f;
-                            damage = 2f;
+                            damage = 5f;
                             speed = 1.5f;
                             knockback = 1.25f;
                             size = 3f;
                             break;
                         case 3:
                             cooldown = 0.15f;
-                            damage = 4f;
+                            damage = 10f;
                             speed = 2.5f;
                             knockback = 1.5f;
                             size = 4f;
@@ -224,21 +237,21 @@ namespace HYPERMAGE.Spells
                     {
                         case 1:
                             cooldown = 0.5f;
-                            damage = 5f;
+                            damage = 8f;
                             speed = 0.75f;
                             size = 6f;
                             knockback = 2f;
                             break;
                         case 2:
                             cooldown = 0.35f;
-                            damage = 8f;
+                            damage = 12f;
                             speed = 0.65f;
                             size = 8f;
                             knockback = 3f;
                             break;
                         case 3:
                             cooldown = 0.15f;
-                            damage = 15f;
+                            damage = 25f;
                             speed = 0.4f;
                             size = 10f;
                             knockback = 4f;
@@ -277,21 +290,21 @@ namespace HYPERMAGE.Spells
                             cooldown = 0.4f;
                             damage = 5f;
                             lifespan = 0.75f;
-                            knockback = 1f;
+                            knockback = 2f;
                             break;
                         case 2:
                             cooldown = 0.3f;
                             damage = 8f;
                             size = 1.25f;
                             lifespan = 0.55f;
-                            knockback = 1.25f;
+                            knockback = 2.5f;
                             break;
                         case 3:
                             cooldown = 0.2f;
                             damage = 15f;
                             size = 1.5f;
                             lifespan = 0.4f;
-                            knockback = 1.5f;
+                            knockback = 3f;
                             break;
                     }
                     break;
@@ -317,7 +330,28 @@ namespace HYPERMAGE.Spells
                             break;
                     }
                     break;
-
+                case 6: // sparks
+                    switch (rank)
+                    {
+                        case 1:
+                            cooldown = 0.5f;
+                            damage = 1f;
+                            lifespan = 0.5f;
+                            break;
+                        case 2:
+                            cooldown = 0.4f;
+                            damage = 2f;
+                            size = 1.5f;
+                            lifespan = 0.8f;
+                            break;
+                        case 3:
+                            cooldown = 0.1f;
+                            damage = 3f;
+                            size = 3f;
+                            lifespan = 1.5f;
+                            break;
+                    }
+                    break;
             }
         }
         public void RankUp()

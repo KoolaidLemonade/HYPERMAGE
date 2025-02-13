@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Audio;
+﻿using HYPERMAGE.Helpers;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,8 @@ namespace HYPERMAGE.Managers
 
         public static void ClearSounds()
         {
+            PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0f, 0f, 0f);
+
             foreach (var sound in sounds)
             {
                 sound.Stop();
