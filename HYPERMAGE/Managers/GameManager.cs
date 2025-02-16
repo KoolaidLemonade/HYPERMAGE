@@ -5,6 +5,7 @@ using HYPERMAGE.Spells;
 using HYPERMAGE.UI;
 using HYPERMAGE.UI.UIElements;
 using Microsoft.Xna.Framework.Audio;
+using System.Diagnostics;
 using System.Net.Mime;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Net.Mime.MediaTypeNames;
@@ -41,6 +42,8 @@ namespace HYPERMAGE.Managers
         public static int t;
 
         public static bool exit;
+
+        private static float timer;
         public static void Init()
         {
             player = new Player(new(150, 100));
@@ -52,6 +55,8 @@ namespace HYPERMAGE.Managers
 
         public static void Update()
         {
+            timer += Globals.TotalSeconds;
+
             if (!death)
             {
                 SceneManager.GetScene().Update();
@@ -104,21 +109,6 @@ namespace HYPERMAGE.Managers
 
             if (transitionTimer >= 3)
             {
-                UIManager.Clear();
-                ParticleManager.Clear();
-                MobManager.Clear();
-                ProjectileManager.Clear();
-
-                SoundManager.ClearSounds();
-                SoundManager.ClearSong();
-
-                GameManager.wavesPower = 0.0f;
-                GameManager.waves = false;
-                GameManager.fadeout = false;
-
-                SceneManager.RemoveScene();
-                SceneManager.AddScene(nextScene);
-
                 if (death)
                 {
                     player.health = 3;
@@ -131,8 +121,16 @@ namespace HYPERMAGE.Managers
                 }
 
                 transition = false;
-                transitionTimer = 0;   
+                transitionTimer = 0;
+
+                SceneManager.RemoveScene();
+                SceneManager.AddScene(nextScene);
             }
+
+            if (timer >= 2)
+            {
+                timer = 0;
+            }    
         }
 
         public static void Draw()
@@ -173,6 +171,24 @@ namespace HYPERMAGE.Managers
         {
             decayRate = decay;
             abberationPower += intensity;
+        }
+
+        public static void DrawScrollingTextBG(string text, float opacity)
+        {
+            int width = (int)Globals.GetPixelFont().MeasureString(text).X;
+            int height = (int)Globals.GetPixelFont().MeasureString(text).Y;
+
+            float speedX = 2f / width;
+            float speedY = 2f / height;
+
+
+            for (int i = 0; i < (320 / width) * 5; i++)
+            {
+                for (int j = 0; j < (180 / height) * 5; j++)
+                {
+                    Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), text, new Vector2((width) * i, (height) * j) - new Vector2(timer / speedX, timer / speedX) + new Vector2(Globals.RandomFloat(-0.5f, 0.5f), 0) - new Vector2(width, height) - new Vector2(j % 2 == 0 ? width / 2 : 0, 0), Color.White * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.5f);
+                }
+            }
         }
     }
 }

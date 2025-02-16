@@ -10,8 +10,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +40,18 @@ namespace HYPERMAGE
 
         public static void RemoveScene()
         {
+            GameManager.wavesPower = 0.0f;
+            GameManager.waves = false;
+            GameManager.fadeout = false;
+
+            UIManager.Clear();
+            ParticleManager.Clear();
+            MobManager.Clear();
+            ProjectileManager.Clear();
+
+            SoundManager.ClearSounds();
+            SoundManager.ClearSong();
+
             sceneStack.Pop();
         }
 
@@ -253,11 +267,19 @@ namespace HYPERMAGE
 
             if (introTimer >= introStep * 5)
             {
+                if (GameManager.waves)
+                {
+                    GameManager.AddScreenShake(0.1f, 10f);
+                    GameManager.AddAbberationPowerForce(600, 50);
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lowbass"), 1f, 0f, 0f);
+                }
+
                 GameManager.wavesPower = 0.0f;
                 GameManager.waves = false;
             }
 
-            if (introTimer >= (introStep * 5) + 0.5 || InputManager.Clicked)
+            if (introTimer >= (introStep * 5) + 0.8 || InputManager.Clicked)
             {
                 GameManager.wavesPower = 0.0f;
                 GameManager.waves = false;
@@ -410,7 +432,7 @@ namespace HYPERMAGE
         public void Draw()
         {
 
-            shopkeep.Draw(new(160 - shopkeep.frameWidth / 2, 0), Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.8f);
+            shopkeep.Draw(new(160 - shopkeep.frameWidth / 2, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.8f);
 
             GameManager.player.Draw();
 
@@ -438,6 +460,147 @@ namespace HYPERMAGE
 
         public void DrawVFX()
         {
+        }
+    }
+
+    public class StageTransition : IScene
+    {
+        public Animation falling;
+        public Vector2 fallingPos = new(15, -30);
+        public Vector2 fallingVel;
+
+        public float timer;
+        public float fadeIn;
+
+        public List<string> lines = [];
+        public float lineShiftTimer;
+        public int lineShift;
+        public StageTransition()
+        {
+        }
+        public void Load()
+        {
+            falling = new Animation(Globals.Content.Load<Texture2D>("falling"), 3, 1, 0.3f, 1);
+
+            GameManager.waves = true;
+            GameManager.wavesPower = 0f;
+
+            lines.Add(GetPoemLine(5));
+            lines.Add(GetPoemLine(6));
+            lines.Add(GetPoemLine(7));
+            lines.Add(GetPoemLine(8));
+
+            SoundManager.PlaySong(Globals.Content.Load<Song>("faf"), 1f);
+        }
+        public void Update()
+        {
+            InputManager.Update();
+
+            timer += Globals.TotalSeconds;
+            lineShiftTimer += Globals.TotalSeconds;
+
+            if (lineShiftTimer >= 1.5f)
+            {
+                lineShiftTimer = 0f;
+
+                if (lineShift < lines.Count - 1)
+                {
+                    lineShift++;
+                }
+
+                else
+                {
+                    lineShift = 0;
+                }
+            }
+
+            if (fadeIn < 1)
+            {
+                fadeIn += Globals.TotalSeconds / 5;
+
+            }
+
+            GameManager.wavesPower = fadeIn;
+
+            fallingVel += fallingPos.DirectionTo(new Vector2(15, 40) + new Vector2(Globals.RandomFloat(-5, 5), Globals.RandomFloat(-5, 5)));
+
+            fallingPos += fallingVel * Globals.TotalSeconds;
+
+            fallingVel /= 1.1f;
+
+            falling.Update();
+        }
+        public void Draw()
+        {
+            falling.Draw(fallingPos, Color.White * fadeIn, 0f, Vector2.Zero, 0.7f, SpriteEffects.None, 1f);
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), lines[i], new Vector2(150, 50 + (20 * i)), Color.White * fadeIn);
+            }
+
+            GameManager.DrawScrollingTextBG(lines[lineShift] + " ", fadeIn / 20);
+        }
+
+        public void DrawVFX()
+        {
+        }
+
+        public string GetPoemLine(int line)
+        {
+            switch (line)
+            {
+                case 1:
+                    return "IN A DREAM, I WAS FALLING";
+                case 2:
+                    return "HEAVEN-SENT SUNSHARDS PIERCE THE VEIL";
+                case 3:
+                    return "AND THE SHIFTING FRACTURES DRIBBLE MAGICKS";
+                case 4:
+                    return "SCATTERING AMONGST THE GRAND FIRMAMENT";
+                case 5:
+                    return "IN A DREAM, I WAS FALLING";
+                case 6:
+                    return "FLEDGLINGS IMBIBE FROM THE EMPYREAN STREAM";
+                case 7:
+                    return "AND SWALLOW WHOLE EACH OTHERS' GLEAM";
+                case 8:
+                    return "BECOMING AN IMMORTAL BEING";
+                case 9:
+                    return "IN A DREAM, I WAS FALLING";
+                case 10:
+                    return "WOUND ONCE GAPING HAVE BEEN SEWN SHUT";
+                case 11:
+                    return "GREAT SEALS REPOSE WITHIN GOD'S GUT";
+                case 12:
+                    return "BUT - VOICELESS WHISPERS ARE NOT SILENT";
+                case 13:
+                    return "IN A DREAM, I WAS FALLING";
+                case 14:
+                    return "THOSE HANDS WHICH DEAL IN SHAPED ARCANE";
+                case 15:
+                    return "HAVE THRESHED INTO A SOUL AGAIN";
+                case 16:
+                    return "A DEATHLESS CYCLE THUS MAINTAINED";
+                case 17:
+                    return "IN A DREAM, I WAS FALLING";
+                case 18:
+                    return "ACTUALITIES TWISTING INTO NAUGHT";
+                case 19:
+                    return "BITTER CACOPHONIES OF EMPTINESS";
+                case 20:
+                    return "WHERE SOUND OUGHT TO LAY";
+                case 21:
+                    return "IN A DREAM, I WAS FALLING";
+                case 22:
+                    return "A DREAM THAT WAS NOT ALL A DREAM";
+                case 23:
+                    return "THOUGHTS OF WHICH NOT ALL WERE MINE-";
+                case 24:
+                    return "AND NEVER DID I CATCH MYSELF";
+            }
+
+            return "";
         }
     }
 }

@@ -108,7 +108,7 @@ namespace HYPERMAGE
             t += Globals.TotalSeconds;
             tt++;
 
-            Vector2 mouseUV = new Vector2(0, 1) - (new Vector2(-InputManager.MousePosition.X, InputManager.MousePosition.Y) / new Vector2(320, 180));
+            Vector2 mouseUV = new Vector2(0, 0) - (new Vector2(-InputManager.MousePosition.X, -InputManager.MousePosition.Y) / new Vector2(320, 180));
             abberation.Parameters["mousePosition"].SetValue(mouseUV);
 
             abberation.Parameters["power"].SetValue(GameManager.abberationPower);

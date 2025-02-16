@@ -1,4 +1,5 @@
 ﻿using HYPERMAGE.Helpers;
+using HYPERMAGE.Models;
 
 namespace HYPERMAGE.Particles
 {
@@ -7,6 +8,7 @@ namespace HYPERMAGE.Particles
     {
         private static Texture2D defaultTexture;
         public Texture2D texture = defaultTexture ??= Globals.Content.Load<Texture2D>("particle");
+        public Animation anim = null;
         public float lifespan = 2f;
         public Color colorStart = Color.White;
         public Color colorEnd = Color.White;
@@ -20,6 +22,9 @@ namespace HYPERMAGE.Particles
         public float rotationSpeed = 0f;
         public bool flashing = false;
         public bool fastScale = false;
+
+        public bool spawnIndicator = false;
+        public bool manaDrop = false;
         public ParticleData()
         {
         }

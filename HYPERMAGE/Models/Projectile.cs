@@ -189,7 +189,7 @@ namespace HYPERMAGE.Models
                 height = texture.Height;
             }
 
-            origin = new(width / 2, height / 2);
+            origin = new(width / 2f, height / 2f);
 
             center = position + origin;
 
@@ -201,7 +201,7 @@ namespace HYPERMAGE.Models
         {
             if (anim != null)
             {
-                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, origin, Vector2.One, SpriteEffects.None, 1f);
+                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, origin, scale, SpriteEffects.None, 1f);
             }
 
             else

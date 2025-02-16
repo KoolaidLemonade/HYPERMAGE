@@ -379,6 +379,24 @@
 /processorParam:TextureFormat=Color
 /build:eye2.png
 
+#begin faf.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:faf.mp3
+
+#begin falling.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:falling.png
+
 #begin fireballicon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -536,6 +554,12 @@
 /processorParam:TextureFormat=Color
 /build:logoletters.png
 
+#begin lowbass.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:lowbass.wav
+
 #begin magick.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -559,6 +583,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mana.png
+
+#begin manadrop.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:manadrop.png
 
 #begin minislime.png
 /importer:TextureImporter
@@ -818,6 +854,18 @@
 /processorParam:TextureFormat=Color
 /build:ui2.png
 
+#begin upgradeborder.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:upgradeborder.png
+
 #begin warp.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -829,6 +877,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:waves.fx
+
+#begin wavy.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:wavy.wav
 
 #begin wizard.png
 /importer:TextureImporter

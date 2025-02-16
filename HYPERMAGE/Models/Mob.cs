@@ -48,6 +48,8 @@ namespace HYPERMAGE.Models
         public float rotation = 0;
         public float scale = 1f;
 
+        public int manaDrop;
+
         public bool turnToPlayer = true;
         public int direction;
 
@@ -178,7 +180,7 @@ namespace HYPERMAGE.Models
                 height = texture.Height;
             }
 
-            origin = new Vector2(width / 2, height / 2) ;
+            origin = new Vector2(width / 2f, height / 2f) ;
 
             this.position = position - origin;
 
@@ -210,7 +212,7 @@ namespace HYPERMAGE.Models
                             sizeEnd = 0,
                             colorStart = Color.White,
                             colorEnd = Color.White,
-                            velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200)),
+                            velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-400, 200)),
                             lifespan = 0.2f,
                             rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
                         };
@@ -557,12 +559,12 @@ namespace HYPERMAGE.Models
 
             if (anims.getFirstAnim() != null)
             {
-                anims.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, Vector2.One, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
+                anims.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
             }
 
             else if (anim != null)
             {
-                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, Vector2.One, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
+                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
             }
 
             else
@@ -576,7 +578,7 @@ namespace HYPERMAGE.Models
 
             for (int i = 0; i < 10; i++)
             {
-                ParticleData spawnParticleData = new()
+                ParticleData deathParticleData = new()
                 {
                     opacityStart = 1f,
                     opacityEnd = 1f,
@@ -589,8 +591,8 @@ namespace HYPERMAGE.Models
                     rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
                 };
 
-                Particle spawnParticle = new(center, spawnParticleData);
-                ParticleManager.AddParticle(spawnParticle);
+                Particle deathParticle = new(center, deathParticleData);
+                ParticleManager.AddParticle(deathParticle);
             }
 
             switch (aiType)
@@ -602,6 +604,24 @@ namespace HYPERMAGE.Models
                         MobManager.AddMob(minislime);
                     }
                     break;
+            }
+
+            if (manaDrop > 0)
+            {
+                for (int i = 0; i < manaDrop; i++)
+                {
+                    ParticleData manaData = new()
+                    {
+                        manaDrop = true,
+                        lifespan = 5f,
+                        anim = new Animation(Globals.Content.Load<Texture2D>("manadrop"), 5, 1, 0.2f, 1),
+                        velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200))
+                        
+                    };
+
+                    Particle manaDrop = new(center, manaData);
+                    ParticleManager.AddParticle(manaDrop);
+                }
             }
 
             active = false;

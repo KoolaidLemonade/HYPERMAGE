@@ -22,6 +22,10 @@ public class Player
 
     public Polygon hitbox;
 
+    public int width;
+    public int height;
+    public Vector2 origin;
+
     public float speed = 1.7f;
     public float acceleration = 150f;
 
@@ -35,7 +39,7 @@ public class Player
     public Color flashColor1;
     public Color flashColor2;
 
-    public int mana = 553;
+    public int mana = 4;
     public int health = 3;
     public int lives = 3;
 
@@ -52,11 +56,22 @@ public class Player
         anim = new(texture, 5, 1, 0.1f);
         position = pos;
 
-        hitbox = PolygonFactory.CreateRectangle((int)(position.X + anim.frameWidth / 2), (int)(position.Y + anim.frameHeight / 2), 3, 3);
+        width = anim.frameWidth;
+        height = anim.frameHeight;
+
+        origin = new Vector2(width / 2f, height / 2f);
+
+        center = position + origin;
+
+        hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, 1, 1);
     }
 
     public void Update()
     {
+        hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, 1, 1);
+
+        center = position + origin;
+
         if (InputManager.Moving)
         {
             velocity += Vector2.Normalize(InputManager.Direction) * acceleration * Globals.TotalSeconds;
@@ -90,7 +105,7 @@ public class Player
                             rotationSpeed = b
                         };
 
-                        Particle dashParticle = new(new(position.X + texture.Width / 6 / 2, position.Y + texture.Height / 2), dashParticleData);
+                        Particle dashParticle = new(center, dashParticleData);
                         ParticleManager.AddParticle(dashParticle);
                     }
                 }
@@ -115,7 +130,7 @@ public class Player
                             rotationSpeed = b
                         };
 
-                        Particle dashParticle = new(new(position.X + texture.Width / 6 / 2, position.Y + texture.Height / 2), dashParticleData);
+                        Particle dashParticle = new(center, dashParticleData);
                         ParticleManager.AddParticle(dashParticle);
                     }
                 }
@@ -289,7 +304,7 @@ public class Player
 
         Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)hitbox.GetPosition().X, (int)hitbox.GetPosition().Y, 1, 1), null, Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 
-        anim.Draw(new((int)position.X, (int)position.Y), flashing ? flashColor : Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.8f);
+        anim.Draw(new((int)position.X, (int)position.Y), flashing ? flashColor : Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.8f);
     }
 
     public void AddXP(int xp)

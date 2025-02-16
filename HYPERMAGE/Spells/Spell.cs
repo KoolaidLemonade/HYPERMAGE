@@ -11,10 +11,9 @@ using System.Threading.Tasks;
 
 namespace HYPERMAGE.Spells
 {
-    // i love megaclassing
     public class Spell
     {
-        public static int totalSpellTypes = 8;
+        public static int totalSpellTypes = 5;
 
         public float cooldown;
 
