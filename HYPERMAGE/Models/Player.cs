@@ -27,7 +27,7 @@ public class Player
     public Vector2 origin;
 
     public float speed = 1.7f;
-    public float acceleration = 150f;
+    public float acceleration = 120f;
 
     public float immunityTime = 1f;
     public float immunityTimer;
@@ -39,7 +39,8 @@ public class Player
     public Color flashColor1;
     public Color flashColor2;
 
-    public int mana = 4;
+    public int mana = 554;
+    public int maxHealth = 3;
     public int health = 3;
     public int lives = 3;
 
@@ -81,6 +82,8 @@ public class Player
         {
             if (dashTimer <= 0)
             {
+                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 1, 0);
+
                 oldSpeed = speed;
 
                 speed *= 5;
@@ -100,12 +103,12 @@ public class Player
                             sizeEnd = 0,
                             colorStart = Color.White,
                             colorEnd = Color.White,
-                            velocity = Vector2.Normalize(InputManager.lastDirection).RotatedBy(n) * m,
+                            velocity = Vector2.Normalize(-InputManager.lastDirection).RotatedBy(n) * m,
                             lifespan = 0.5f,
                             rotationSpeed = b
                         };
 
-                        Particle dashParticle = new(center, dashParticleData);
+                        Particle dashParticle = new(center + InputManager.lastDirection * 20, dashParticleData);
                         ParticleManager.AddParticle(dashParticle);
                     }
                 }
@@ -125,12 +128,12 @@ public class Player
                             sizeEnd = 0,
                             colorStart = Color.White,
                             colorEnd = Color.White,
-                            velocity = Vector2.Normalize(InputManager.Direction).RotatedBy(n) * m,
+                            velocity = Vector2.Normalize(-InputManager.Direction).RotatedBy(n) * m,
                             lifespan = 0.5f,
                             rotationSpeed = b
                         };
 
-                        Particle dashParticle = new(center, dashParticleData);
+                        Particle dashParticle = new(center + InputManager.Direction * 20, dashParticleData);
                         ParticleManager.AddParticle(dashParticle);
                     }
                 }
@@ -153,6 +156,27 @@ public class Player
 
             if (dashTimer >= dashLength)
             {
+                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 1, 1, 0);
+
+                for (int i = 0; i < 8; i++)
+                {
+                    ParticleData spawnParticleData = new()
+                    {
+                        opacityStart = 1f,
+                        opacityEnd = 1f,
+                        sizeStart = 6,
+                        sizeEnd = 0,
+                        colorStart = Color.White,
+                        colorEnd = Color.White,
+                        velocity = new(Globals.RandomFloat(-150, 150), Globals.RandomFloat(-150, 150)),
+                        lifespan = 0.2f,
+                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                    };
+
+                    Particle spawnParticle = new(center, spawnParticleData);
+                    ParticleManager.AddParticle(spawnParticle);
+                }
+
                 speed = oldSpeed;
                 dashTimer = 0;
                 InputManager.dashing = false;
@@ -207,7 +231,7 @@ public class Player
                 if (mob.hitbox.IntersectsWith(hitbox) && mob.contactDamage && !immune && !mob.spawning)
                 {
                     Damage(1);
-                }
+                } 
             }
 
             foreach (Projectile projectile in ProjectileManager.projectiles)
@@ -300,6 +324,7 @@ public class Player
     }
     public void Draw()
     {
+
         Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)hitbox.GetPosition().X - 1, (int)hitbox.GetPosition().Y - 1, 3, 3), null, Color.Black * 0.5f, 0f, Vector2.Zero, SpriteEffects.None, 0.9999f);
 
         Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)hitbox.GetPosition().X, (int)hitbox.GetPosition().Y, 1, 1), null, Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 1f);

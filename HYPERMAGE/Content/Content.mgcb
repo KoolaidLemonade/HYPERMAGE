@@ -19,6 +19,18 @@
 /processorParam:DebugMode=Auto
 /build:abberation.fx
 
+#begin alphabet.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:alphabet.png
+
 #begin bat.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -55,11 +67,35 @@
 /processorParam:TextureFormat=Color
 /build:bg2.png
 
+#begin bgbgbg.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bgbgbg.png
+
 #begin bigexplosion.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:bigexplosion.wav
+
+#begin bigtriangle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bigtriangle.png
 
 #begin blackpixel.png
 /importer:TextureImporter
@@ -181,6 +217,18 @@
 /processorParam:TextureFormat=Color
 /build:disintegrateicon.png
 
+#begin empyreanwisp.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:empyreanwisp.png
+
 #begin enemybullet1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -192,6 +240,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:enemybullet1.png
+
+#begin enemybullet10.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet10.png
+
+#begin enemybullet11.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet11.png
 
 #begin enemybullet2.png
 /importer:TextureImporter
@@ -661,6 +733,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:rerollicon.png
+
+#begin rgrgrg.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:rgrgrg.mp3
 
 #begin select.mp3
 /importer:Mp3Importer

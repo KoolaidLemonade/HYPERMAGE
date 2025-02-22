@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,9 @@ namespace HYPERMAGE.Models
         private float timer = 0;
         public float ai;
         public float ai2;
+        public float ai3;
+        public float ai4;
+        public float ai5;
 
         public int aiType;
         public float speed = 1f;
@@ -60,6 +64,8 @@ namespace HYPERMAGE.Models
 
         public bool spawning;
         public float spawnTimer;
+
+        public bool boss = false;
 
         private List <Projectile> projectileImmunity = [];
         public Mob(Vector2 position, int aiType)
@@ -166,6 +172,14 @@ namespace HYPERMAGE.Models
                     health = 30f;
                     spawnCost = 6;
                     break;
+                case 9: //empyrean wisp
+                    anim = new(Globals.Content.Load<Texture2D>("empyreanwisp"), 5, 1, 0.1f);
+                    contactDamage = false;
+
+                    health = 300f;
+                    boss = true;
+                    flying = true;
+                    break;
             }
 
             if (anim != null)
@@ -192,8 +206,6 @@ namespace HYPERMAGE.Models
         }
         public void Update()
         {
-            Debug.WriteLine(position);
-
             center = position + origin;
 
             if (spawning)
@@ -253,7 +265,7 @@ namespace HYPERMAGE.Models
                 Kill();
             }
 
-            foreach (Projectile p in ProjectileManager.projectiles)
+            foreach (Projectile p in ProjectileManager.projectiles.ToList())
             {
                 if (p.hitbox.IntersectsWith(hitbox) && p.friendly && !projectileImmunity.Contains(p))
                 {
@@ -286,8 +298,6 @@ namespace HYPERMAGE.Models
                     }
                 }
             }
-
-            timer += Globals.TotalSeconds;
 
             prevPosition = position;
 
@@ -341,13 +351,15 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 case 0:
-                    return;
+                    break;
                 case 1: //bat
 
-                    if (Math.Abs(GameManager.GetPlayer().center.X - center.X) < 30 && Math.Abs(GameManager.GetPlayer().center.Y - center.Y) < 30)
+                    if (Math.Abs(GameManager.GetPlayer().center.X - center.X) < 30 && Math.Abs(GameManager.GetPlayer().center.Y - center.Y) < 50)
                     {
                         if (ai == 0 && timer > 3)
                         {
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("chirp"), 0.6f, 1f, 0);
+
                             ai = 1;
                             timer = 0;
                         }
@@ -355,9 +367,9 @@ namespace HYPERMAGE.Models
 
                     if (ai == 1)
                     {
-                        velocity += Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 11;
+                        velocity += Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 15;
 
-                        if(timer > 0.35)
+                        if(timer > 0.45)
                         {
                             ai = 0;
                             timer = 0;
@@ -366,12 +378,12 @@ namespace HYPERMAGE.Models
 
                     else
                     {
-                        velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) + new Vector2(Globals.RandomFloat(-1.5f, 1.5f), Globals.RandomFloat(-1.5f, 1.5f))) * Globals.TotalSeconds * speed * 3;
+                        velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) + new Vector2(Globals.RandomFloat(-1.5f, 1.5f), Globals.RandomFloat(-1.5f, 1.5f))) * Globals.TotalSeconds * speed * 4;
                     }
 
                     velocity /= 1.05f;
 
-                    return;
+                    break;
                 case 2: //wisp
 
                     velocity += new Vector2(Globals.RandomFloat(-1, 1), Globals.RandomFloat(-1, 1));
@@ -396,17 +408,17 @@ namespace HYPERMAGE.Models
                         ParticleManager.AddParticle(particle);
                     }
 
-                    if (timer >= 2)
+                    if (timer >= 3f)
                     {
-                        Projectile projectile = new(center, -1, 1f, Vector2.Normalize(GameManager.GetPlayer().center - center) * 100f, 10f, center.DirectionTo(GameManager.GetPlayer().center).ToRotation() + MathHelper.ToRadians(90f));
+                        Projectile projectile = new(center, -1, 1f, Vector2.Normalize(GameManager.GetPlayer().center - center) * 90f, 10f, center.DirectionTo(GameManager.GetPlayer().center).ToRotation() + MathHelper.ToRadians(90f));
                         ProjectileManager.AddProjectile(projectile);
 
                         SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0.6f, 1, 0);
 
                         timer = 0;
                     }
-                    
-                    return;
+
+                    break;
                 case 3: //wizard
 
                     anims.Update((int)ai);
@@ -423,9 +435,9 @@ namespace HYPERMAGE.Models
                         {
                             SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("chirp"), 1, Globals.RandomFloat(-0.5f, 0.5f), 0);
 
-                            for (int i = 0; i < 3; i++)
+                            for (int i = 0; i < 5; i++)
                             {
-                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-25 + (i * 25))) * 60f;
+                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-50 + (i * 25))) * 65f;
 
                                 Projectile projectile = new(center, -2, 1f, projVelocity, 10f, projVelocity.ToRotation() + MathHelper.ToRadians(90f));
                                 ProjectileManager.AddProjectile(projectile);
@@ -460,9 +472,9 @@ namespace HYPERMAGE.Models
                         {
                             SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("chirp"), 1, Globals.RandomFloat(-0.5f, 0.5f), 0);
 
-                            for (int i = 0; i < 3; i++)
+                            for (int i = 0; i < 5; i++)
                             {
-                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-25 + (i * 25))) * 60f;
+                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-50 + (i * 25))) * 65f;
 
                                 Projectile projectile = new(center, -2, 1f, projVelocity, 10f, projVelocity.ToRotation() + MathHelper.ToRadians(90f));
                                 ProjectileManager.AddProjectile(projectile);
@@ -500,18 +512,18 @@ namespace HYPERMAGE.Models
 
                     velocity /= 1.1f;
 
-                    return;
+                    break;
 
                 case 4: //slime
                     velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 3);
                     velocity /= 1.05f;
 
-                    return;
+                    break;
                 case 5: //minislime
                     velocity += (Vector2.Normalize(GameManager.GetPlayer().center - center) * Globals.TotalSeconds * speed * 5);
                     velocity /= 1.05f;
 
-                    return;
+                    break;
 
                 case 6: //sorcerer
                     anims.Update((int)ai);
@@ -538,7 +550,7 @@ namespace HYPERMAGE.Models
                         timer = 0;
                     }
 
-                    return;
+                    break;
                 case 7: //cleric
                     anims.Update((int)ai);
 
@@ -546,8 +558,103 @@ namespace HYPERMAGE.Models
 
                     return;
                 case 8: //totem
-                    return;
+                    break;
+                case 9: //empyrean wisp
+
+                    if (timer == 0)
+                    {
+                        GameManager.AddScreenShake(1.2f, 20f);
+                        GameManager.AddAbberationPowerForce(200, 100);
+
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("cry"), 1f, -0.3f, 0f);
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("cry"), 1f, -0.9f, 0f);
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("wavy"), 2f, 0f, 0f);
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lowbass"), 2f, 0f, 0f);
+
+                        for (int i = 0; i < 30; i++)
+                        {
+                            ParticleData pd2 = new()
+                            {
+                                opacityStart = 1f,
+                                opacityEnd = 1f,
+                                sizeStart = 10,
+                                sizeEnd = 0,
+                                colorStart = Color.White,
+                                colorEnd = Color.White,
+                                velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                                lifespan = Globals.RandomFloat(0.5f, 2f),
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                            };
+
+                            Particle p2 = new(position, pd2);
+                            ParticleManager.AddParticle(p2);
+                        }
+                    }
+
+                    if (timer >= 1.5f && ai == 0)
+                    {
+                        ai = Globals.Random.Next(1) + 1;
+                    }
+
+                    if (ai == 1)
+                    {
+                        ai2 += Globals.TotalSeconds;
+
+                        Vector2 targetPos = new(160, 90);
+
+                        if (Globals.Distance(targetPos, position) > 5)
+                        {
+                            velocity += position.DirectionTo(targetPos) * Globals.TotalSeconds * 50;
+                        }
+
+                        if (ai2 >= 1f)
+                        {
+                            ai3 += Globals.TotalSeconds;
+
+                            if (ai3 >= 0.1f)
+                            {
+                                ai4++;
+
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+                                for (int i = 0; i < 12; i++)
+                                {
+                                    Projectile projectile = new(position, ai4 == 6 ? -5 : -4, 1f, (Vector2.One * ((ai4 == 6 ? 120 : 70) - (ai4 * 5))).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0, 360, i / 12f) + (ai4 * 10))), 10f);
+                                    ProjectileManager.AddProjectile(projectile);
+                                }
+
+                                ai3 = 0;
+                            }
+                        }
+
+                        if (ai4 >= 6)
+                        {
+                            ai = 2;
+                        }
+                    }
+
+                    velocity /= 1.2f;
+
+                    ParticleData pd = new()
+                    {
+                        opacityStart = 1f,
+                        opacityEnd = 0f,
+                        sizeStart = 12,
+                        sizeEnd = 0,
+                        colorStart = Color.White,
+                        colorEnd = Color.Pink,
+                        velocity = new(Globals.RandomFloat(-60, 60), Globals.RandomFloat(-300, 0)),
+                        lifespan = 0.5f,
+                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                    };
+
+                    Particle p = new(position, pd);
+                    ParticleManager.AddParticle(p);
+
+                    break;
             }
+
+            timer += Globals.TotalSeconds;
         }
 
         public void Draw()
@@ -559,17 +666,28 @@ namespace HYPERMAGE.Models
 
             if (anims.getFirstAnim() != null)
             {
-                anims.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
+                anims.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, origin, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
             }
 
             else if (anim != null)
             {
-                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, Vector2.Zero, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
+                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, origin, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
             }
 
             else
             {
                 Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 1f);
+            }
+
+            switch (aiType)
+            {
+                case 9:
+                    if (timer <= 1.2f)
+                    {
+                        GameManager.DrawSpeedLines(Color.Pink, position);
+                    }
+
+                    break;
             }
         }
         public void Kill()
@@ -646,10 +764,10 @@ namespace HYPERMAGE.Models
             {
                 velocity += Vector2.Normalize(p.velocity) * p.knockback / knockbackResist;
             }
+
             else
             {
-                velocity += Vector2.Normalize(GameManager.GetPlayer().center.DirectionTo(center)) * p.knockback / knockbackResist;
-
+                velocity += Vector2.Normalize(p.center.DirectionTo(center)) * p.knockback / knockbackResist;
             }
 
             SoundManager.PlaySound(hitSound, 0.5f, Globals.RandomFloat (-0.5f, 0.5f), 0f);
@@ -664,8 +782,22 @@ namespace HYPERMAGE.Models
 
         public void Spawn()
         {
+            if (!boss)
+            {
+                spawning = true;
+            }
+
+            else
+            {
+                switch (aiType)
+                {
+                    case 9: //empyrean wisp
+
+                        break;
+                }
+            }
+
             MobManager.AddMob(this);
-            spawning = true;
         }
     }
 }

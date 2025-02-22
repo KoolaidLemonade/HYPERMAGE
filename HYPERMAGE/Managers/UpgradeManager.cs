@@ -8,7 +8,7 @@ namespace HYPERMAGE.Managers
 {
     public static class UpgradeManager
     {
-        public static int totalUpgrades = 22;
+        public static int totalUpgrades = 10;
         public static List<int> usedUpgrades = [];
         public static string GetUpgradeName(int id)
         {
@@ -25,7 +25,7 @@ namespace HYPERMAGE.Managers
                 case 5:
                     return "DESTRUCTION";
                 case 6:
-                    return "AERIAL WARFARE";
+                    return "ARMAMENT MASTERY";
                 case 7:
                     return "INCANTATION MASTERY";
                 case 8:
@@ -53,7 +53,7 @@ namespace HYPERMAGE.Managers
                 case 5:
                     return "INCREASES DAMAGE BY 10%";
                 case 6:
-                    return "INCREASES DAMAGE BY 20% WHILE IN THE AIR";
+                    return "INCREASES ARMAMENT DAMAGE BY 20%";
                 case 7:
                     return "INCREASES INCANTATION DAMAGE BY 20%";
                 case 8:
@@ -75,10 +75,13 @@ namespace HYPERMAGE.Managers
                 case 1:
                     return;
                 case 2:
+                    GameManager.GetPlayer().maxHealth++;
                     return;
                 case 3:
+                    GameManager.GetPlayer().mana += 10;
                     return;
                 case 4:
+                    GameManager.GetPlayer().immunityTime += 1;
                     return;
                 case 5:
                     return;
@@ -91,6 +94,7 @@ namespace HYPERMAGE.Managers
                 case 9:
                     return;
                 case 10:
+                    GameManager.GetPlayer().lives++;
                     return;
                 case 11:
                     return;

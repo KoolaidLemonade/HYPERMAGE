@@ -16,12 +16,13 @@ namespace HYPERMAGE.Managers
 {
     public static class LevelManager
     {
-        public static int level = 0;
+        public static int level = 3;
 
         public static List<Mob> spawnWave = [];
         public static int spawnWaveCost;
 
         public static List<int> validSpawns = [];
+        public static int bossID;
 
         public static int levelCredits;
         public static int credits;
@@ -46,7 +47,13 @@ namespace HYPERMAGE.Managers
         private static Vector2 bgPos2 = Vector2.Zero;
 
         private static float bgScrollTimer;
-        public static void DrawBG()
+
+        public static bool bossStage;
+        private static float bossSpawnTimer;
+        private static bool bossSpawned;
+
+        private static bool stageStart = false;
+        public static void Draw()
         {
             Globals.SpriteBatch.Draw(bg3, Vector2.Zero, Color.White);
 
@@ -55,10 +62,15 @@ namespace HYPERMAGE.Managers
 
             Globals.SpriteBatch.Draw(bg2, bgPos2, Color.White);
             Globals.SpriteBatch.Draw(bg2, bgPos2 + new Vector2(bg2.Width, 0), Color.White);
+
+            if (bossSpawnTimer >= 2f && bossSpawnTimer < 5f)
+            {
+                GameManager.DrawBigText();
+            }
         }
         public static void Update()
         {
-            if (bgScrollTimer == 0)
+            if (!stageStart)
             {
                 for (int i = 0; i < 30; i++)
                 {
@@ -98,80 +110,107 @@ namespace HYPERMAGE.Managers
                     ParticleManager.AddParticle(spawnParticle);
                 }
 
+                GameManager.AddScreenShake(0.2f, 15f);
+                GameManager.AddAbberationPowerForce(500, 50);
 
                 SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("wavy"), 1f, 0f, 0f);
 
                 SoundManager.PlaySong(song, 1f);
+
+                stageStart = true;
             }
 
-            if (bgScrollTimer < 3 && !endLevel)
+            if (!bossStage)
             {
-                bgScrollTimer += Globals.TotalSeconds;
-            }
+                if (bgScrollTimer < 3 && !endLevel)
+                {
+                    bgScrollTimer += Globals.TotalSeconds;
+                }
 
-            bgPos.X -= bgScrollTimer / 12;
+                bgPos.X -= bgScrollTimer / 12;
 
-            if (bgPos.X < -bg.Width)
-            {
-                bgPos.X = 0;
-            }
+                if (bgPos.X < -bg.Width)
+                {
+                    bgPos.X = 0;
+                }
 
-            bgPos2.X -= bgScrollTimer / 8;
+                bgPos2.X -= bgScrollTimer / 8;
 
-            if (bgPos2.X < -bg2.Width)
-            {
-                bgPos2.X = 0;
-            }
+                if (bgPos2.X < -bg2.Width)
+                {
+                    bgPos2.X = 0;
+                }
 
 
-            if (MobManager.mobs.Count == 0)
-            {
-                creditsTimer += Globals.TotalSeconds;
-            }
+                if (MobManager.mobs.Count == 0)
+                {
+                    creditsTimer += Globals.TotalSeconds;
+                }
 
+                else
+                {
+                    creditsTimer += Globals.TotalSeconds / 2;
+                }
+
+                if (creditsTimer >= 1 && levelCredits > 0)
+                {
+                    creditsTimer = 0;
+
+
+                    levelCredits -= MobManager.mobs.Count == 0 ? 2 : 1;
+                    credits += MobManager.mobs.Count == 0 ? 2 : 1;
+                }
+
+                if (MobManager.mobs.Count == 0 ? credits >= spawnWaveCost : Globals.Random.Next(200) == 0 && credits >= spawnWaveCost)
+                {
+                    SpawnNextWave();
+                }
+
+                if (spawnWaveCost > credits && levelCredits <= 0 && !endCred)
+                {
+                    credits += spawnWaveCost - credits;
+                    endCred = true;
+                }
+
+                if (credits <= 0 && levelCredits <= 0 && MobManager.mobs.Count == 0)
+                {
+                    endLevel = true;
+                }
+
+                if (endLevel)
+                {
+                    endLevelTimer += Globals.TotalSeconds;
+
+                    if (bgScrollTimer > 0)
+                    {
+                        bgScrollTimer -= Globals.TotalSeconds;
+                    }
+                }
+
+                if (endLevelTimer >= 5f)
+                {
+                    GameManager.TransitionScene(new StageTransition());
+                }
+            }        
+            
             else
             {
-                creditsTimer += Globals.TotalSeconds / 2;
-            }
+                bossSpawnTimer += Globals.TotalSeconds;
 
-            if (creditsTimer >= 1 && levelCredits > 0)
-            {
-                creditsTimer = 0;
-
-
-                levelCredits--;
-                credits++;
-            }
-
-            if (MobManager.mobs.Count == 0 ? credits >= spawnWaveCost : Globals.Random.Next(200) == 0 && credits >= spawnWaveCost)
-            {
-                SpawnNextWave();
-            }
-
-            if (spawnWaveCost > credits && levelCredits == 0 && !endCred)
-            {
-                credits += spawnWaveCost - credits;
-                endCred = true;
-            }
-
-            if (credits == 0 && levelCredits == 0 && MobManager.mobs.Count == 0)
-            {
-                endLevel = true;
-            }
-
-            if (endLevel)
-            {
-                endLevelTimer += Globals.TotalSeconds;
-
-                if (bgScrollTimer > 0)
+                if (bossSpawnTimer >= 6f && !bossSpawned)
                 {
-                    bgScrollTimer -= Globals.TotalSeconds;
-                }
-            }
+                    bossSpawned = true;
 
-            if (endLevelTimer >= 5f)
-            {
-                GameManager.TransitionScene(new StageTransition());
+                    Vector2 spawnPos = Vector2.Zero;
+
+                    switch (bossID)
+                    {
+                        case 9: spawnPos = new Vector2(160 + 11, 40); break;
+                    }
+
+                    Mob boss = new(spawnPos, bossID);
+                    boss.Spawn();
+                }
             }
         }
 
@@ -282,6 +321,8 @@ namespace HYPERMAGE.Managers
             endCred = false;
             level++;
 
+            stageStart = false;
+
             endLevel = false;
             endLevelTimer = 0;
             bgScrollTimer = 0;
@@ -300,11 +341,12 @@ namespace HYPERMAGE.Managers
                     levelCredits = 20;
                     //
 
-                    validSpawns.Add(0);
                     validSpawns.Add(1);
                     validSpawns.Add(2);
                     validSpawns.Add(3);
                     validSpawns.Add(4);
+
+                    bossStage = false;
 
                     break;
                 case 2:
@@ -318,11 +360,12 @@ namespace HYPERMAGE.Managers
 
                     levelCredits = 40;
                     //
-                    validSpawns.Add(0);
                     validSpawns.Add(1);
                     validSpawns.Add(2);
                     validSpawns.Add(3);
                     validSpawns.Add(4);
+
+                    bossStage = false;
 
                     break;
                 case 3:
@@ -341,10 +384,50 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(2);
                     validSpawns.Add(3);
 
+                    bossStage = false;
+
+                    break;
+
+                case 4:
+                    bossStage = true;
+                    bossSpawned = false;
+
+                    bg = Globals.Content.Load<Texture2D>("bg");
+                    bg2 = Globals.Content.Load<Texture2D>("bg2");
+                    bg3 = Globals.Content.Load<Texture2D>("stars");
+                    song = Globals.Content.Load<Song>("rgrgrg");
+
+                    GameManager.groundBounds = new(0, 60, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    validSpawns.Add(9);
+
+                    bossID = validSpawns[Globals.Random.Next(validSpawns.Count)];
+
+                    GameManager.AddBigText(GetBossName(bossID));
+
                     break;
             }
 
-            GetNextSpawnWave(validSpawns[Globals.Random.Next(validSpawns.Count)]);
+            if (!bossStage)
+            {
+                GetNextSpawnWave(validSpawns[Globals.Random.Next(validSpawns.Count)]);
+            }
+        }
+
+        public static List<string> GetBossName(int id)
+        {
+            List<string> words = [];
+
+            switch (id)
+            {
+                case 9:
+                    words.Add("empyrean");
+                    words.Add("wisp");
+                    break;
+            }
+
+            return words;
         }
     }
 }

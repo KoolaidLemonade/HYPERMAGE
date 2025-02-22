@@ -13,7 +13,7 @@ namespace HYPERMAGE.Spells
 {
     public class Spell
     {
-        public static int totalSpellTypes = 5;
+        public static int totalSpellTypes = 8;
 
         public float cooldown;
 
@@ -139,20 +139,52 @@ namespace HYPERMAGE.Spells
 
             }
         }
-        public void Cast(float spread, Player player)
+        public void Cast(Player player)
         {
+            float castDamage = damage;
+
+            if (UpgradeManager.usedUpgrades.Contains(1) && spellTraits.Contains(1))
+            {
+                castDamage *= 1.2f;
+            }
+
+            if (UpgradeManager.usedUpgrades.Contains(5))
+            {
+                castDamage *= 1.1f;
+            }
+
+            if (UpgradeManager.usedUpgrades.Contains(7) && spellTraits.Contains(14))
+            {
+                castDamage *= 1.2f;
+            }
+
+            if (UpgradeManager.usedUpgrades.Contains(8) && spellTraits.Contains(15))
+            {
+                castDamage *= 1.2f;
+            }
+
+            if (UpgradeManager.usedUpgrades.Contains(9) && spellTraits.Contains(25))
+            {
+                castDamage *= 1.2f;
+            }
+
+            if (UpgradeManager.usedUpgrades.Contains(6) && spellTraits.Contains(21))
+            {
+                castDamage *= 1.2f;
+            }
+
             switch (spellType)
             {
                 case 0:
                     return;
                 case 1: // firebolt
-                    Projectile firebolt = new(player.center, 1, speed, damage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
+                    Projectile firebolt = new(player.center, 1, speed, castDamage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center) * 200, lifespan, size);
                     ProjectileManager.AddProjectile(firebolt);
 
                     SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0.6f, 0);
                     return;
                 case 2: // fireball
-                    Projectile fireball = new(player.center, 2, speed, damage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-spread, spread))) * 200, lifespan, size);
+                    Projectile fireball = new(player.center, 2, speed, castDamage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center) * 200, lifespan, size);
                     ProjectileManager.AddProjectile(fireball);
 
                     SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("heavyhit"), 0.3f, -0.8f, 0);
@@ -177,28 +209,37 @@ namespace HYPERMAGE.Spells
                         ParticleManager.AddParticle(kindleParticle);
                     }
 
-                    Projectile kindle = new(InputManager.MousePosition, 3, speed, damage, -1, knockback, lifespan, 5, size);
+                    Projectile kindle = new(InputManager.MousePosition, 3, speed, castDamage, -1, knockback, lifespan, 5, size);
                     ProjectileManager.AddProjectile(kindle);
 
                     SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0, 0);
                     return;
 
                 case 4: // bladeofflame
-                    Projectile bladeofflame = new(player.center, 4, speed, damage, -1, knockback, Vector2.Zero, lifespan, 20, 0f, size, true, 0, 25 + (5 * rank));
+                    Projectile bladeofflame = new(player.center, 4, speed, castDamage, -1, knockback, Vector2.Zero, lifespan, 20, 0f, size, true, 0, 25 + (5 * rank));
                     ProjectileManager.AddProjectile(bladeofflame);
 
                     SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0, 0);
                     return;
 
                 case 5: // disintegrate
-                    Projectile disintegrate = new(new Vector2(InputManager.MousePosition.X, -10), 5, speed, damage, -1, knockback, lifespan, 10, size);
+                    Projectile disintegrate = new(new Vector2(InputManager.MousePosition.X, -10), 5, speed, castDamage, -1, knockback, lifespan, 10, size);
                     ProjectileManager.AddProjectile(disintegrate);
 
                     SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("smallexplosion"), 0.6f, 0.4f, 0);
                     GameManager.AddScreenShake(0.1f, 3f);
 
                     return;
+                case 6: //sparks
 
+                    for (int i = 0; i < rank + 3; i++)
+                    {
+                        Projectile spark = new(player.center, 6, speed * Globals.RandomFloat(0.75f, 1.25f), castDamage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-20f, 20f))) * 200, lifespan * Globals.RandomFloat(0.75f, 1.25f), size);
+                        ProjectileManager.AddProjectile(spark);
+                    }
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0.6f, 0);
+                    return;
             }
         }
 
@@ -333,21 +374,26 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
+                            size = 2.5f;
                             cooldown = 0.5f;
                             damage = 1f;
-                            lifespan = 0.5f;
+                            lifespan = 1f;
                             break;
                         case 2:
+                            size = 3.5f;
                             cooldown = 0.4f;
                             damage = 2f;
-                            size = 1.5f;
-                            lifespan = 0.8f;
+                            size = 3.5f;
+                            lifespan = 1.5f;
+                            speed = 1.5f;
                             break;
                         case 3:
+                            size = 4.5f;
                             cooldown = 0.1f;
                             damage = 3f;
-                            size = 3f;
-                            lifespan = 1.5f;
+                            size = 4f;
+                            lifespan = 2.5f;
+                            speed = 2f;
                             break;
                     }
                     break;

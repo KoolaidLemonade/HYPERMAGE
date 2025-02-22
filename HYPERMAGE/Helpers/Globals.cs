@@ -132,6 +132,7 @@ public static class Globals
             {
                 currentLine = testLine;
             }
+
             else
             {
                 if (breakOnWord)
@@ -140,6 +141,7 @@ public static class Globals
                         lines.Add(currentLine);
                     currentLine = word;
                 }
+
                 else
                 {
                     while (currentLine.Length > 0 && font.MeasureString(currentLine + "-").X > maxWidth)
@@ -148,6 +150,7 @@ public static class Globals
                         lines.Add(currentLine[..lastChar] + "-");
                         currentLine = currentLine[lastChar..];
                     }
+
                     currentLine += " ";
                     currentLine += word;
                 }

@@ -27,12 +27,12 @@ namespace HYPERMAGE.UI.UIElements
 
         public Vector2 originalPos;
 
-        public float layerDepth = 0.93f;
+        public float layerDepth = 0.99f;
         public ShopSpell(SpriteFont spriteFont, Spell spell, Texture2D texture, Vector2 position) : base(texture, position)
         {
             this.spell = spell;
 
-            spellText = new TextBox(layerDepth + 0.01f, spriteFont, spell.description, InputManager.MousePosition, 85);
+            spellText = new TextBox(layerDepth + 0.01f, spriteFont, spell.description, InputManager.MousePosition, 120);
 
             spellText.text.Insert(0, " ");
             spellText.text.Insert(0, spell.name);
@@ -68,7 +68,7 @@ namespace HYPERMAGE.UI.UIElements
                 spellText.Update();
             }
 
-            spellText.position = new((int)InputManager.MousePosition.X, (int)InputManager.MousePosition.Y);
+            spellText.position = new Vector2((int)InputManager.MousePosition.X, (int)InputManager.MousePosition.Y) - new Vector2(InputManager.MousePosition.X > 160 ? spellText.longestString : 0, 0);
         }
         public override void Draw()
         {
@@ -80,12 +80,12 @@ namespace HYPERMAGE.UI.UIElements
 
                 for (int i = 0; i < spell.spellTraits.Count; i++)
                 {
-                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new((int)InputManager.MousePosition.X + spellText.longestString - ((i + 1) * 9), (int)InputManager.MousePosition.Y + 1), new Rectangle((spell.spellTraits[i] - 1) * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layerDepth + 0.01f);
+                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new Vector2((int)InputManager.MousePosition.X + spellText.longestString - ((i + 1) * 9), (int)InputManager.MousePosition.Y + 1) - new Vector2(InputManager.MousePosition.X > 160 ? spellText.longestString : 0, 0), new Rectangle((spell.spellTraits[i] - 1) * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layerDepth + 0.01f);
 
                     if (i == spell.spellTraits.Count - 1)
                     {
-                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), spell.cost.ToString(), new((int)InputManager.MousePosition.X + Globals.GetPixelFont().MeasureString(spell.name).X + 6, (int)InputManager.MousePosition.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layerDepth + 0.01f);
-                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("mana"), new((int)InputManager.MousePosition.X + Globals.GetPixelFont().MeasureString(spell.name).X + 6 + Globals.GetPixelFont().MeasureString(spell.cost.ToString()).X, (int)InputManager.MousePosition.Y + 1), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layerDepth + 0.01f);
+                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), spell.cost.ToString(), new Vector2((int)InputManager.MousePosition.X + Globals.GetPixelFont().MeasureString(spell.name).X + 6, (int)InputManager.MousePosition.Y) - new Vector2(InputManager.MousePosition.X > 160 ? spellText.longestString : 0, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layerDepth + 0.01f);
+                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("mana"), new Vector2((int)InputManager.MousePosition.X + Globals.GetPixelFont().MeasureString(spell.name).X + 6 + Globals.GetPixelFont().MeasureString(spell.cost.ToString()).X, (int)InputManager.MousePosition.Y + 1) - new Vector2(InputManager.MousePosition.X > 160 ? spellText.longestString : 0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layerDepth + 0.01f);
                     }
                 }
             }

@@ -73,13 +73,13 @@ namespace HYPERMAGE
         private static int hitstop = 0;
         public void Load()
         {
-            heart = new(Globals.Content.Load<Texture2D>("heart"), new(133, 8));
+            heart = new(Globals.Content.Load<Texture2D>("heart"), new(123, 8));
             mana = new(Globals.Content.Load<Texture2D>("mana"), new(181, 6));
 
             UIManager.AddElement(heart);
             UIManager.AddElement(mana);
 
-            GameManager.GetPlayer().position = new(160, 90);
+            GameManager.GetPlayer().position = new(160 - 5.5f, 150);
 
             LevelManager.NextLevel();
         }
@@ -113,7 +113,7 @@ namespace HYPERMAGE
         }
         public void Draw()
         {
-            LevelManager.DrawBG();
+            LevelManager.Draw();
 
             GameManager.player.Draw();
 
@@ -227,7 +227,7 @@ namespace HYPERMAGE
 
         public void DrawVFX()
         {
-            ParticleManager.Draw();
+            ParticleManager.Draw();            
         }
         public void Draw()
         {
@@ -379,6 +379,7 @@ namespace HYPERMAGE
             GameManager.wavesPower = 1f;
 
             GameManager.player.position = new Vector2(160 - 5, 140);
+            GameManager.player.center = new Vector2(160, 140 + 5);
 
             GameManager.bounds = new(0 - 30, 0 - 30, 320 + 30, 180 + 30);
 
@@ -386,6 +387,49 @@ namespace HYPERMAGE
             {
                 ShopManager.Reroll();
             }
+
+            for (int i = 0; i < 30; i++)
+            {
+                ParticleData spawnParticleData = new()
+                {
+                    opacityStart = 1f,
+                    opacityEnd = 1f,
+                    sizeStart = 12 - Globals.Random.Next(6),
+                    sizeEnd = 0,
+                    colorStart = Color.White,
+                    colorEnd = Color.White,
+                    velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-800, 50)),
+                    lifespan = Globals.RandomFloat(0.2f, 0.8f),
+                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                };
+
+                Particle spawnParticle = new(GameManager.GetPlayer().center, spawnParticleData);
+                ParticleManager.AddParticle(spawnParticle);
+            }
+
+            for (int i = 0; i < 15; i++)
+            {
+                ParticleData spawnParticleData = new()
+                {
+                    opacityStart = 1f,
+                    opacityEnd = 1f,
+                    sizeStart = 4 - Globals.Random.Next(4),
+                    sizeEnd = 0,
+                    colorStart = Color.White,
+                    colorEnd = Color.White,
+                    velocity = new(Globals.RandomFloat(-600, 600), Globals.RandomFloat(-200, 50)),
+                    lifespan = Globals.RandomFloat(0.2f, 0.8f),
+                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                };
+
+                Particle spawnParticle = new(GameManager.GetPlayer().center, spawnParticleData);
+                ParticleManager.AddParticle(spawnParticle);
+            }
+
+            GameManager.AddScreenShake(0.2f, 15f);
+            GameManager.AddAbberationPowerForce(500, 50);
+
+            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("wavy"), 1f, 0f, 0f);
 
             SoundManager.PlaySong(Globals.Content.Load<Song>("shop"), 1f);
         }
@@ -468,13 +512,20 @@ namespace HYPERMAGE
         public Animation falling;
         public Vector2 fallingPos = new(15, -30);
         public Vector2 fallingVel;
+        public bool upBump = false;
 
         public float timer;
         public float fadeIn;
+        public float upgradeFadeIn;
+        public bool upgradeShow = false;
+
+        public float exitTimer;
 
         public List<string> lines = [];
         public float lineShiftTimer;
         public int lineShift;
+
+        public List<Upgrade> upgrades = [];
         public StageTransition()
         {
         }
@@ -490,11 +541,24 @@ namespace HYPERMAGE
             lines.Add(GetPoemLine(7));
             lines.Add(GetPoemLine(8));
 
+            for (int i = 0; i < 3; i++)
+            {
+                Upgrade upgrade = new Upgrade(new((45) + (80 * i), 30), Globals.Content.Load<Texture2D>("upgradeborder"));
+
+                upgrade.opacity = 0f;
+
+                upgrades.Add(upgrade);
+
+                UIManager.AddElement(upgrade);
+            }
+
             SoundManager.PlaySong(Globals.Content.Load<Song>("faf"), 1f);
         }
         public void Update()
         {
+            ParticleManager.Update();
             InputManager.Update();
+            UIManager.Update();
 
             timer += Globals.TotalSeconds;
             lineShiftTimer += Globals.TotalSeconds;
@@ -514,36 +578,83 @@ namespace HYPERMAGE
                 }
             }
 
-            if (fadeIn < 1)
+            if (fadeIn < 1 && !Upgrade.choiceMade)
             {
                 fadeIn += Globals.TotalSeconds / 5;
 
             }
 
-            GameManager.wavesPower = fadeIn;
+            if (timer > 8f || InputManager.Clicked)
+            {
+                upgradeShow = true;
+            }
 
-            fallingVel += fallingPos.DirectionTo(new Vector2(15, 40) + new Vector2(Globals.RandomFloat(-5, 5), Globals.RandomFloat(-5, 5)));
+            if (upgradeShow && !Upgrade.choiceMade && upgradeFadeIn < 1)
+            {
+                upgradeFadeIn += Globals.TotalSeconds;
+            }
+
+            if (Upgrade.choiceMade)
+            {
+                if (!upBump)
+                {
+                    upBump = true;
+                    fallingVel += new Vector2(0, -100);
+                }   
+
+                exitTimer += Globals.TotalSeconds;
+
+                upgradeFadeIn -= Globals.TotalSeconds * 2;
+
+                if (fadeIn > 0)
+                {
+                    fadeIn -= Globals.TotalSeconds / 3;
+                }
+            }
+
+            foreach (var upgrade in upgrades)
+            {
+                upgrade.opacity = upgradeFadeIn;
+            }
+
+            if (!Upgrade.choiceMade)
+            {
+                GameManager.wavesPower = fadeIn;
+            }
+
+            fallingVel += fallingPos.DirectionTo(new Vector2(15, Upgrade.choiceMade ? 180 : 40) + new Vector2(Globals.RandomFloat(-5, 5), Globals.RandomFloat(-5, 5))) * (Upgrade.choiceMade ? 3.5f : 1);
 
             fallingPos += fallingVel * Globals.TotalSeconds;
 
-            fallingVel /= 1.1f;
+            fallingVel /= 1.02f;
 
             falling.Update();
+
+            if (exitTimer >= 3f)
+            {
+                GameManager.TransitionScene(new Shop());
+            }
+
         }
         public void Draw()
         {
-            falling.Draw(fallingPos, Color.White * fadeIn, 0f, Vector2.Zero, 0.7f, SpriteEffects.None, 1f);
+            UIManager.Draw();
+
+            falling.Draw(fallingPos, Color.White * fadeIn, 0f, Vector2.Zero, 0.7f, SpriteEffects.None, 0.8f);
 
             for (int i = 0; i < lines.Count; i++)
             {
-                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), lines[i], new Vector2(150, 50 + (20 * i)), Color.White * fadeIn);
+                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), lines[i], new Vector2(150, 50 + (20 * i)), Color.White * fadeIn, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.8f);
             }
 
             GameManager.DrawScrollingTextBG(lines[lineShift] + " ", fadeIn / 20);
+
+            Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, 180), null, Color.Black * (upgradeFadeIn / 1.1f), 0f, Vector2.Zero, SpriteEffects.None, 0.9f);
         }
 
         public void DrawVFX()
         {
+            ParticleManager.Draw();
         }
 
         public string GetPoemLine(int line)

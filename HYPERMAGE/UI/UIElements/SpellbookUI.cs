@@ -419,7 +419,7 @@ namespace HYPERMAGE.UI.UIElements
             this.index = index;
             this.spell = spell;
 
-            spellText = new TextBox(0.992f, Globals.GetPixelFont(), spell.description, InputManager.MousePosition, 85);
+            spellText = new TextBox(0.992f, Globals.GetPixelFont(), spell.description, InputManager.MousePosition, 120);
 
             spellText.text.Insert(0, " ");
             spellText.text.Insert(0, spell.name);

@@ -22,7 +22,7 @@ namespace HYPERMAGE.UI
         {
             this.layerDepth = layerDepth;
 
-            this.text = Globals.LineBreakText(text, spriteFont, maxWidth, false);
+            this.text = Globals.LineBreakText(text, spriteFont, maxWidth, true);
 
             for (int i = 0; i < this.text.Count; i++)
             {

@@ -373,7 +373,7 @@ namespace HYPERMAGE.Spells
             {
                 if (spell.position == frontPos)
                 {
-                    spell.Cast(0f, GameManager.GetPlayer());
+                    spell.Cast(GameManager.GetPlayer());
                     spellCooldown = spell.cooldown;
                 }
             }
@@ -441,7 +441,7 @@ namespace HYPERMAGE.Spells
             {
                 if (spell.position == frontPos)
                 {
-                    spell.Cast(0f, GameManager.GetPlayer());
+                    spell.Cast(GameManager.GetPlayer());
                     spellCooldown = spell.cooldown;
                 }
             }
