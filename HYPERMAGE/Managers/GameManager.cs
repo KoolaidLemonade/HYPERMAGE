@@ -55,12 +55,14 @@ namespace HYPERMAGE.Managers
         private static int letterCount;
         private static int nextLetter;
 
+        public static float zoneSize = 1f;
+
         private static float timer;
         public static void Init()
         {
             player = new Player(new(150, 100));
 
-            SceneManager.AddScene(new GameScene());
+            SceneManager.AddScene(new MainMenu());
 
             Spellbook.Init();
         }
@@ -136,6 +138,8 @@ namespace HYPERMAGE.Managers
 
                 transition = false;
                 transitionTimer = 0;
+
+                zoneSize = 1f;
 
                 SceneManager.RemoveScene();
                 SceneManager.AddScene(nextScene);

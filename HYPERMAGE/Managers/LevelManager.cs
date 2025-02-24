@@ -16,7 +16,7 @@ namespace HYPERMAGE.Managers
 {
     public static class LevelManager
     {
-        public static int level = 3;
+        public static int level = 0;
 
         public static List<Mob> spawnWave = [];
         public static int spawnWaveCost;
@@ -24,6 +24,7 @@ namespace HYPERMAGE.Managers
         public static List<int> validSpawns = [];
         public static int bossID;
 
+        public static int totalLevelCredits;
         public static int levelCredits;
         public static int credits;
         private static float creditsTimer;
@@ -53,7 +54,10 @@ namespace HYPERMAGE.Managers
         private static bool bossSpawned;
 
         private static bool stageStart = false;
-        public static void Draw()
+
+        private static float nextZoneSize;
+        private static float zoneSizeTimer;
+        public static void DrawBG()
         {
             Globals.SpriteBatch.Draw(bg3, Vector2.Zero, Color.White);
 
@@ -62,7 +66,9 @@ namespace HYPERMAGE.Managers
 
             Globals.SpriteBatch.Draw(bg2, bgPos2, Color.White);
             Globals.SpriteBatch.Draw(bg2, bgPos2 + new Vector2(bg2.Width, 0), Color.White);
-
+        }
+        public static void Draw()
+        {
             if (bossSpawnTimer >= 2f && bossSpawnTimer < 5f)
             {
                 GameManager.DrawBigText();
@@ -122,6 +128,27 @@ namespace HYPERMAGE.Managers
 
             if (!bossStage)
             {
+                Debug.WriteLine(nextZoneSize);
+
+                if (nextZoneSize > 0)
+                {
+                    zoneSizeTimer += Globals.TotalSeconds;
+
+                    GameManager.zoneSize = Globals.NonLerp(GameManager.zoneSize, nextZoneSize, zoneSizeTimer / 5);
+
+                    GameManager.bounds = new(
+                        Globals.NonLerp(160 - (GameManager.zoneSize * 320), 160 - (nextZoneSize * 320), zoneSizeTimer / 5), 
+                        Globals.NonLerp(90 - (GameManager.zoneSize * 180), 90 - (nextZoneSize * 180), zoneSizeTimer / 5), 
+                        Globals.NonLerp(160 + (GameManager.zoneSize * 320), 160 + (nextZoneSize * 320), zoneSizeTimer / 5), 
+                        Globals.NonLerp(90 + (GameManager.zoneSize * 180), 90 + (nextZoneSize * 180), zoneSizeTimer / 5));
+
+                    if (zoneSizeTimer > 5)
+                    {
+                        nextZoneSize = 0;
+                        zoneSizeTimer = 0;
+                    }
+                }
+
                 if (bgScrollTimer < 3 && !endLevel)
                 {
                     bgScrollTimer += Globals.TotalSeconds;
@@ -205,7 +232,7 @@ namespace HYPERMAGE.Managers
 
                     switch (bossID)
                     {
-                        case 9: spawnPos = new Vector2(160 + 11, 40); break;
+                        case 9: spawnPos = new Vector2(160, 40); break;
                     }
 
                     Mob boss = new(spawnPos, bossID);
@@ -238,6 +265,9 @@ namespace HYPERMAGE.Managers
             }
 
             GetNextSpawnWave(validSpawns[Globals.Random.Next(validSpawns.Count)]);
+
+            nextZoneSize = (((float)levelCredits / (float)totalLevelCredits) / 6) + 0.3f;
+            zoneSizeTimer = 0;
         }
 
         public static void GetNextSpawnWave(int type)
@@ -413,6 +443,8 @@ namespace HYPERMAGE.Managers
             {
                 GetNextSpawnWave(validSpawns[Globals.Random.Next(validSpawns.Count)]);
             }
+
+            totalLevelCredits = levelCredits;
         }
 
         public static List<string> GetBossName(int id)

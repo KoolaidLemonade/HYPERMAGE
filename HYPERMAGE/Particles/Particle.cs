@@ -34,6 +34,8 @@ namespace HYPERMAGE.Particles
         private bool flashing;
         private float flashingTimer;
 
+        public bool friendly;
+
         private int width;
         private int height;
 
@@ -62,7 +64,8 @@ namespace HYPERMAGE.Particles
 
             flashing = data.flashing;
             fastScale = data.fastScale;
-            
+            friendly = data.friendly;
+
             spawnIndicator = data.spawnIndicator;
             manaDrop = data.manaDrop;
 

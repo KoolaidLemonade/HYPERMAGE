@@ -71,6 +71,7 @@ namespace HYPERMAGE.Models
         public Mob(Vector2 position, int aiType)
         {
             this.aiType = aiType;
+            this.position = position;
 
             switch (aiType)
             {
@@ -173,7 +174,10 @@ namespace HYPERMAGE.Models
                     spawnCost = 6;
                     break;
                 case 9: //empyrean wisp
-                    anim = new(Globals.Content.Load<Texture2D>("empyreanwisp"), 5, 1, 0.1f);
+                    hitSound = Globals.Content.Load<SoundEffect>("hit");
+                    deathSound = Globals.Content.Load<SoundEffect>("shoot");
+
+                    texture = Globals.Content.Load<Texture2D>("empyreanwisp");
                     contactDamage = false;
 
                     health = 300f;
@@ -196,17 +200,13 @@ namespace HYPERMAGE.Models
 
             origin = new Vector2(width / 2f, height / 2f) ;
 
-            this.position = position - origin;
-
-            center = position + origin;
-
-            hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, width, height);
+            hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, width, height);
 
             active = true;
         }
         public void Update()
         {
-            center = position + origin;
+            center = position;
 
             if (spawning)
             {
@@ -244,7 +244,7 @@ namespace HYPERMAGE.Models
                 anim.Update();
             }
 
-            hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, width, height);
+            hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, width, height);
 
             if (projectileImmunity != null)
             {
@@ -301,37 +301,28 @@ namespace HYPERMAGE.Models
 
             prevPosition = position;
 
+
+            if (position.X < GameManager.bounds.X)
+            {
+                velocity.X += Globals.TotalSeconds * Math.Abs(position.X - GameManager.bounds.X);
+            }
+
+            if (position.X > GameManager.bounds.Z - width)
+            {
+                velocity.X -= Globals.TotalSeconds * Math.Abs(position.X - (GameManager.bounds.Z - width));
+            }
+
+            if (position.Y < GameManager.bounds.Y)
+            {
+                velocity.Y += Globals.TotalSeconds * Math.Abs(position.Y - GameManager.bounds.Y);
+            }
+
+            if (position.Y > GameManager.bounds.W - height)
+            {
+                velocity.Y -= Globals.TotalSeconds * Math.Abs(position.Y - (GameManager.bounds.W - height));
+            }
+
             position += velocity * speed * Globals.TotalSeconds * 30;
-
-            if (!flying)
-            {
-                if (position.X < GameManager.groundBounds.X || position.X > GameManager.groundBounds.Z - width * scale)
-                {
-                    position.X = prevPosition.X;
-                    velocity.X = 0f;
-                }
-
-                if (position.Y < GameManager.groundBounds.Y || position.Y > GameManager.groundBounds.W - height * scale)
-                {
-                    position.Y = prevPosition.Y;
-                    velocity.Y = 0f;
-                }
-            }
-
-            else
-            {
-                if (position.X < GameManager.bounds.X || position.X > GameManager.bounds.Z - width * scale)
-                {
-                    position.X = prevPosition.X;
-                    velocity.X = 0f;
-                }
-
-                if (position.Y < GameManager.bounds.Y || position.Y > GameManager.bounds.W - height * scale)
-                {
-                    position.Y = prevPosition.Y;
-                    velocity.Y = 0f;
-                }
-            }
 
             //
 
@@ -666,17 +657,17 @@ namespace HYPERMAGE.Models
 
             if (anims.getFirstAnim() != null)
             {
-                anims.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, origin, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
+                anims.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, new((int)origin.X, (int)origin.Y), scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
             }
 
             else if (anim != null)
             {
-                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, origin, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
+                anim.Draw(new((int)position.X, (int)position.Y), Color.White, 0f, new((int)origin.X, (int)origin.Y), scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.8f);
             }
 
             else
             {
-                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 1f);
+                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, new((int)origin.X, (int)origin.Y), scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 1f);
             }
 
             switch (aiType)

@@ -32,7 +32,21 @@ public static class ProjectileManager
     {
         foreach (var projectile in projectiles.ToList())
         {
-            projectile.Draw();
+            if (projectile.friendly)
+            {
+                projectile.Draw();
+            }
+        }
+    }
+
+    public static void DrawEnemyProj()
+    {
+        foreach (var projectile in projectiles.ToList())
+        {
+            if (!projectile.friendly)
+            {
+                projectile.Draw();
+            }
         }
     }
 

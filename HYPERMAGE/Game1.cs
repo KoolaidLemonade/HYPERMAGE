@@ -3,8 +3,10 @@ using HYPERMAGE.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace HYPERMAGE
 {
@@ -13,6 +15,8 @@ namespace HYPERMAGE
         private readonly GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
+        private RenderTarget2D vfxMaster;
+        private RenderTarget2D vfxEnemy;
         private RenderTarget2D vfx;
         private RenderTarget2D game;
 
@@ -23,6 +27,8 @@ namespace HYPERMAGE
         private RenderTarget2D renderTarget5;
         private RenderTarget2D renderTarget6;
 
+        private RenderTarget2D voroDisplacement;
+        private RenderTarget2D zoneTarget;
         private RenderTarget2D warpTarget;
         private RenderTarget2D abberationTarget;
 
@@ -34,6 +40,10 @@ namespace HYPERMAGE
         private Effect noise;
         private Effect warp;
         private Effect abberation;
+        private Effect zone;
+        private Effect voro;
+        private Effect perlin;
+        private Effect outline;
 
         private float time;
         private float time2;
@@ -49,6 +59,8 @@ namespace HYPERMAGE
 
         protected override void Initialize()
         {
+            vfxMaster = new RenderTarget2D(GraphicsDevice, 320, 180);
+            vfxEnemy = new RenderTarget2D(GraphicsDevice, 320, 180);
             vfx = new RenderTarget2D(GraphicsDevice, 320, 180);
             game = new RenderTarget2D(GraphicsDevice, 320, 180);
 
@@ -59,6 +71,8 @@ namespace HYPERMAGE
             renderTarget5 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
             renderTarget6 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
 
+            voroDisplacement = new RenderTarget2D(GraphicsDevice, 320, 180);
+            zoneTarget = new RenderTarget2D(GraphicsDevice, 320, 180);
             warpTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
             abberationTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
 
@@ -90,6 +104,14 @@ namespace HYPERMAGE
             noise = Content.Load<Effect>("noise");
             warp = Content.Load<Effect>("warp");
             abberation = Content.Load<Effect>("abberation");
+            zone = Content.Load<Effect>("zone");
+            voro = Content.Load<Effect>("voro");
+            perlin = Content.Load<Effect>("perlin");
+            outline = Content.Load<Effect>("outline");
+
+            voro.Parameters["PaletteTexture"].SetValue(Globals.Content.Load<Texture2D>("voropalette"));
+
+            zone.Parameters["center"].SetValue(new Vector2(0.5f, 0.5f));
 
             noise.Parameters["power"].SetValue(0.85f);
 
@@ -107,6 +129,8 @@ namespace HYPERMAGE
         {
             t += Globals.TotalSeconds;
             tt++;
+
+            zone.Parameters["range"].SetValue(GameManager.zoneSize);
 
             Vector2 mouseUV = new Vector2(0, 0) - (new Vector2(-InputManager.MousePosition.X, -InputManager.MousePosition.Y) / new Vector2(320, 180));
             abberation.Parameters["mousePosition"].SetValue(mouseUV);
@@ -156,6 +180,10 @@ namespace HYPERMAGE
             waves.Parameters["power"].SetValue(GameManager.wavesPower);
             waves.Parameters["time"].SetValue(time);
             noise.Parameters["time"].SetValue(time);
+            zone.Parameters["time"].SetValue(time);
+            voro.Parameters["time"].SetValue(time);
+            perlin.Parameters["time"].SetValue(time);
+            //outline.Parameters["time"].SetValue(time);
 
             if (GameManager.fadeout)
             {
@@ -203,6 +231,10 @@ namespace HYPERMAGE
             SceneManager.GetScene().DrawVFX();
             spriteBatch.End();
 
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack, effect: outline);
+            SceneManager.GetScene().DrawEnemyVFX();
+            spriteBatch.End();
+
             GraphicsDevice.SetRenderTarget(game);
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
             SceneManager.GetScene().Draw();
@@ -210,23 +242,54 @@ namespace HYPERMAGE
 
             invert.Parameters["InvertTex"].SetValue(game);
 
+            GraphicsDevice.SetRenderTarget(voroDisplacement);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: perlin);
+            spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, 180), new Color(Color.White, 0));
+            spriteBatch.End();
+
             GraphicsDevice.SetRenderTarget(renderTarget);
 
+            voro.Parameters["DisplacementTexture"].SetValue(voroDisplacement);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: voro);
+            spriteBatch.Draw(voroDisplacement, new Rectangle(0, 0, 320, 180), new Color(Color.White, 0));
+            spriteBatch.End();
+
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
-            spriteBatch.Draw(game, Vector2.Zero, new Color(Color.White, 0));
+            SceneManager.GetScene().DrawBG();
+            spriteBatch.End();
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+            spriteBatch.Draw(game, Vector2.Zero, new Color(Color.White, 1));
             spriteBatch.End();
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode : SpriteSortMode.FrontToBack, effect: invert);
-            spriteBatch.Draw(vfx, Vector2.Zero, new Color(Color.White, 0));
+            spriteBatch.Draw(vfx, Vector2.Zero, new Color(Color.White, 1));
             spriteBatch.End();
 
+            GraphicsDevice.SetRenderTarget(zoneTarget);
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: voro);
+            spriteBatch.Draw(voroDisplacement, new Rectangle(0, 0, 320, 180), new Color(Color.White, 0));
+            spriteBatch.End();
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack, effect: zone);
+            spriteBatch.Draw(renderTarget, Vector2.Zero, new Color(Color.White, 0));
+            spriteBatch.End();
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+            SceneManager.GetScene().DrawUI();
+            spriteBatch.End();
+
+            //
 
             GraphicsDevice.SetRenderTarget(renderTarget2);
 
             blur.Parameters["offset"].SetValue(new Vector2(1f / renderTarget.Width, 0));
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: blur);
-            spriteBatch.Draw(renderTarget, Vector2.Zero, new Color(Color.White, 0));
+            spriteBatch.Draw(zoneTarget, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(renderTarget3);
@@ -236,17 +299,6 @@ namespace HYPERMAGE
             spriteBatch.Begin(blendState: LightenBlend, samplerState: SamplerState.PointClamp, effect: blur);
             spriteBatch.Draw(renderTarget2, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
-
-            GraphicsDevice.SetRenderTarget(renderTarget4);
-
-            if (GameManager.waves)
-            {
-                spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: waves);
-                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, 180), Color.Transparent);
-                spriteBatch.End();
-            }
-
-            GraphicsDevice.SetRenderTarget(null);
 
             GraphicsDevice.SetRenderTarget(renderTarget5);
 
@@ -259,7 +311,7 @@ namespace HYPERMAGE
             spriteBatch.End();
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: shake);
-            spriteBatch.Draw(renderTarget, new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0));
+            spriteBatch.Draw(zoneTarget, new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0));
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(renderTarget6);
@@ -298,7 +350,6 @@ namespace HYPERMAGE
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: abberation);
             spriteBatch.Draw(abberationTarget, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
-
 
             base.Draw(gameTime);
         }

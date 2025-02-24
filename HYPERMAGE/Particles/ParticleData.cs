@@ -22,6 +22,7 @@ namespace HYPERMAGE.Particles
         public float rotationSpeed = 0f;
         public bool flashing = false;
         public bool fastScale = false;
+        public bool friendly = true;
 
         public bool spawnIndicator = false;
         public bool manaDrop = false;

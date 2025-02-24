@@ -17,12 +17,6 @@ namespace HYPERMAGE.Models
         public Texture2D texture;
         public Animation anim;
 
-        public Texture2D underglow;
-        public int underglowWidth;
-        public int underglowHeight;
-        public Vector2 underglowOrigin;
-        public Color underglowColor;
-
         public Vector2 position;
         public int aiType;
         public float maxLifespan;
@@ -128,14 +122,23 @@ namespace HYPERMAGE.Models
             {
                 // enemy projectiles
                 case -5:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
+
                     break;
                 case -4:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
+
                     break;
                 case -3:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
+
                     break;
                 case -2:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
+
                     break;
                 case -1:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
 
                     break;
                 case 0:
@@ -162,13 +165,6 @@ namespace HYPERMAGE.Models
                 case 7:
                     texture = null;
                     break;
-            }
-
-            if (underglow != null)
-            {
-                underglowWidth = underglow.Width;
-                underglowHeight = underglow.Height;
-                underglowOrigin = new(underglowWidth / 2, underglowHeight / 2);
             }
 
             if (anim != null)
@@ -208,11 +204,6 @@ namespace HYPERMAGE.Models
                 }
 
                 Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? 0.8f : 1f);
-
-                if (underglow != null)
-                {
-                    Globals.SpriteBatch.Draw(underglow, new((int)position.X, (int)position.Y), null, underglowColor, rotation, underglowOrigin, scale, SpriteEffects.None, friendly ? 0.8f - 0.01f : 1f - 0.01f);
-                }
             }
         }
 

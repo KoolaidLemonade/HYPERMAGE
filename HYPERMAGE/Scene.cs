@@ -26,7 +26,10 @@ namespace HYPERMAGE
         public void Load();
         public void Update();
         public void Draw();
+        public void DrawEnemyVFX();
         public void DrawVFX();
+        public void DrawBG();
+        public void DrawUI();
     }
 
     public static class SceneManager
@@ -81,6 +84,9 @@ namespace HYPERMAGE
 
             GameManager.GetPlayer().position = new(160 - 5.5f, 150);
 
+            GameManager.waves = true;
+            GameManager.wavesPower = 1f;
+
             LevelManager.NextLevel();
         }
         public void Update()
@@ -105,6 +111,11 @@ namespace HYPERMAGE
             UIManager.Update();
         }
 
+        public void DrawEnemyVFX()
+        {
+            ParticleManager.DrawEnemyParticles();
+            ProjectileManager.DrawEnemyProj();
+        }
         public void DrawVFX()
         {
             ProjectileManager.Draw();
@@ -118,9 +129,16 @@ namespace HYPERMAGE
             GameManager.player.Draw();
 
             MobManager.Draw();
-
+        }
+        public void DrawBG()
+        {
+            LevelManager.DrawBG();
+        }
+        public void DrawUI()
+        {
             UIManager.Draw();
         }
+
         public static void AddHitstop(int hitstopFrames)
         {
             hitstop = hitstopFrames;
@@ -213,7 +231,8 @@ namespace HYPERMAGE
                     velocity = new(Globals.RandomFloat(-20, 20), Globals.RandomFloat(-80, 20)),
                     lifespan = 0.4f,
                     rotationSpeed = 1f,
-                    resistance = 1.2f
+                    resistance = 1.2f,
+                    friendly = false
                 };
 
                 Particle particle = new(InputManager.MousePosition, ParticleData);
@@ -224,6 +243,10 @@ namespace HYPERMAGE
             InputManager.Update();
             ParticleManager.Update();
         }
+        public void DrawEnemyVFX()
+        {
+            ParticleManager.DrawEnemyParticles();
+        }
 
         public void DrawVFX()
         {
@@ -232,6 +255,13 @@ namespace HYPERMAGE
         public void Draw()
         {
             UIManager.Draw();
+        }
+        public void DrawUI()
+        {
+        }
+        public void DrawBG()
+        {
+
         }
     }
 
@@ -291,8 +321,20 @@ namespace HYPERMAGE
                 SceneManager.AddScene(new Shop());
             }
         }
+        public void DrawEnemyVFX()
+        {
+
+        }
+        public void DrawUI()
+        {
+        }
         public void DrawVFX()
         {
+        }
+
+        public void DrawBG()
+        {
+
         }
         public void Draw()
         {
@@ -467,6 +509,10 @@ namespace HYPERMAGE
 
             UIManager.Update();
         }
+        public void DrawEnemyVFX()
+        {
+
+        }
 
         public void DrawVFX()
         {
@@ -481,7 +527,14 @@ namespace HYPERMAGE
             GameManager.player.Draw();
 
             MobManager.Draw();
+        }
 
+        public void DrawBG()
+        {
+
+        }
+        public void DrawUI()
+        {
             UIManager.Draw();
         }
     }
@@ -502,8 +555,22 @@ namespace HYPERMAGE
         {
         }
 
+        public void DrawEnemyVFX()
+        {
+
+        }
         public void DrawVFX()
         {
+        }
+
+        public void DrawBG()
+        {
+
+        }
+
+        public void DrawUI()
+        {
+
         }
     }
 
@@ -636,6 +703,15 @@ namespace HYPERMAGE
             }
 
         }
+
+        public void DrawEnemyVFX()
+        {
+
+        }
+        public void DrawBG()
+        {
+
+        }
         public void Draw()
         {
             UIManager.Draw();
@@ -655,6 +731,10 @@ namespace HYPERMAGE
         public void DrawVFX()
         {
             ParticleManager.Draw();
+        }
+
+        public void DrawUI()
+        {
         }
 
         public string GetPoemLine(int line)

@@ -51,12 +51,26 @@ public static class ParticleManager
     {
         foreach (var particle in particles.ToList())
         {
-            particle.Draw();
+            if (particle.friendly)
+            {
+                particle.Draw();
+            }
         }
 
         foreach (var textPopup in textPopups.ToList())
         {
             textPopup.Draw();
+        }
+    }
+
+    public static void DrawEnemyParticles()
+    {
+        foreach (var particle in particles.ToList())
+        {
+            if (!particle.friendly)
+            {
+                particle.Draw();
+            }
         }
     }
 }

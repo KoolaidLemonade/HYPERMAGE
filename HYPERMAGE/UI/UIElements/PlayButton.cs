@@ -25,7 +25,7 @@ namespace HYPERMAGE.UI.UIElements
                 SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("select"), 0.5f, 0f, 0f);
 
                 transition = true;
-                GameManager.TransitionScene(new GameScene());
+                GameManager.TransitionScene(new Shop());
             }
 
             base.Clicked();

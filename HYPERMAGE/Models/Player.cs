@@ -16,7 +16,7 @@ public class Player
 
     public Vector2 center;
 
-    private Vector2 prevPosition;
+    private Vector2 nextPosition;
     public Vector2 position;
     public Vector2 velocity;
 
@@ -188,23 +188,29 @@ public class Player
 
         velocity *= Globals.TotalSeconds;
 
-        prevPosition = position;
-
-        position += velocity * Globals.TotalSeconds * (InputManager.slow ? 1000 : 2000);
-
         //
 
-        if (position.X < GameManager.bounds.X || position.X > GameManager.bounds.Z - anim.frameWidth)
+        if (position.X < GameManager.bounds.X)
         {
-            position.X = prevPosition.X;
-            velocity.X = 0f;
+            velocity.X += Globals.TotalSeconds * Math.Abs(position.X - GameManager.bounds.X);
         }
 
-        if (position.Y < GameManager.bounds.Y || position.Y > GameManager.bounds.W - anim.frameHeight)
+        if (position.X > GameManager.bounds.Z - width)
         {
-            position.Y = prevPosition.Y;
-            velocity.Y = 0f;
+            velocity.X -= Globals.TotalSeconds * Math.Abs(position.X - (GameManager.bounds.Z - width));
         }
+
+        if (position.Y < GameManager.bounds.Y)
+        {
+            velocity.Y += Globals.TotalSeconds * Math.Abs(position.Y - GameManager.bounds.Y);
+        }
+
+        if (position.Y > GameManager.bounds.W - height)
+        {
+            velocity.Y -= Globals.TotalSeconds * Math.Abs(position.Y - (GameManager.bounds.W - height));
+        }
+
+        position += velocity * Globals.TotalSeconds * (InputManager.slow ? 1000 : 2000);
 
         center = new(position.X + anim.frameWidth / 2, position.Y + anim.frameHeight / 2);
 
