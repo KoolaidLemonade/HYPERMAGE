@@ -64,15 +64,11 @@ public class Player
 
         center = position + origin;
 
-        hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, 1, 1);
+        hitbox = PolygonFactory.CreateRectangle((int)center.X - 1, (int)center.Y - 1, 1, 1);
     }
 
     public void Update()
     {
-        hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, 1, 1);
-
-        center = position + origin;
-
         if (InputManager.Moving)
         {
             velocity += Vector2.Normalize(InputManager.Direction) * acceleration * Globals.TotalSeconds;
@@ -212,10 +208,6 @@ public class Player
 
         position += velocity * Globals.TotalSeconds * (InputManager.slow ? 1000 : 2000);
 
-        center = new(position.X + anim.frameWidth / 2, position.Y + anim.frameHeight / 2);
-
-        hitbox.SetPosition(center);
-
         // 
 
         if (InputManager.LeftMouseDown && !InputManager.buttonClicked)
@@ -281,6 +273,11 @@ public class Player
             }
         }
 
+
+        center = position + origin;
+
+        hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, 1, 1);
+
         //
 
         anim.Update();
@@ -330,11 +327,6 @@ public class Player
     }
     public void Draw()
     {
-
-        Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)hitbox.GetPosition().X - 1, (int)hitbox.GetPosition().Y - 1, 3, 3), null, Color.Black * 0.5f, 0f, Vector2.Zero, SpriteEffects.None, 0.9999f);
-
-        Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)hitbox.GetPosition().X, (int)hitbox.GetPosition().Y, 1, 1), null, Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 1f);
-
         anim.Draw(new((int)position.X, (int)position.Y), flashing ? flashColor : Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.8f);
     }
 

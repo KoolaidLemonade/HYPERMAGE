@@ -59,10 +59,10 @@ namespace HYPERMAGE
 
         protected override void Initialize()
         {
-            vfxMaster = new RenderTarget2D(GraphicsDevice, 320, 180);
             vfxEnemy = new RenderTarget2D(GraphicsDevice, 320, 180);
             vfx = new RenderTarget2D(GraphicsDevice, 320, 180);
             game = new RenderTarget2D(GraphicsDevice, 320, 180);
+            vfxMaster = new RenderTarget2D(GraphicsDevice, 320, 180);
 
             renderTarget = new RenderTarget2D(GraphicsDevice, 320, 180);
             renderTarget2 = new RenderTarget2D(GraphicsDevice, 320, 180);
@@ -231,7 +231,9 @@ namespace HYPERMAGE
             SceneManager.GetScene().DrawVFX();
             spriteBatch.End();
 
-            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack, effect: outline);
+            GraphicsDevice.SetRenderTarget(vfxEnemy);
+            GraphicsDevice.Clear(Color.Transparent);
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
             SceneManager.GetScene().DrawEnemyVFX();
             spriteBatch.End();
 
@@ -261,12 +263,26 @@ namespace HYPERMAGE
             spriteBatch.End();
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
-            spriteBatch.Draw(game, Vector2.Zero, new Color(Color.White, 1));
+            spriteBatch.Draw(game, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
 
-            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode : SpriteSortMode.FrontToBack, effect: invert);
-            spriteBatch.Draw(vfx, Vector2.Zero, new Color(Color.White, 1));
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack, effect: invert);
+            spriteBatch.Draw(vfx, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+            spriteBatch.Draw(vfxEnemy, new Vector2(1, 0), new Color(Color.Red, 0));
+            spriteBatch.Draw(vfxEnemy, new Vector2(-1, 0), new Color(Color.Red, 0));
+            spriteBatch.Draw(vfxEnemy, new Vector2(0, 1), new Color(Color.Red, 0));
+            spriteBatch.Draw(vfxEnemy, new Vector2(0, -1), new Color(Color.Red, 0));
+
+            spriteBatch.End();
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack, effect: invert);
+            spriteBatch.Draw(vfxEnemy, Vector2.Zero, new Color(Color.White, 0));
+            spriteBatch.End();
+
 
             GraphicsDevice.SetRenderTarget(zoneTarget);
 

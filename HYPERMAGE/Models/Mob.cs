@@ -430,7 +430,7 @@ namespace HYPERMAGE.Models
                             {
                                 Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-50 + (i * 25))) * 65f;
 
-                                Projectile projectile = new(center, -2, 1f, projVelocity, 10f, projVelocity.ToRotation() + MathHelper.ToRadians(90f));
+                                Projectile projectile = new(center, -2, 1f, projVelocity, 10f, 0f);
                                 ProjectileManager.AddProjectile(projectile);
 
 
@@ -467,7 +467,7 @@ namespace HYPERMAGE.Models
                             {
                                 Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-50 + (i * 25))) * 65f;
 
-                                Projectile projectile = new(center, -2, 1f, projVelocity, 10f, projVelocity.ToRotation() + MathHelper.ToRadians(90f));
+                                Projectile projectile = new(center, -2, 1f, projVelocity, 10f, 0f);
                                 ProjectileManager.AddProjectile(projectile);
 
                                 for (int j = 0; j < 3; j++)

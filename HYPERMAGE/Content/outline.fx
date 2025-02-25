@@ -26,12 +26,13 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float2 uv = input.TextureCoordinates;
     float4 col = input.Color;
 	
-    if (sqrt(pow(abs(uv.x - 0.5), 2) + pow(abs(uv.y - 0.5), 2)) > 0.4)
-    {
-        col = float4(1, 0, 0, 0);
-    }
-
-	return tex2D(SpriteTextureSampler, uv) * col;
+    float2 size = float2(1.0, 1.0) / float2(320, 180);
+	
+    float outlineThickness = 2;
+	
+	
+	
+	return col;
 }
 
 technique SpriteDrawing

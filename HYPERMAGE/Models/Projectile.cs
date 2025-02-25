@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -27,6 +28,9 @@ namespace HYPERMAGE.Models
         public int height;
 
         public Polygon hitbox;
+        public Vector2 hitboxOffset;
+        public Vector2 hitboxSize;
+        public Vector2 hitboxOrigin;
 
         public Vector2 center;
 
@@ -135,11 +139,13 @@ namespace HYPERMAGE.Models
                     break;
                 case -2:
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
-
+                    hitboxOffset = new(0, 0);
+                    hitboxSize = new(9, 9);
                     break;
                 case -1:
-                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
-
+                    texture = Globals.Content.Load<Texture2D>("enemybullet4");
+                    hitboxOffset = new(0, 0);
+                    hitboxSize = new(3, 3);
                     break;
                 case 0:
                     break;
@@ -185,7 +191,16 @@ namespace HYPERMAGE.Models
 
             center = position + origin;
 
-            hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
+
+            if (hitboxOffset == Vector2.Zero && hitboxSize == Vector2.Zero)
+            {
+                hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
+            }
+
+            else
+            {
+                hitbox = PolygonFactory.CreateRectangle((int)position.X + (int)hitboxOffset.X, (int)position.Y + (int)hitboxOffset.Y, (int)(hitboxSize.X * scale), (int)(hitboxSize.Y * scale), rotation);
+            }
         }
         public void Draw()
         {
@@ -203,7 +218,7 @@ namespace HYPERMAGE.Models
                     return;
                 }
 
-                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? 0.8f : 1f);
+                Globals.SpriteBatch.Draw(texture, new(position.X, position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? 0.8f : 1f);
             }
         }
 
@@ -216,7 +231,15 @@ namespace HYPERMAGE.Models
                 anim.Update();
             }
 
-            hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
+            if (hitboxOffset == Vector2.Zero && hitboxSize == Vector2.Zero)
+            {
+                hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
+            }
+
+            else
+            {
+                hitbox = PolygonFactory.CreateRectangle((int)position.X + (int)hitboxOffset.X, (int)position.Y + (int)hitboxOffset.Y, (int)(hitboxSize.X * scale), (int)(hitboxSize.Y * scale), rotation);
+            }
 
             center = position + origin;
 
@@ -269,6 +292,31 @@ namespace HYPERMAGE.Models
                     break;
                 case -1: //wisp
                     position += velocity * Globals.TotalSeconds * speed;
+
+                    ai += Globals.TotalSeconds;
+
+                    if (ai > 0.1f)
+                    {
+                        ParticleData ParticleData = new()
+                        {
+                            opacityStart = 1f,
+                            opacityEnd = 0f,
+                            sizeStart = 2f,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = new(Globals.RandomFloat(-50, 50), Globals.RandomFloat(-50, 50)),
+                            lifespan = 0.2f,
+                            rotationSpeed = 1f,
+                            resistance = 1.2f,
+                            friendly = false
+                        };
+
+                        Particle particle = new(position, ParticleData);
+                        ParticleManager.AddParticle(particle);
+
+                        ai = 0;
+                    }
 
                     break;
                 case 0:

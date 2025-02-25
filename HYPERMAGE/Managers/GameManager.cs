@@ -62,7 +62,7 @@ namespace HYPERMAGE.Managers
         {
             player = new Player(new(150, 100));
 
-            SceneManager.AddScene(new MainMenu());
+            SceneManager.AddScene(new GameScene());
 
             Spellbook.Init();
         }
