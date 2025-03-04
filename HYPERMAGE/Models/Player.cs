@@ -26,8 +26,8 @@ public class Player
     public int height;
     public Vector2 origin;
 
-    public float speed = 1.7f;
-    public float acceleration = 120f;
+    public float speed = 1.8f;
+    public float acceleration = 150f;
 
     public float immunityTime = 1f;
     public float immunityTimer;
@@ -39,7 +39,7 @@ public class Player
     public Color flashColor1;
     public Color flashColor2;
 
-    public int mana = 554;
+    public int mana = 400;
     public int maxHealth = 3;
     public int health = 3;
     public int lives = 3;

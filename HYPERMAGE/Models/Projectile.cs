@@ -1,6 +1,7 @@
 ﻿using HYPERMAGE.Helpers;
 using HYPERMAGE.Managers;
 using HYPERMAGE.Particles;
+using HYPERMAGE.Spells;
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,9 @@ namespace HYPERMAGE.Models
 
         private float ai;
         private float ai2;
+
+        public bool explosify;
+        public float explosifyDamage;
 
         private double angle = 0;
         public Projectile(Vector2 position, int aiType, float speed, Vector2 velocity, float lifespan) : this(position, aiType, speed, 1, -1, 0f, velocity, lifespan, 60, 0f, 1f, false, 0, 0)
@@ -127,20 +131,24 @@ namespace HYPERMAGE.Models
                 // enemy projectiles
                 case -5:
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
+                    hitboxOffset = new(0, 0);
+                    hitboxSize = new(9, 9);
 
                     break;
                 case -4:
-                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
-
+                    texture = Globals.Content.Load<Texture2D>("enemybullet4");
+                    hitboxOffset = new(0, 0);
+                    hitboxSize = new(3, 3);
                     break;
                 case -3:
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
-
-                    break;
-                case -2:
-                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
                     hitboxOffset = new(0, 0);
                     hitboxSize = new(9, 9);
+                    break;
+                case -2:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet1");
+                    hitboxOffset = new(0, 0);
+                    hitboxSize = new(4, 4);
                     break;
                 case -1:
                     texture = Globals.Content.Load<Texture2D>("enemybullet4");
@@ -253,10 +261,35 @@ namespace HYPERMAGE.Models
                 //enemy projectiles
                 case -5:
                     position += velocity * Globals.TotalSeconds * speed;
-                    rotation = velocity.ToRotation() + MathHelper.ToRadians(90);
+
+
+                    ai += Globals.TotalSeconds;
+
+                    if (ai > 0.1f)
+                    {
+                        ParticleData ParticleData = new()
+                        {
+                            sizeStart = 5f,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = new(Globals.RandomFloat(-50, 50), Globals.RandomFloat(-50, 50)),
+                            lifespan = 0.25f,
+                            rotationSpeed = 1f,
+                            resistance = 1.2f,
+                            friendly = false
+                        };
+
+                        Particle particle = new(position, ParticleData);
+                        ParticleManager.AddParticle(particle);
+
+                        ai = 0;
+                    }
+
                     break;
                 case -4: //sorcerer
                     position += velocity * Globals.TotalSeconds * speed;
+                    rotation = velocity.ToRotation() + MathHelper.ToRadians(90);
                     break;
                 case -3: //sorcerer
                     position += velocity * Globals.TotalSeconds * speed;
@@ -276,7 +309,9 @@ namespace HYPERMAGE.Models
                                 sizeEnd = 0,
                                 velocity = (Vector2.One * 100f).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360))),
                                 lifespan = 0.5f,
-                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                friendly = false
+
                             };
 
                             Particle projParticle = new(position, projParticleData);
@@ -292,6 +327,7 @@ namespace HYPERMAGE.Models
                     break;
                 case -1: //wisp
                     position += velocity * Globals.TotalSeconds * speed;
+                    rotation = velocity.ToRotation() + MathHelper.ToRadians(90);
 
                     ai += Globals.TotalSeconds;
 
@@ -692,6 +728,49 @@ namespace HYPERMAGE.Models
         }
         public void Kill()
         {
+            if (explosify)
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    ParticleData pd = new()
+                    {
+                        opacityStart = .8f,
+                        opacityEnd = 0.1f,
+                        sizeStart = 4 + Globals.Random.Next(3),
+                        sizeEnd = 0,
+                        colorStart = Color.White,
+                        colorEnd = Color.Gold,
+                        velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200)),
+                        lifespan = Globals.RandomFloat(0.5f, 1f),
+                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                    };
+
+                    Particle p = new(position, pd);
+                    ParticleManager.AddParticle(p);
+                }
+
+                for (int i = 0; i < 10; i++)
+                {
+                    ParticleData pd = new()
+                    {
+                        sizeStart = 1 + Globals.Random.Next(3),
+                        sizeEnd = 0,
+                        colorStart = Color.White,
+                        colorEnd = Color.White,
+                        velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                        lifespan = 0.2f,
+                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                    };
+
+                    Particle p = new(position, pd);
+                    ParticleManager.AddParticle(p);
+                }
+
+                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 0.4f, -0.2f, 0f);
+
+                CreateExplosion(position, explosifyDamage, 1f, 50);
+            }
+
             switch (aiType)
             {
                 case -3: //sorcerer
@@ -703,7 +782,8 @@ namespace HYPERMAGE.Models
                             sizeEnd = 0,
                             velocity = (Vector2.One * 50f).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360))),
                             lifespan = 0.5f,
-                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                            friendly = false
                         };
 
                         Particle projParticle = new(position, projParticleData);

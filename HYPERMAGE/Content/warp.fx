@@ -25,7 +25,7 @@ struct VertexShaderOutput
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
     float2 uv = input.UV * 2 - 1;
-    float2 offset = uv.yx / 7;
+    float2 offset = uv.yx / 5;
     uv = uv + uv * offset * offset;
     uv = uv * 0.5 + 0.5;
 	

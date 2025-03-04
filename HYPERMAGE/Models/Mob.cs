@@ -2,6 +2,7 @@
 using HYPERMAGE.Managers;
 using HYPERMAGE.Particles;
 using HYPERMAGE.Spells;
+using HYPERMAGE.UI.UIElements;
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,11 @@ namespace HYPERMAGE.Models
         public float ai3;
         public float ai4;
         public float ai5;
+        public float ai6;
+        public float ai7;
+        public float ai8;
+        public float ai9;
+        public float ai10;
 
         public int aiType;
         public float speed = 1f;
@@ -66,6 +72,7 @@ namespace HYPERMAGE.Models
         public float spawnTimer;
 
         public bool boss = false;
+        public bool draw = true;
 
         private List <Projectile> projectileImmunity = [];
         public Mob(Vector2 position, int aiType)
@@ -97,10 +104,10 @@ namespace HYPERMAGE.Models
                     scale = 2f;
                     health = 3f;
                     knockbackResist = 0.6f;
-                    spawnCost = 5;
+                    spawnCost = 3;
                     flying = true;
 
-                    timer = Globals.RandomFloat(0, 2);
+                    timer = Globals.RandomFloat(1, 2);
                     break;
                 case 3: //wizard
                     anims.AddAnimation(0, new(Globals.Content.Load<Texture2D>("wizard"), 2, 2, 0.5f, 1));
@@ -114,7 +121,7 @@ namespace HYPERMAGE.Models
                     width = 23;
                     height = 24;
 
-                    health = 15f;
+                    health = 18f;
                     spawnCost = 4;
                     break;
                 case 4: //slime
@@ -125,7 +132,7 @@ namespace HYPERMAGE.Models
 
                     health = 4f;
                     knockbackResist = 0.8f;
-                    spawnCost = 1;
+                    spawnCost = 2;
 
                     break;
                 case 5: //mini slime
@@ -151,8 +158,8 @@ namespace HYPERMAGE.Models
                     width = 23;
                     height = 21;
 
-                    health = 10f;
-                    spawnCost = 3;
+                    health = 12f;
+                    spawnCost = 6;
                     break;
                 case 7: //cleric
                     anims.AddAnimation(0, new(Globals.Content.Load<Texture2D>("cleric"), 2, 2, 0.5f, 1));
@@ -168,6 +175,10 @@ namespace HYPERMAGE.Models
                     break;
                 case 8: //totem
                     texture = Globals.Content.Load<Texture2D>("totem");
+
+                    hitSound = Globals.Content.Load<SoundEffect>("hit");
+                    deathSound = Globals.Content.Load<SoundEffect>("shoot");
+
                     contactDamage = false;
 
                     health = 30f;
@@ -180,8 +191,24 @@ namespace HYPERMAGE.Models
                     texture = Globals.Content.Load<Texture2D>("empyreanwisp");
                     contactDamage = false;
 
-                    health = 300f;
+                    knockbackResist = 200f;
+                    health = 150f;
                     boss = true;
+                    flying = true;
+
+                    UIManager.AddElement(new BossBar(Globals.Content.Load<Texture2D>("bossbar"), new(55, 170), this));
+
+                    break;
+                case 10: //eye monster
+                    texture = Globals.Content.Load<Texture2D>("eyemonster1");
+
+                    hitSound = Globals.Content.Load<SoundEffect>("hit");
+                    deathSound = Globals.Content.Load<SoundEffect>("shoot");
+
+                    contactDamage = false;
+
+                    health = 8f;
+                    spawnCost = 3;
                     flying = true;
                     break;
             }
@@ -207,6 +234,8 @@ namespace HYPERMAGE.Models
         public void Update()
         {
             center = position;
+
+            timer += Globals.TotalSeconds;
 
             if (spawning)
             {
@@ -265,62 +294,88 @@ namespace HYPERMAGE.Models
                 Kill();
             }
 
-            foreach (Projectile p in ProjectileManager.projectiles.ToList())
+            if (draw)
             {
-                if (p.hitbox.IntersectsWith(hitbox) && p.friendly && !projectileImmunity.Contains(p))
+                foreach (Projectile p in ProjectileManager.projectiles.ToList())
                 {
-                    projectileImmunity.Add(p);
-
-                    HitByProj(p);
-                    p.HitEnemy();
-
-                    if (p.pierce == 0)
+                    if (p.hitbox.IntersectsWith(hitbox) && p.friendly && !projectileImmunity.Contains(p))
                     {
-                        p.Kill();
-                    }
+                        projectileImmunity.Add(p);
 
-                    else if (p.pierce > 0)
+                        HitByProj(p);
+                        p.HitEnemy();
+
+                        if (p.pierce == 0)
+                        {
+                            p.Kill();
+                        }
+
+                        else if (p.pierce > 0)
+                        {
+                            p.pierce--;
+                        }
+
+                        health -= p.damage;
+                    }
+                }
+
+                foreach (Mob m in MobManager.mobs)
+                {
+                    if (m.flying && flying || !m.flying && !flying)
                     {
-                        p.pierce--;
+                        if (m.hitbox.IntersectsWith(hitbox) && m != this)
+                        {
+                            velocity += m.center.DirectionTo(center) / (40 * knockbackResist);
+                        }
                     }
-
-                    health -= p.damage;
                 }
             }
 
-            foreach (Mob m in MobManager.mobs)
+            if (!boss)
             {
-                if (m.flying && flying || !m.flying && !flying)
+                if (!flying)
                 {
-                    if (m.hitbox.IntersectsWith(hitbox) && m != this)
+                    if (position.X < GameManager.groundBounds.X + 5)
                     {
-                        velocity += m.center.DirectionTo(center) / (40 * knockbackResist);
+                        velocity.X += Globals.TotalSeconds * Math.Abs(position.X - GameManager.groundBounds.X + 5);
+                    }
+
+                    if (position.X > GameManager.groundBounds.Z - 5)
+                    {
+                        velocity.X -= Globals.TotalSeconds * Math.Abs(position.X - (GameManager.groundBounds.Z - 5));
+                    }
+
+                    if (position.Y < GameManager.groundBounds.Y + 5)
+                    {
+                        velocity.Y += Globals.TotalSeconds * Math.Abs(position.Y - GameManager.groundBounds.Y + 5);
+                    }
+
+                    if (position.Y > GameManager.groundBounds.W - 5)
+                    {
+                        velocity.Y -= Globals.TotalSeconds * Math.Abs(position.Y - (GameManager.groundBounds.W - 5));
                     }
                 }
-            }
 
-            prevPosition = position;
+                if (position.X < GameManager.bounds.X + 5)
+                {
+                    velocity.X += Globals.TotalSeconds * Math.Abs(position.X - GameManager.bounds.X + 5);
+                }
 
+                if (position.X > GameManager.bounds.Z - 5)
+                {
+                    velocity.X -= Globals.TotalSeconds * Math.Abs(position.X - (GameManager.bounds.Z - 5));
+                }
 
-            if (position.X < GameManager.bounds.X)
-            {
-                velocity.X += Globals.TotalSeconds * Math.Abs(position.X - GameManager.bounds.X);
-            }
+                if (position.Y < GameManager.bounds.Y + 5)
+                {
+                    velocity.Y += Globals.TotalSeconds * Math.Abs(position.Y - GameManager.bounds.Y + 5);
+                }
 
-            if (position.X > GameManager.bounds.Z - width)
-            {
-                velocity.X -= Globals.TotalSeconds * Math.Abs(position.X - (GameManager.bounds.Z - width));
-            }
-
-            if (position.Y < GameManager.bounds.Y)
-            {
-                velocity.Y += Globals.TotalSeconds * Math.Abs(position.Y - GameManager.bounds.Y);
-            }
-
-            if (position.Y > GameManager.bounds.W - height)
-            {
-                velocity.Y -= Globals.TotalSeconds * Math.Abs(position.Y - (GameManager.bounds.W - height));
-            }
+                if (position.Y > GameManager.bounds.W  - 5)
+                {
+                    velocity.Y -= Globals.TotalSeconds * Math.Abs(position.Y - (GameManager.bounds.W - 5));
+                }
+            }    
 
             position += velocity * speed * Globals.TotalSeconds * 30;
 
@@ -446,7 +501,8 @@ namespace HYPERMAGE.Models
                                         colorEnd = Color.White,
                                         velocity = projVelocity.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-20, 20))) * 2,
                                         lifespan = 0.5f,
-                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                        friendly = false
                                     };
 
                                     Particle projParticle = new(center, projParticleData);
@@ -482,7 +538,8 @@ namespace HYPERMAGE.Models
                                         colorEnd = Color.White,
                                         velocity = projVelocity.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-20, 20))) * 2,
                                         lifespan = 0.5f,
-                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                        friendly = false
                                     };
 
                                     Particle projParticle = new(center, projParticleData);
@@ -552,7 +609,7 @@ namespace HYPERMAGE.Models
                     break;
                 case 9: //empyrean wisp
 
-                    if (timer == 0)
+                    if (ai9 == 0)
                     {
                         GameManager.AddScreenShake(1.2f, 20f);
                         GameManager.AddAbberationPowerForce(200, 100);
@@ -580,79 +637,634 @@ namespace HYPERMAGE.Models
                             Particle p2 = new(position, pd2);
                             ParticleManager.AddParticle(p2);
                         }
+
+                        ai9 = 1;
+                    }
+
+                    if (draw && ai10 == 0)
+                    {
+                        ParticleData pd = new()
+                        {
+                            opacityStart = 0.8f,
+                            opacityEnd = 0f,
+                            sizeStart = 12,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.Pink,
+                            velocity = new(Globals.RandomFloat(-60, 60), Globals.RandomFloat(-300, 0)),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle p = new(position, pd);
+                        ParticleManager.AddParticle(p);
                     }
 
                     if (timer >= 1.5f && ai == 0)
                     {
-                        ai = Globals.Random.Next(1) + 1;
+                        ai = 2;
                     }
+
+                    velocity /= 1.2f;
+
+                    ai8 += Globals.TotalSeconds;
 
                     if (ai == 1)
                     {
-                        ai2 += Globals.TotalSeconds;
-
-                        Vector2 targetPos = new(160, 90);
-
-                        if (Globals.Distance(targetPos, position) > 5)
+                        if (ai8 >= 12f)
                         {
-                            velocity += position.DirectionTo(targetPos) * Globals.TotalSeconds * 50;
-                        }
+                            ai2 += Globals.TotalSeconds;
 
-                        if (ai2 >= 1f)
-                        {
-                            ai3 += Globals.TotalSeconds;
-
-                            if (ai3 >= 0.1f)
+                            if (ai2 >= 0.25f)
                             {
-                                ai4++;
-
-                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
-
-                                for (int i = 0; i < 12; i++)
+                                if (ai5 == 0)
                                 {
-                                    Projectile projectile = new(position, ai4 == 6 ? -5 : -4, 1f, (Vector2.One * ((ai4 == 6 ? 120 : 70) - (ai4 * 5))).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0, 360, i / 12f) + (ai4 * 10))), 10f);
+                                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1f, -0.3f, 0f);
+
+                                    draw = false;
+
+                                    for (int i = 0; i < 10; i++)
+                                    {
+                                        ParticleData pd = new()
+                                        {
+                                            opacityStart = 1f,
+                                            opacityEnd = 1f,
+                                            sizeStart = 6,
+                                            sizeEnd = 0,
+                                            colorStart = Color.White,
+                                            colorEnd = Color.White,
+                                            velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                                            lifespan = 0.2f,
+                                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                            friendly = false
+                                        };
+
+                                        Particle p = new(position, pd);
+                                        ParticleManager.AddParticle(p);
+                                    }
+
+                                    position = new(160, 90);
+
+
+                                    ai5 = 1;
+                                }
+                            }
+
+                            if (ai2 >= 0.75f && ai2 < 0.8f)
+                            {
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, -0.3f, 0f);
+                                GameManager.AddScreenShake(0.1f, 5f);
+
+                                for (int i = 0; i < 30; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = 6,
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.Red,
+                                        velocity = Vector2.One.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360))) * 300,
+                                        lifespan = 0.2f,
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                        friendly = false
+                                    };
+
+                                    Particle p = new(position, pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+                            }
+
+                            if (ai2 >= 1.5f)
+                            {
+                                if (ai6 == 0)
+                                {
+                                    draw = true;
+                                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("heavyhit"), 1f, -0.3f, 0f);
+
+                                    GameManager.AddScreenShake(0.25f, 5f);
+                                    GameManager.AddAbberationPowerForce(300, 20);
+
+                                    for (int i = 0; i < 20; i++)
+                                    {
+                                        ParticleData pd = new()
+                                        {
+                                            opacityStart = 1f,
+                                            opacityEnd = 1f,
+                                            sizeStart = 6,
+                                            sizeEnd = 0,
+                                            colorStart = Color.White,
+                                            colorEnd = Color.White,
+                                            velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                                            lifespan = 0.2f,
+                                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                            friendly = false
+                                        };
+
+                                        Particle p = new(position, pd);
+                                        ParticleManager.AddParticle(p);
+                                    }
+
+                                    ai6 = 1;
+                                }
+                            }
+
+                            if (ai2 >= 1.75f && ai4 < 24)
+                            {
+                                ai3 += Globals.TotalSeconds;
+
+                                if (ai3 >= 0.25f)
+                                {
+                                    ai4++;
+
+                                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+                                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bop"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+                                    for (int i = 0; i < 12; i++)
+                                    {
+                                        Projectile projectile = new(position, ai4 % 4 == 0 ? -5 : -4, 1f, (Vector2.One * (ai4 % 4 == 0 ? 50 : 70)).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0, 360, i / 12f) + (ai4 * 10))), 10f);
+                                        ProjectileManager.AddProjectile(projectile);
+                                    }
+
+                                    ai3 = 0;
+                                }
+                            }
+
+                            if (ai4 == 24)
+                            {
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("wavy"), 2f, 0f, 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lastingexplosion"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    Projectile projectile = new(position, -5, 1f, (Vector2.One * 90).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0, 360, i / 10f))), 10f);
                                     ProjectileManager.AddProjectile(projectile);
                                 }
 
+                                ai4++;
+                            }
+
+                            if (ai4 > 24)
+                            {
+                                ai7 += Globals.TotalSeconds;
+                                ai10 = 1;
+                            }
+
+                            if (ai7 >= 4f)
+                            {
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1f, -0.3f, 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("heavyhit"), 1f, -0.3f, 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("cry"), 1f, 0.5f, 0f);
+
+                                GameManager.AddScreenShake(0.2f, 5f);
+                                GameManager.AddAbberationPowerForce(300, 20);
+
+                                for (int i = 0; i < 20; i++)
+                                {
+                                    ParticleData pd2 = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = 6,
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = new(Globals.RandomFloat(-250, 250), Globals.RandomFloat(-250, 250)),
+                                        lifespan = Globals.RandomFloat(0.5f, 1f),
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                        friendly = false
+                                    };
+
+                                    Particle p2 = new(position, pd2);
+                                    ParticleManager.AddParticle(p2);
+                                }
+
+                                ai = 2;
+
+                                ai2 = 0;
                                 ai3 = 0;
+                                ai4 = 0;
+                                ai5 = 0;
+                                ai6 = 0;
+                                ai7 = 0;
+
+                                ai8 = 0;
+                                ai10 = 0;
                             }
                         }
-
-                        if (ai4 >= 6)
+                        
+                        else
                         {
                             ai = 2;
                         }
                     }
 
-                    velocity /= 1.2f;
-
-                    ParticleData pd = new()
+                    if (ai == 2)
                     {
-                        opacityStart = 1f,
-                        opacityEnd = 0f,
-                        sizeStart = 12,
-                        sizeEnd = 0,
-                        colorStart = Color.White,
-                        colorEnd = Color.Pink,
-                        velocity = new(Globals.RandomFloat(-60, 60), Globals.RandomFloat(-300, 0)),
-                        lifespan = 0.5f,
-                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
-                    };
+                        ai5 += Globals.TotalSeconds;
 
-                    Particle p = new(position, pd);
-                    ParticleManager.AddParticle(p);
+                        if (ai5 >= 0.25f)
+                        {
+                            if (ai2 == 0)
+                            {
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1f, -0.3f, 0f);
+
+                                draw = false;
+
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = 6,
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                                        lifespan = 0.2f,
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                        friendly = false
+                                    };
+
+                                    Particle p = new(position, pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+
+                                if (Globals.Random.Next(2) == 0)
+                                {
+                                    if (GameManager.GetPlayer().center.X < 160)
+                                    {
+                                        position = new Vector2(320 - 100, Globals.RandomFloat(50, 180 - 50));
+                                    }
+
+                                    else
+                                    {
+                                        position = new Vector2(100, Globals.RandomFloat(50, 180 - 50));
+                                    }
+                                }
+
+                                else
+                                {
+                                    if (GameManager.GetPlayer().center.Y < 90)
+                                    {
+                                        position = new Vector2(Globals.RandomFloat(100, 320 - 100), 180 - 50);
+                                    }
+
+                                    else
+                                    {
+                                        position = new Vector2(Globals.RandomFloat(100, 320 - 100), 50);
+                                    }
+                                }
+
+
+                                ai2 = 1;
+                            }
+                        }
+
+                        if (ai5 >= 0.75f)
+                        {
+                            if (ai3 == 0)
+                            {
+                                draw = true;
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1f, -0.3f, 0f);
+
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = 6,
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                                        lifespan = 0.2f,
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                        friendly = false
+                                    };
+
+                                    Particle p = new(position, pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+
+                                ai3 = 1;
+                            }
+                        }
+
+                        if (ai5 >= 1f)
+                        {
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+
+                            for (int i = 0; i < 5; i++)
+                            {
+                                Projectile projectile = new(position, -1, 1f, position.DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians(-30 + (i * 15))) * 100, 10f);
+                                ProjectileManager.AddProjectile(projectile);
+                            }
+
+                            velocity -= position.DirectionTo(GameManager.GetPlayer().center) * Globals.TotalSeconds * 600;
+
+                            if (ai8 > 18f)
+                            {
+                                ai = 1;
+                            }
+
+                            else
+                            {
+                                ai = Globals.Random.Next(4) + 1;
+                            }
+
+                            ai2 = 0;
+                            ai3 = 0;
+                            ai4 = 0;
+                            ai5 = 0;
+                        }
+                    }
+
+                    if (ai == 3)
+                    {
+                        ai2 += Globals.TotalSeconds;
+
+                        if (ai2 >= 0.5f)
+                        {
+                            if (ai3 == 0)
+                            {
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("cry"), 1f, -0.3f, 0f);
+
+                                draw = false;
+
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = 6,
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                                        lifespan = 0.2f,
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                        friendly = false
+                                    };
+
+                                    Particle p = new(position, pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+
+                                ai3 = 1;
+                            }
+                        }
+
+                        if (ai2 >= 1.5f)
+                        {
+                            if (ai3 == 1)
+                            {
+                                ai3 = 2;
+
+                                draw = true;
+
+                                ai6 = GameManager.GetPlayer().center.Y;
+
+                                position = new(-20, ai6);
+
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+
+                                for (int i = 0; i < 100; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = 5,
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.Red,
+                                        velocity = new(Globals.RandomFloat(-25, 25), Globals.RandomFloat(-25, 25)),
+                                        lifespan = 0.25f,
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                        friendly = false
+                                    };
+
+                                    Particle p = new(new(Globals.RandomFloat(0, 320), ai6 + Globals.RandomFloat(-5, 5)), pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+                            }
+                        }
+
+                        if (ai2 >= 2f && ai3 == 2)
+                        {
+                            if (ai5 == 0)
+                            {
+                                ParticleData pd = new()
+                                {
+                                    opacityStart = 1f,
+                                    opacityEnd = 1f,
+                                    sizeStart = 6,
+                                    sizeEnd = 0,
+                                    colorStart = Color.White,
+                                    colorEnd = Color.White,
+                                    velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                                    lifespan = 0.2f,
+                                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                    friendly = false
+                                };
+
+                                Particle p = new(position, pd);
+                                ParticleManager.AddParticle(p);
+
+                                GameManager.AddScreenShake(0.4f, 3f);
+                                GameManager.AddAbberationPowerForce(200, 10);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+                                contactDamage = true;
+
+                                ai5 = 1;
+                            }
+
+                            ai4 += Globals.TotalSeconds;
+
+                            if (ai4 >= 0.03f)
+                            {
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+                                Projectile projectile = new(position, -1, 1f, new Vector2(0, -100 * Globals.RandomFloat(0.75f, 1.25f)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-25, 25))), 10f);
+                                ProjectileManager.AddProjectile(projectile);
+
+                                Projectile projectile2 = new(position, -1, 1f, new Vector2(0, 100 * Globals.RandomFloat(0.75f, 1.25f)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-25, 25))), 10f);
+                                ProjectileManager.AddProjectile(projectile2);
+
+                                ai4 = 0;
+                            }
+
+                            velocity += position.DirectionTo(new(340, ai6)) * Globals.TotalSeconds * 150;
+
+                            if (position.X >= 320)
+                            {
+                                ai2 = 3;
+
+                                draw = false;
+                                contactDamage = false;
+                                position = new(30, ai6);
+                            }
+                        }
+
+                        if (ai2 >= 3f)
+                        {
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1f, -0.3f, 0f);
+
+                            draw = true;
+
+                            for (int i = 0; i < 10; i++)
+                            {
+                                ParticleData pd = new()
+                                {
+                                    opacityStart = 1f,
+                                    opacityEnd = 1f,
+                                    sizeStart = 6,
+                                    sizeEnd = 0,
+                                    colorStart = Color.White,
+                                    colorEnd = Color.White,
+                                    velocity = new(Globals.RandomFloat(-400, 400), Globals.RandomFloat(-400, 400)),
+                                    lifespan = 0.2f,
+                                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                    friendly = false
+                                };
+
+                                Particle p = new(position, pd);
+                                ParticleManager.AddParticle(p);
+                            }
+
+                            ai = 2;
+
+                            ai2 = 0;
+                            ai3 = 0;
+                            ai4 = 0;
+                            ai5 = 0;
+                            ai6 = 0;
+                        }
+                    }
+
+                    if (ai == 4)
+                    {
+                        ai4 += Globals.TotalSeconds;
+
+                        if (ai4 >= 0.4f)
+                        {
+                            velocity += position.DirectionTo(GameManager.GetPlayer().center) * Globals.TotalSeconds * 35;
+
+                            ai2 += Globals.TotalSeconds;
+
+                            if (ai2 >= 0.15f)
+                            {
+                                velocity -= position.DirectionTo(GameManager.GetPlayer().center) * Globals.TotalSeconds * 300;
+
+                                ai3++;
+
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+
+                                Projectile projectile = new(position, -1, 1f, position.DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-30, 30))) * 120, 10f);
+                                ProjectileManager.AddProjectile(projectile);
+
+                                if (ai3 % 5 == 0)
+                                {
+                                    Projectile projectile2 = new(position, -5, 1f, position.DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-30, 30))) * 80, 10f);
+                                    ProjectileManager.AddProjectile(projectile2);
+                                }
+
+                                ai2 = 0;
+                            }
+                        }
+
+                        if (ai3 >= 25)
+                        {
+                            ai = Globals.Random.Next(4) + 1;
+
+                            ai2 = 0;
+                            ai3 = 0;
+                            ai4 = 0;
+                            ai5 = 0;
+                        }
+                    }
+
+                    break;
+
+                case 10: // eye monster
+                    velocity /= 1.1f;
+
+                    ai += Globals.TotalSeconds;
+
+                    if (ai >= 3f)
+                    {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            ParticleData pd = new()
+                            {
+                                opacityStart = 1f,
+                                opacityEnd = 1f,
+                                sizeStart = 6,
+                                sizeEnd = 0,
+                                colorStart = Color.White,
+                                colorEnd = Color.White,
+                                velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200)),
+                                lifespan = 0.2f,
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                friendly = false
+                            };
+
+                            Particle p = new(position, pd);
+                            ParticleManager.AddParticle(p);
+                        }
+
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.5f, 0), 0f);
+
+                        Projectile projectile = new(position, -5, 1f, position.DirectionTo(GameManager.GetPlayer().center) * 35, 10f);
+                        ProjectileManager.AddProjectile(projectile);
+
+                        ai = 0;
+                    }
+
+                    if (Globals.Distance(position, GameManager.GetPlayer().center) < 50)
+                    {
+                        velocity -= position.DirectionTo(GameManager.GetPlayer().center) * Globals.TotalSeconds * 3;
+                    }
 
                     break;
             }
-
-            timer += Globals.TotalSeconds;
         }
 
         public void Draw()
         {
-            if (spawning)
+            if (spawning || !draw)
             {
                 return;
+            }
+
+            switch (aiType)
+            {
+                case 10:
+                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eyemonster2"), new Vector2((int)position.X + 5, (int)position.Y + 4 + (float)Math.Sin(timer * 3)) + new Vector2(1, 0).RotatedBy(position.DirectionTo(GameManager.GetPlayer().center).ToRotation()) * 3, null, Color.White, rotation, new((int)origin.X, (int)origin.Y), scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.91f);
+
+                    Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y + (float)Math.Sin(timer * 3) * 2.5f), null, Color.White, rotation, new((int)origin.X, (int)origin.Y), scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.9f);
+
+                    return;
+                case 9:
+                    if (timer <= 1.2f)
+                    {
+                        GameManager.DrawSpeedLines(Color.Pink, position);
+                    }
+
+                    Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y + (float)Math.Sin(timer * 5) * 2.5f), null, Color.White, rotation, new((int)origin.X, (int)origin.Y), scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 1f);
+
+                    return;
             }
 
             if (anims.getFirstAnim() != null)
@@ -667,18 +1279,7 @@ namespace HYPERMAGE.Models
 
             else
             {
-                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, new((int)origin.X, (int)origin.Y), scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 1f);
-            }
-
-            switch (aiType)
-            {
-                case 9:
-                    if (timer <= 1.2f)
-                    {
-                        GameManager.DrawSpeedLines(Color.Pink, position);
-                    }
-
-                    break;
+                Globals.SpriteBatch.Draw(texture, new((int)position.X, (int)position.Y), null, Color.White, rotation, new((int)origin.X, (int)origin.Y), scale, direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.9f);
             }
         }
         public void Kill()

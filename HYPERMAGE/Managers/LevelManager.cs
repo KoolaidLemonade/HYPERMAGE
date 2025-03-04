@@ -128,26 +128,6 @@ namespace HYPERMAGE.Managers
 
             if (!bossStage)
             {
-                Debug.WriteLine(nextZoneSize);
-
-                if (nextZoneSize > 0)
-                {
-                    zoneSizeTimer += Globals.TotalSeconds;
-
-                    GameManager.zoneSize = Globals.NonLerp(GameManager.zoneSize, nextZoneSize, zoneSizeTimer / 5);
-
-                    GameManager.bounds = new(
-                        Globals.NonLerp(160 - (GameManager.zoneSize * 320), 160 - (nextZoneSize * 320), zoneSizeTimer / 5), 
-                        Globals.NonLerp(90 - (GameManager.zoneSize * 180), 90 - (nextZoneSize * 180), zoneSizeTimer / 5), 
-                        Globals.NonLerp(160 + (GameManager.zoneSize * 320), 160 + (nextZoneSize * 320), zoneSizeTimer / 5), 
-                        Globals.NonLerp(90 + (GameManager.zoneSize * 180), 90 + (nextZoneSize * 180), zoneSizeTimer / 5));
-
-                    if (zoneSizeTimer > 5)
-                    {
-                        nextZoneSize = 0;
-                        zoneSizeTimer = 0;
-                    }
-                }
 
                 if (bgScrollTimer < 3 && !endLevel)
                 {
@@ -226,17 +206,65 @@ namespace HYPERMAGE.Managers
 
                 if (bossSpawnTimer >= 6f && !bossSpawned)
                 {
+                    nextZoneSize = 0.4f;
+
                     bossSpawned = true;
 
                     Vector2 spawnPos = Vector2.Zero;
 
                     switch (bossID)
                     {
-                        case 9: spawnPos = new Vector2(160, 40); break;
+                        case 9: 
+                            spawnPos = new Vector2(160, 40);  
+
+                            break;
                     }
 
                     Mob boss = new(spawnPos, bossID);
                     boss.Spawn();
+                }
+
+                switch (bossID)
+                {
+                    case 9:
+                        if (bgScrollTimer < 4 && !endLevel)
+                        {
+                            bgScrollTimer += Globals.TotalSeconds;
+                        }
+
+                        bgPos.X -= bgScrollTimer / 15;
+
+                        if (bgPos.X < -bg.Width)
+                        {
+                            bgPos.X = 0;
+                        }
+
+                        bgPos2.X -= bgScrollTimer / 10;
+
+                        if (bgPos2.X < -bg2.Width)
+                        {
+                            bgPos2.X = 0;
+                        }
+                        break;
+                }
+            }
+
+            if (nextZoneSize > 0)
+            {
+                zoneSizeTimer += Globals.TotalSeconds;
+
+                GameManager.zoneSize = Globals.NonLerp(GameManager.zoneSize, nextZoneSize, zoneSizeTimer / 5);
+
+                GameManager.bounds = new(
+                    Globals.NonLerp(160 - (GameManager.zoneSize * 320), 160 - (nextZoneSize * 320), zoneSizeTimer / 5),
+                    Globals.NonLerp(90 - (GameManager.zoneSize * 180), 90 - (nextZoneSize * 180), zoneSizeTimer / 5),
+                    Globals.NonLerp(160 + (GameManager.zoneSize * 320), 160 + (nextZoneSize * 320), zoneSizeTimer / 5),
+                    Globals.NonLerp(90 + (GameManager.zoneSize * 180), 90 + (nextZoneSize * 180), zoneSizeTimer / 5));
+
+                if (zoneSizeTimer > 5)
+                {
+                    nextZoneSize = 0;
+                    zoneSizeTimer = 0;
                 }
             }
         }
@@ -266,7 +294,7 @@ namespace HYPERMAGE.Managers
 
             GetNextSpawnWave(validSpawns[Globals.Random.Next(validSpawns.Count)]);
 
-            nextZoneSize = (((float)levelCredits / (float)totalLevelCredits) / 6) + 0.3f;
+            nextZoneSize = (((float)levelCredits / (float)totalLevelCredits) / 4) + 0.3f;
             zoneSizeTimer = 0;
         }
 
@@ -277,7 +305,7 @@ namespace HYPERMAGE.Managers
 
             if (type == 0)
             {
-                spawnPos = new(Globals.RandomFloat(20, 300), 90);
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 35, GameManager.bounds.Z - 35), GameManager.bounds.W - 45);
                     
                 Mob wizard = new(spawnPos, 3);
                 spawnWave.Add(wizard);
@@ -292,7 +320,7 @@ namespace HYPERMAGE.Managers
 
             if (type == 1)
             {
-                spawnPos = new(Globals.RandomFloat(20, 300), 140);
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 35, GameManager.bounds.Z - 35), GameManager.bounds.W - 45);
 
                 Mob wizard = new(spawnPos, 3);
                 spawnWave.Add(wizard);
@@ -300,7 +328,7 @@ namespace HYPERMAGE.Managers
 
             if (type == 2)
             {
-                spawnPos = new(Globals.RandomFloat(20, 300), 20);
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 35, GameManager.bounds.Z - 35), GameManager.bounds.Y + 35);
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -312,7 +340,7 @@ namespace HYPERMAGE.Managers
 
             if (type == 3)
             {
-                spawnPos = new(Globals.RandomFloat(20, 300), 30);
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 35, GameManager.bounds.Z - 35), GameManager.bounds.Y + 35);
 
                 for (int i = 0; i < 2; i++)
                 {
@@ -324,10 +352,54 @@ namespace HYPERMAGE.Managers
 
             if (type == 4)
             {
-                spawnPos = new(Globals.RandomFloat(20, 300), 140);
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 20, GameManager.bounds.Z - 20), GameManager.bounds.W - 45);
 
                 Mob sorcerer = new(spawnPos, 6);
                 spawnWave.Add(sorcerer);
+            }
+
+            if (type == 5)
+            {
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 20, GameManager.bounds.Z - 20), GameManager.bounds.Y + 25);
+
+                Mob eye = new(spawnPos, 10);
+                spawnWave.Add(eye);
+            }
+
+            if (type == 6)
+            {
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 35, GameManager.bounds.Z - 35), GameManager.bounds.Y + 35);
+
+                Mob bat = new(spawnPos, 1);
+
+                spawnWave.Add(bat);
+            }
+
+            if (type == 7)
+            {
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 35, GameManager.bounds.Z - 35), GameManager.bounds.W - 35);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    Mob slime = new(spawnPos + new Vector2(Globals.RandomFloat(-10, 10), Globals.RandomFloat(-10, 10)), 4);
+
+                    spawnWave.Add(slime);
+                }
+            }
+
+            if (type == 8)
+            {
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 35, GameManager.bounds.Z - 35), GameManager.bounds.W - 35);
+
+                Mob sorcerer = new(spawnPos, 6);
+                spawnWave.Add(sorcerer);
+
+                for (int i = 0; i < 2; i++)
+                {
+                    Mob slime = new(spawnPos + new Vector2(Globals.RandomFloat(-10, 10), Globals.RandomFloat(-10, 10)), 4);
+
+                    spawnWave.Add(slime);
+                }
             }
 
             int j = 0;
@@ -365,16 +437,22 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars");
                     song = Globals.Content.Load<Song>("stage3");
 
-                    GameManager.groundBounds = new(0, 60, 320, 180);
+                    GameManager.groundBounds = new(0, 90, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
 
                     levelCredits = 20;
                     //
 
+                    //validSpawns.Add(0);
                     validSpawns.Add(1);
                     validSpawns.Add(2);
                     validSpawns.Add(3);
                     validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    //validSpawns.Add(8);
+
 
                     bossStage = false;
 
@@ -385,15 +463,20 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars");
                     song = Globals.Content.Load<Song>("stage3");
 
-                    GameManager.groundBounds = new(0, 60, 320, 180);
+                    GameManager.groundBounds = new(0, 90, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
 
                     levelCredits = 40;
                     //
+                    //validSpawns.Add(0);
                     validSpawns.Add(1);
                     validSpawns.Add(2);
                     validSpawns.Add(3);
                     validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    validSpawns.Add(8);
 
                     bossStage = false;
 
@@ -404,7 +487,7 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars");
                     song = Globals.Content.Load<Song>("stage3");
 
-                    GameManager.groundBounds = new(0, 60, 320, 180);
+                    GameManager.groundBounds = new(0, 90, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
 
                     levelCredits = 60;
@@ -413,6 +496,11 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(1);
                     validSpawns.Add(2);
                     validSpawns.Add(3);
+                    validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    validSpawns.Add(8);
 
                     bossStage = false;
 
@@ -427,7 +515,7 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars");
                     song = Globals.Content.Load<Song>("rgrgrg");
 
-                    GameManager.groundBounds = new(0, 60, 320, 180);
+                    GameManager.groundBounds = new(0, 90, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
 
                     validSpawns.Add(9);

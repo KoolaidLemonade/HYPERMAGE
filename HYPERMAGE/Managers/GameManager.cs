@@ -62,7 +62,7 @@ namespace HYPERMAGE.Managers
         {
             player = new Player(new(150, 100));
 
-            SceneManager.AddScene(new GameScene());
+            SceneManager.AddScene(new Shop());
 
             Spellbook.Init();
         }
@@ -139,7 +139,7 @@ namespace HYPERMAGE.Managers
                 transition = false;
                 transitionTimer = 0;
 
-                zoneSize = 1f;
+                zoneSize = 2f;
 
                 SceneManager.RemoveScene();
                 SceneManager.AddScene(nextScene);
