@@ -2,10 +2,12 @@
 using HYPERMAGE.Managers;
 using HYPERMAGE.Models;
 using HYPERMAGE.Particles;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -770,6 +772,93 @@ namespace HYPERMAGE.Spells
                     return;
                 case 35: //ray of light
 
+                    Vector2 nextCenter;
+                    int count = 0;
+
+                    for (int i = 0; i < 40; i++)
+                    {
+                        count++;
+                        nextCenter = player.center + player.center.DirectionTo(InputManager.MousePosition) * 9 * i;
+
+                        if (nextCenter.X > GameManager.bounds.X && nextCenter.X < GameManager.bounds.Z && nextCenter.Y > GameManager.bounds.Y && nextCenter.Y < GameManager.bounds.W)
+                        {
+                            Projectile ray = new(nextCenter, 8, 0f, castDamage, -1, knockback, Vector2.Zero, lifespan, 60, player.center.DirectionTo(InputManager.MousePosition).ToRotation(), 1f, true, 0f, size);
+
+                            if (explosify && i % 3 == 0)
+                            {
+                                ray.explosify = true;
+                                ray.explosifyDamage = explosifyDamage / 3;
+
+                            }
+
+                            ProjectileManager.AddProjectile(ray);
+                        }
+
+                        else
+                        {
+                            for (int j = 0; j < 10; j++)
+                            {
+                                ParticleData pd = new()
+                                {
+                                    sizeStart = Globals.RandomFloat(4f, 7f),
+                                    sizeEnd = 0,
+                                    colorStart = Color.White,
+                                    colorEnd = Color.White,
+                                    velocity = new(Globals.RandomFloat(-80, 80), Globals.RandomFloat(-80, 80)),
+                                    lifespan = Globals.RandomFloat(0.5f, 0.8f),
+                                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                };
+
+                                Particle p = new(nextCenter, pd);
+                                ParticleManager.AddParticle(p);
+                            }
+
+                            for (int j = 0; j < 10; j++)
+                            {
+                                ParticleData pd = new()
+                                {
+                                    sizeStart = Globals.RandomFloat(2f, 4f),
+                                    sizeEnd = 0,
+                                    colorStart = Color.White,
+                                    colorEnd = Color.White,
+                                    velocity = new(Globals.RandomFloat(-350, 350), Globals.RandomFloat(-350, 350)),
+                                    lifespan = Globals.RandomFloat(0.2f, 0.4f),
+                                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                };
+
+                                Particle p = new(nextCenter, pd);
+                                ParticleManager.AddParticle(p);
+                            }
+
+                            break;
+                        }
+                    }
+
+                    explosify = false;
+
+                    for (int i = 0; i < 10; i++)
+                    {
+                        ParticleData pd = new()
+                        {
+                            sizeStart = Globals.RandomFloat(2f, size / 2f),
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200)),
+                            lifespan = Globals.RandomFloat(0.1f, 0.5f),
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle p = new(player.center, pd);
+                        ParticleManager.AddParticle(p);
+                    }
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("magick2"), 0.4f, 0f, 0);
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, 1f, 0);
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("magick"), 5f, 1f, 0);
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("chirp"), 1f, 1f, 0);
+
+
                     return;
                 case 36: //purify
 
@@ -929,7 +1018,6 @@ namespace HYPERMAGE.Spells
                             size = 3.5f;
                             cooldown = 0.4f;
                             damage = 2f;
-                            size = 3.5f;
                             lifespan = 1.5f;
                             speed = 1.5f;
                             break;
@@ -937,7 +1025,6 @@ namespace HYPERMAGE.Spells
                             size = 4.5f;
                             cooldown = 0.1f;
                             damage = 3f;
-                            size = 4f;
                             lifespan = 2.5f;
                             speed = 2f;
                             break;
@@ -1342,12 +1429,26 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-
+                            size = 10f;
+                            cooldown = 0.5f;
+                            damage = 2f;
+                            lifespan = 0.5f;
+                            knockback = 1f;
                             break;
                         case 2:
+                            cooldown = 0.4f;
+                            damage = 4f;
+                            size = 15f;
+                            lifespan = 0.5f;
+                            knockback = 1f;
 
                             break;
                         case 3:
+                            size = 20f;
+                            cooldown = 0.1f;
+                            damage = 10f;
+                            lifespan = 0.5f;
+                            knockback = 1f;
 
                             break;
                     }

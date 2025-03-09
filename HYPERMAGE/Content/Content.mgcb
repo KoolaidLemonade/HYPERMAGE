@@ -43,6 +43,12 @@
 /processorParam:TextureFormat=Color
 /build:alphabet.png
 
+#begin asasa.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:asasa.mp3
+
 #begin awaga.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -114,6 +120,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:bg2.png
+
+#begin bg3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bg3.png
+
+#begin bg4.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bg4.png
 
 #begin bgbgbg.png
 /importer:TextureImporter
@@ -204,6 +234,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:bossbar.png
+
+#begin brain.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:brain.png
 
 #begin bwowop.mp3
 /importer:Mp3Importer
@@ -722,6 +764,18 @@
 /processorParam:Quality=Best
 /build:lastingexplosion.wav
 
+#begin lich.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:lich.png
+
 #begin lightbringericon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -992,6 +1046,18 @@
 /processorParam:Quality=Best
 /build:rgrgrg.mp3
 
+#begin seal.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:seal.png
+
 #begin select.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -1147,6 +1213,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:stars.png
+
+#begin stars2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:stars2.png
 
 #begin sundermindicon.png
 /importer:TextureImporter

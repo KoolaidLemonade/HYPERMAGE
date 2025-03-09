@@ -390,6 +390,10 @@ namespace HYPERMAGE
         private static RerollButton rerollButton;
         private static LockButton lockButton;
         private static SpellbookUI spellbook;
+
+        private static float timer = 0.8f;
+        private float sealrot;
+
         public Shop()
         {
         }
@@ -397,17 +401,17 @@ namespace HYPERMAGE
         {
             spriteFont = Globals.Content.Load<SpriteFont>("font");
 
-            shopkeep = new Animation(Globals.Content.Load<Texture2D>("shopkeep"), 5, 1, 1.5f, 1);
+            shopkeep = new Animation(Globals.Content.Load<Texture2D>("lich"), 12, 1, 0.4f, 1);
 
-            mana = new(Globals.Content.Load<Texture2D>("mana"), new(210, 5));
-            heart = new(Globals.Content.Load<Texture2D>("heart"), new(250, 7));
-            spellbook = new(new(280, 5), Globals.Content.Load<Texture2D>("spellbookicon"));
+            mana = new(Globals.Content.Load<Texture2D>("mana"), new(215, -20));
+            heart = new(Globals.Content.Load<Texture2D>("heart"), new(276, -20));
+            spellbook = new(new(280, -20), Globals.Content.Load<Texture2D>("spellbookicon"));
 
-            xp = new(new(70, 5));
-            buyXPButton = new(new(50, 5), Globals.Content.Load<Texture2D>("xpicon"));
-            rerollButton = new(new(122, 50), Globals.Content.Load<Texture2D>("rerollicon"));
+            xp = new(new(266, -20));
+            buyXPButton = new(new(252, -20), Globals.Content.Load<Texture2D>("xpicon"));
+            rerollButton = new(new(250, -20), Globals.Content.Load<Texture2D>("rerollicon"));
 
-            lockButton = new(new(360 - 164, 50), Globals.Content.Load<Texture2D>("lockicon"));
+            lockButton = new(new(238, -20), Globals.Content.Load<Texture2D>("lockicon"));
 
             UIManager.AddElement(spellbook);
             UIManager.AddElement(lockButton);
@@ -477,6 +481,77 @@ namespace HYPERMAGE
         }
         public void Update()
         {
+            timer += Globals.TotalSeconds;
+            sealrot += Globals.TotalSeconds;
+
+            if (GameManager.GetPlayer().center.X > 160 - 20 && GameManager.GetPlayer().center.X < 160 + 20 && GameManager.GetPlayer().center.Y > 85 - 15 && GameManager.GetPlayer().center.Y < 85 + 15)
+            {
+                SpellbookUI.open = true;
+
+                if (timer >= 2)
+                {
+                    timer = 0;
+                }
+            }
+
+            else
+            {
+                SpellbookUI.open = false;
+                SpellbookUI.closing = true;
+
+                if (timer >= 2)
+                {
+                    timer = 0;
+
+                    GameManager.AddAbberationPowerForce(500, 22);
+                    GameManager.AddScreenShake(0.1f, 2f);
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lowbass"), 1f, Globals.RandomFloat(-1, 0f), 0);
+
+                    for (int i = 0; i < 50; i++)
+                    {
+                        Vector2 pos = new Vector2(160, 86) + Vector2.One.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360))) * 33;
+                        ParticleData pd = new()
+                        {
+                            sizeStart = Globals.RandomFloat(2f, 6f),
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = pos.DirectionTo(new(160, 90)) * Globals.RandomFloat(150, 330),
+                            lifespan = Globals.RandomFloat(0.1f, 0.5f),
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                            friendly = false
+                        };
+
+                        Particle p = new(pos, pd);
+                        ParticleManager.AddParticle(p);
+
+                    }
+                }
+
+                if (Globals.Random.Next(2) == 0)
+                {
+                    Vector2 pos = new Vector2(160, 86) + Vector2.One.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360))) * Globals.RandomFloat(60, 200);
+                    ParticleData pd = new()
+                    {
+                        sizeStart = Globals.RandomFloat(2f, 3f),
+                        opacityStart = 0,
+                        opacityEnd = Globals.RandomFloat(0, 1),
+                        sizeEnd = 0,
+                        colorStart = Color.White,
+                        colorEnd = Color.White,
+                        velocity = pos.DirectionTo(new(160, 90)) * Globals.RandomFloat(150, 270),
+                        lifespan = Globals.RandomFloat(0.5f, 1f),
+                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                        resistance = 1.05f,
+                        friendly = false
+                    };
+
+                    Particle p = new(pos, pd);
+                    ParticleManager.AddParticle(p);
+                }
+
+            }
+
             if (GameManager.GetPlayer().position.Y > 180 + 10 || GameManager.GetPlayer().position.Y < 0 - 10 || GameManager.GetPlayer().position.X > 320 + 10 || GameManager.GetPlayer().position.X < 0 - 10)
             {
                 GameManager.TransitionScene(new GameScene());
@@ -484,12 +559,12 @@ namespace HYPERMAGE
 
             if (SpellbookUI.open || SpellbookUI.closing)
             {
-                buyXPButton.position = new(Globals.NonLerp(50, 252, SpellbookUI.openingTimer), Globals.NonLerp(5, 134, SpellbookUI.openingTimer));
-                xp.position = new(Globals.NonLerp(70, 266, SpellbookUI.openingTimer), Globals.NonLerp(5, 134, SpellbookUI.openingTimer));
-                mana.position = new(Globals.NonLerp(210, 215, SpellbookUI.openingTimer), Globals.NonLerp(5, 145, SpellbookUI.openingTimer));
-                heart.position = new(Globals.NonLerp(250, 276, SpellbookUI.openingTimer), Globals.NonLerp(7, 147, SpellbookUI.openingTimer));
-                rerollButton.position = new(Globals.NonLerp(122, 250, SpellbookUI.openingTimer), Globals.NonLerp(50, 29, SpellbookUI.openingTimer));
-                lockButton.position = new(Globals.NonLerp(360 - 164, 238, SpellbookUI.openingTimer), Globals.NonLerp(50, 41, SpellbookUI.openingTimer));
+                buyXPButton.position = new(252, Globals.NonLerp(-20, 134, SpellbookUI.openingTimer));
+                xp.position = new(266, Globals.NonLerp(-20, 134, SpellbookUI.openingTimer));
+                mana.position = new(215, Globals.NonLerp(-20, 145, SpellbookUI.openingTimer));
+                heart.position = new(276, Globals.NonLerp(-20, 147, SpellbookUI.openingTimer));
+                rerollButton.position = new(250, Globals.NonLerp(-20, 29, SpellbookUI.openingTimer));
+                lockButton.position = new(238, Globals.NonLerp(-20, 41, SpellbookUI.openingTimer));
             }
 
 
@@ -511,6 +586,7 @@ namespace HYPERMAGE
         }
         public void DrawEnemyVFX()
         {
+            ParticleManager.DrawEnemyParticles();
 
         }
 
@@ -521,8 +597,10 @@ namespace HYPERMAGE
         }
         public void Draw()
         {
+            shopkeep.Draw(new(158 - shopkeep.frameWidth / 2, 0), new (Color.White * 0.75f, 1f), 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.8f);
+            Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("seal"), new Vector2(160, 90), null, Color.White * 0.2f, sealrot / 5, new Vector2(72.5f, 72.5f), 1f, SpriteEffects.None, 0.79f);
+            Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("seal"), new Vector2(160, 90), null, Color.White * 0.02f, -sealrot / 7, new Vector2(72.5f, 72.5f), 2f, SpriteEffects.None, 0.79f);
 
-            shopkeep.Draw(new(160 - shopkeep.frameWidth / 2, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.8f);
 
             GameManager.player.Draw();
 

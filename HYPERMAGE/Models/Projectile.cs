@@ -41,6 +41,7 @@ namespace HYPERMAGE.Models
 
         public int immunityFrameCounter;
         public int immunityFrames;
+        public bool immuneSameType = false;
 
         public float speed;
         public float damage;
@@ -54,6 +55,7 @@ namespace HYPERMAGE.Models
 
         public bool explosify;
         public float explosifyDamage;
+
 
         private double angle = 0;
         public Projectile(Vector2 position, int aiType, float speed, Vector2 velocity, float lifespan) : this(position, aiType, speed, 1, -1, 0f, velocity, lifespan, 60, 0f, 1f, false, 0, 0)
@@ -179,6 +181,11 @@ namespace HYPERMAGE.Models
                 case 7:
                     texture = null;
                     break;
+                case 8: // ray of light
+                    hitboxSize = new(10, ai2);
+                    immuneSameType = true;
+                    texture = null;
+                    break;
             }
 
             if (anim != null)
@@ -188,7 +195,7 @@ namespace HYPERMAGE.Models
                 origin = new(width / 2f, height / 2f);
             }
 
-            else if (texture != null) 
+            else if (texture != null)
             {
                 width = texture.Width;
                 height = texture.Height;
@@ -212,6 +219,27 @@ namespace HYPERMAGE.Models
         }
         public void Draw()
         {
+            if (aiType == 5 && ai == 1)
+            {
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 20 + Globals.Random.Next(3), 0, 40 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.8f);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 25 + Globals.Random.Next(3), 0, 50 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 0.699f);
+                return;
+            }
+
+            if (aiType == 7)
+            {
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, (int)(width - ai), (int)(height - ai)), null, Color.White, rotation + Globals.RandomFloat(0, 10), new Vector2(0.5f, 0.5f), SpriteEffects.None, 0.8f);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, (int)(width - ai), (int)(height - ai)), null, Color.White, -rotation + Globals.RandomFloat(0, -10), new Vector2(0.5f, 0.5f), SpriteEffects.None, 0.8f);
+
+                return;
+            }
+
+            if (aiType == 8)
+            {
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, 10, (int)(ai2 - ai)), null, Color.White, rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, 0.8f);
+                return;
+            }
+
             if (anim != null)
             {
                 anim.Draw(new((int)position.X, (int)position.Y), Color.White, rotation, origin, scale, SpriteEffects.None, 1f);
@@ -219,13 +247,6 @@ namespace HYPERMAGE.Models
 
             else if (texture != null)
             {
-                if (aiType == 5 && ai == 1)
-                {
-                    Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 20 + Globals.Random.Next(3), 0, 40 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.8f);
-                    Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 25 + Globals.Random.Next(3), 0, 50 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 0.699f);
-                    return;
-                }
-
                 Globals.SpriteBatch.Draw(texture, new(position.X, position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? 0.8f : 1f);
             }
         }
@@ -381,7 +402,7 @@ namespace HYPERMAGE.Models
                         Particle projParticle = new(position, projParticleData);
                         ParticleManager.AddParticle(projParticle);
                     }
-                    
+
                     if (!Globals.InBounds(hitbox))
                     {
                         Kill();
@@ -434,7 +455,7 @@ namespace HYPERMAGE.Models
                         Kill();
                     }
 
-                    break;  
+                    break;
 
                 case 3: //kindle
 
@@ -688,8 +709,20 @@ namespace HYPERMAGE.Models
                     }
                 case 7: //explode hitbox
                     {
+                        ai += Globals.TotalSeconds * (200 + ai * 10);
 
                         rotation++;
+                        break;
+                    }
+                case 8: //ray of light
+                    {
+                        ai += Globals.TotalSeconds * (ai2 + ai * 2);
+
+                        if (ai >= ai2)
+                        {
+                            Kill();
+                        }
+
                         break;
                     }
             }
@@ -722,6 +755,25 @@ namespace HYPERMAGE.Models
 
                     Particle projParticle = new(position, projParticleData);
                     ParticleManager.AddParticle(projParticle);
+
+                    break;
+                case 8:
+                    for (int j = 0; j < 10; j++)
+                    {
+                        ParticleData pd = new()
+                        {
+                            sizeStart = Globals.RandomFloat(2f, 8f),
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = -position.DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-30, 30))) * Globals.RandomFloat(200, 500),
+                            lifespan = Globals.RandomFloat(0.2f, 0.6f),
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle p = new(position, pd);
+                        ParticleManager.AddParticle(p);
+                    }
 
                     break;
             }
@@ -793,7 +845,7 @@ namespace HYPERMAGE.Models
                     for (int i = 0; i < 16; i++)
                     {
                         Projectile projectile = new(position, -4, 1f, (Vector2.One * (i % 2 == 0 ? 50 : 70)).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0, 360, i / 16f))), 5f);
-                        ProjectileManager.AddProjectile(projectile);    
+                        ProjectileManager.AddProjectile(projectile);
                     }
 
                     SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("smallexplosion"), 0.7f, 0f + Globals.RandomFloat(0, 0.5f), 0f);
@@ -939,7 +991,7 @@ namespace HYPERMAGE.Models
 
                         if (ai == 1)
                         {
-                            for (int i = 0 ; i < 15; i++)
+                            for (int i = 0; i < 15; i++)
                             {
                                 ParticleData fadeParticleData = new()
                                 {

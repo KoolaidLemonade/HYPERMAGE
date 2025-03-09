@@ -16,7 +16,8 @@ namespace HYPERMAGE.Managers
 {
     public static class LevelManager
     {
-        public static int level = 0;
+        public static int level = 4;
+        public static int stage = 0;
 
         public static List<Mob> spawnWave = [];
         public static int spawnWaveCost;
@@ -141,7 +142,7 @@ namespace HYPERMAGE.Managers
                     bgPos.X = 0;
                 }
 
-                bgPos2.X -= bgScrollTimer / 8;
+                bgPos2.X -= bgScrollTimer / 5;
 
                 if (bgPos2.X < -bg2.Width)
                 {
@@ -164,8 +165,8 @@ namespace HYPERMAGE.Managers
                     creditsTimer = 0;
 
 
-                    levelCredits -= MobManager.mobs.Count == 0 ? 2 : 1;
-                    credits += MobManager.mobs.Count == 0 ? 2 : 1;
+                    levelCredits -= MobManager.mobs.Count == 0 ? stage * 2 : stage;
+                    credits += MobManager.mobs.Count == 0 ? stage * 2 : stage;
                 }
 
                 if (MobManager.mobs.Count == 0 ? credits >= spawnWaveCost : Globals.Random.Next(200) == 0 && credits >= spawnWaveCost)
@@ -402,6 +403,21 @@ namespace HYPERMAGE.Managers
                 }
             }
 
+            if (type == 9)
+            {
+                spawnPos = new(Globals.RandomFloat(GameManager.bounds.X + 20, GameManager.bounds.Z - 20), GameManager.bounds.Y + 25);
+
+                Mob eye = new(spawnPos, 10);
+                spawnWave.Add(eye);
+
+                for (int i = 0; i < 2; i++)
+                {
+                    Mob wisp = new(spawnPos + new Vector2(Globals.RandomFloat(-10, 10), Globals.RandomFloat(-10, 10)), 2);
+
+                    spawnWave.Add(wisp);
+                }
+            }
+
             int j = 0;
 
             foreach (Mob mob in spawnWave)
@@ -432,6 +448,8 @@ namespace HYPERMAGE.Managers
             switch (level)
             {
                 case 1:
+                    stage = 1;
+
                     bg = Globals.Content.Load<Texture2D>("bg");
                     bg2 = Globals.Content.Load<Texture2D>("bg2");
                     bg3 = Globals.Content.Load<Texture2D>("stars");
@@ -447,8 +465,8 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(1);
                     validSpawns.Add(2);
                     validSpawns.Add(3);
-                    validSpawns.Add(4);
-                    validSpawns.Add(5);
+                    //validSpawns.Add(4);
+                    //validSpawns.Add(5);
                     validSpawns.Add(6);
                     validSpawns.Add(7);
                     //validSpawns.Add(8);
@@ -472,11 +490,11 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(1);
                     validSpawns.Add(2);
                     validSpawns.Add(3);
-                    validSpawns.Add(4);
-                    validSpawns.Add(5);
+                    //validSpawns.Add(4);
+                    //validSpawns.Add(5);
                     validSpawns.Add(6);
                     validSpawns.Add(7);
-                    validSpawns.Add(8);
+                    //validSpawns.Add(8);
 
                     bossStage = false;
 
@@ -496,11 +514,11 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(1);
                     validSpawns.Add(2);
                     validSpawns.Add(3);
-                    validSpawns.Add(4);
-                    validSpawns.Add(5);
+                    //validSpawns.Add(4);
+                    //validSpawns.Add(5);
                     validSpawns.Add(6);
                     validSpawns.Add(7);
-                    validSpawns.Add(8);
+                    //validSpawns.Add(8);
 
                     bossStage = false;
 
@@ -523,6 +541,103 @@ namespace HYPERMAGE.Managers
                     bossID = validSpawns[Globals.Random.Next(validSpawns.Count)];
 
                     GameManager.AddBigText(GetBossName(bossID));
+
+                    break;
+                case 5:
+                    stage = 2;
+
+                    bg = Globals.Content.Load<Texture2D>("bg3");
+                    bg2 = Globals.Content.Load<Texture2D>("bg4");
+                    bg3 = Globals.Content.Load<Texture2D>("stars2");
+                    song = Globals.Content.Load<Song>("asasa");
+
+                    GameManager.groundBounds = new(0, 80, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 80;
+
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+                    validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    validSpawns.Add(8);
+                    validSpawns.Add(9);
+
+                    bossStage = false;
+
+                    break;
+                case 6:
+                    stage = 2;
+
+                    bg = Globals.Content.Load<Texture2D>("bg3");
+                    bg2 = Globals.Content.Load<Texture2D>("bg4");
+                    bg3 = Globals.Content.Load<Texture2D>("stars2");
+                    song = Globals.Content.Load<Song>("asasa");
+
+                    GameManager.groundBounds = new(0, 80, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 80;
+
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+                    validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    validSpawns.Add(8);
+                    validSpawns.Add(9);
+
+                    bossStage = false;
+
+                    break;
+                case 7:
+                    stage = 2;
+
+                    bg = Globals.Content.Load<Texture2D>("bg3");
+                    bg2 = Globals.Content.Load<Texture2D>("bg4");
+                    bg3 = Globals.Content.Load<Texture2D>("stars2");
+                    song = Globals.Content.Load<Song>("asasa");
+
+                    GameManager.groundBounds = new(0, 80, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 80;
+
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+                    validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    validSpawns.Add(8);
+                    validSpawns.Add(9);
+
+                    bossStage = false;
+
+                    break;
+                case 8:
+                    stage = 2;
+
+                    bg = Globals.Content.Load<Texture2D>("wall");
+                    bg2 = Globals.Content.Load<Texture2D>("wall2");
+                    bg3 = Globals.Content.Load<Texture2D>("stars2");
+                    song = Globals.Content.Load<Song>("rgrgrg");
+
+                    GameManager.groundBounds = new(0, 80, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    validSpawns.Add(11);
+
+                    bossStage = true;
 
                     break;
             }

@@ -114,7 +114,9 @@ public static class Globals
     }
     public static float NonLerp(float value1, float value2, float amount)
     {
-        return (float)(value1 + (value2 - value1) * Math.Pow(amount, 2));
+        double t = Math.Pow(amount, 2);
+
+        return (float)(value1 + t * (value2 - value1));
     }
 
     public static List<string> LineBreakText(string text, SpriteFont font, float maxWidth, bool breakOnWord = true)

@@ -20,7 +20,9 @@ namespace HYPERMAGE.UI.UIElements
 
         public static bool closing;
         public static float openingTimer;
-        public static float openTime = 0.5f;
+        public static float openTime = 0.65f;
+
+        private static float timer;
 
         public static Vector2 handVelocity = Vector2.Zero;
         public static Vector2 handPos = Vector2.Zero;
@@ -113,7 +115,7 @@ namespace HYPERMAGE.UI.UIElements
         }
         public override void Update()
         {
-            UpdateButtonHitbox();
+            timer += Globals.TotalSeconds;
 
             if (open || closing)
             {
@@ -125,22 +127,6 @@ namespace HYPERMAGE.UI.UIElements
                 handPos += handVelocity * Globals.TotalSeconds;
 
                 handVelocity /= 1.2f;
-            }
-
-
-            if (buttonHitbox.Contains(InputManager.MousePosition))
-            {
-                mouseHovering = true;
-
-                if (InputManager.Clicked)
-                {
-                    Clicked();
-                }
-            }
-
-            else
-            {
-                mouseHovering = false;
             }
 
             if (open)
@@ -168,56 +154,39 @@ namespace HYPERMAGE.UI.UIElements
 
             for (int i = 0; i < spellsPrimary.Count; i++)
             {
-                spellsPrimary[i].position = new Vector2(1 + 8 + spellsPrimary[i].posIndex * 20, Globals.NonLerp(-48, 16 + 1, openingTimer));
+                spellsPrimary[i].position = new Vector2(1 + 8 + spellsPrimary[i].posIndex * 20, Globals.NonLerp(-48, 32 + 1, openingTimer));
             }
 
             for (int i = 0; i < spellsSecondary.Count; i++)
             {
-                spellsSecondary[i].position = new Vector2(1 + 8 + spellsSecondary[i].posIndex * 20, Globals.NonLerp(-32, (16 * 4) + 1, openingTimer));
+                spellsSecondary[i].position = new Vector2(1 + 8 + spellsSecondary[i].posIndex * 20, Globals.NonLerp(-32, (16 * 5) + 1, openingTimer));
             }
 
             for (int i = 0; i < spellsMemory.Count; i++)
             {
-                spellsMemory[i].position = new Vector2(1 + 8 + spellsMemory[i].posIndex * 20, Globals.NonLerp(-16, (16 * 7) + 1, openingTimer));
+                spellsMemory[i].position = new Vector2(1 + 8 + spellsMemory[i].posIndex * 20, Globals.NonLerp(-16, (16 * 8) + 1, openingTimer));
             }
 
             //
 
             for (int i = 0; i < spellsPrimaryBorders.Count; i++)
             {
-                spellsPrimaryBorders[i].position = new Vector2(8 + spellsPrimaryBorders[i].posIndex * 20, Globals.NonLerp(-48, 16, openingTimer));
+                spellsPrimaryBorders[i].position = new Vector2(8 + spellsPrimaryBorders[i].posIndex * 20, Globals.NonLerp(-48, 32, openingTimer));
             }
 
             for (int i = 0; i < spellsSecondaryBorders.Count; i++)
             {
-                spellsSecondaryBorders[i].position = new Vector2(8 + spellsSecondaryBorders[i].posIndex * 20, Globals.NonLerp(-32, (16 * 4), openingTimer));
+                spellsSecondaryBorders[i].position = new Vector2(8 + spellsSecondaryBorders[i].posIndex * 20, Globals.NonLerp(-32, (16 * 5), openingTimer));
             }
 
             for (int i = 0; i < spellsMemoryBorders.Count; i++)
             {
-                spellsMemoryBorders[i].position = new Vector2(8 + spellsMemoryBorders[i].posIndex * 20, Globals.NonLerp(-16, (16 * 7), openingTimer));
+                spellsMemoryBorders[i].position = new Vector2(8 + spellsMemoryBorders[i].posIndex * 20, Globals.NonLerp(-16, (16 * 8), openingTimer));
             }
 
-            position.Y = Globals.NonLerp(originalPosition.Y, 165, openingTimer);
+            position.Y = Globals.NonLerp(originalPosition.Y, 180, openingTimer);
         }
 
-        public override void Clicked()
-        {
-            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bop"), 0.5f, 0f, 0f);
-
-            if (!open)
-            {
-                open = true;
-            }
-
-            else
-            {
-                closing = true;
-                open = false;
-            }
-
-            base.Clicked();
-        }
         public override void Draw()
         {
             if (open || closing)
@@ -233,8 +202,8 @@ namespace HYPERMAGE.UI.UIElements
                 {
                     if (Spellbook.traitsPrimary[i] > 0)
                     {
-                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsPrimary[i].ToString(), new(8 + k * 20, Globals.NonLerp(-48, 38, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
-                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + k * 20, Globals.NonLerp(-48, 39, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsPrimary[i].ToString(), new(8 + k * 20, Globals.NonLerp(-48, 38 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + k * 20, Globals.NonLerp(-48, 39 + 16, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
                         k++;
                     }
@@ -246,8 +215,8 @@ namespace HYPERMAGE.UI.UIElements
                 {
                     if (Spellbook.traitsSecondary[i] > 0)
                     {
-                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsSecondary[i].ToString(), new(8 + j * 20, Globals.NonLerp(-48, 86, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
-                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + j * 20, Globals.NonLerp(-32, 87, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsSecondary[i].ToString(), new(8 + j * 20, Globals.NonLerp(-48, 86 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + j * 20, Globals.NonLerp(-32, 87 + 16, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
                         j++;
                     }
@@ -259,26 +228,27 @@ namespace HYPERMAGE.UI.UIElements
                 {
                     if (Spellbook.traitsMemory[i] > 0)
                     {
-                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsMemory[i].ToString(), new(8 + l * 20, Globals.NonLerp(-16, 134, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
-                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + l * 20, Globals.NonLerp(-16, 135, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsMemory[i].ToString(), new(8 + l * 20, Globals.NonLerp(-16, 134 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + l * 20, Globals.NonLerp(-16, 135 + 16, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
                         l++;
                     }
                 }
 
 
-                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "PRIMARY", new(8, Globals.NonLerp(-48, 6, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "PRIMARY", new(8, Globals.NonLerp(-48, 6 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
-                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "SECONDARY", new(8, Globals.NonLerp(-32, 54, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "SECONDARY", new(8, Globals.NonLerp(-32, 54 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
-                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "MEMORY", new(8, Globals.NonLerp(-16, 102, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "MEMORY", new(8, Globals.NonLerp(-16, 102 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
-                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, (int)Globals.NonLerp(0, 160, openingTimer )), null, Color.Black * 0.85f, 0f, Vector2.Zero, SpriteEffects.None, 0.91f);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, (int)Globals.NonLerp(0, 180, openingTimer )), null, Color.Black * 0.93f, 0f, Vector2.Zero, SpriteEffects.None, 0.91f);
 
-                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, (int)Globals.NonLerp(0, 160, openingTimer ), 320, 1), Color.White);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, (int)Globals.NonLerp(0, 180, openingTimer), 320, 1), Color.White);
+
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("brain"), new(90 + (float)Math.Sin(timer) * 3, Globals.NonLerp(-120, 88, openingTimer) + (float)Math.Cos(timer)), null, Color.White * openingTimer * 0.2f, 0f + (float)Math.Sin(timer) / 20, new(170 / 2, 138 / 2), 1f + (float)Math.Cos(timer) / 30, SpriteEffects.None, 0.911f);
+
             }
-
-            base.Draw();
         }
 
         public static void AddSpell(SpellbookSpell spell)
@@ -764,7 +734,7 @@ namespace HYPERMAGE.UI.UIElements
 
         private void DrawHoverGlow(int index, int posIndex)
         {
-            Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)8 + posIndex * 20, index == 1 ? 16 : index == 2 ? 16 * 4 : 16 * 7, 16, 16), null, Color.White * 0.5f, 0f, Vector2.Zero, SpriteEffects.None, 0.9925f);
+            Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)8 + posIndex * 20, index == 1 ? 32 : index == 2 ? 16 * 5 : 16 * 8, 16, 16), null, Color.White * 0.5f, 0f, Vector2.Zero, SpriteEffects.None, 0.9925f);
         }
     }
 

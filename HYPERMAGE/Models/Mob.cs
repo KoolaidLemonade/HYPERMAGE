@@ -97,17 +97,16 @@ namespace HYPERMAGE.Models
                     flying = true;
                     break;
                 case 2: //wisp
-                    texture = Globals.Content.Load<Texture2D>("particle");
+                    texture = Globals.Content.Load<Texture2D>("enemybullet1");
                     hitSound = Globals.Content.Load<SoundEffect>("hit");
                     deathSound = Globals.Content.Load<SoundEffect>("shoot");
 
-                    scale = 2f;
                     health = 3f;
                     knockbackResist = 0.6f;
                     spawnCost = 3;
                     flying = true;
 
-                    timer = Globals.RandomFloat(1, 2);
+                    timer = Globals.RandomFloat(0, 1);
                     break;
                 case 3: //wizard
                     anims.AddAnimation(0, new(Globals.Content.Load<Texture2D>("wizard"), 2, 2, 0.5f, 1));
@@ -235,8 +234,6 @@ namespace HYPERMAGE.Models
         {
             center = position;
 
-            timer += Globals.TotalSeconds;
-
             if (spawning)
             {
                 spawnTimer += Globals.TotalSeconds;
@@ -268,6 +265,8 @@ namespace HYPERMAGE.Models
                 return;
             }
 
+            timer += Globals.TotalSeconds;
+
             if (anim != null)
             {
                 anim.Update();
@@ -298,24 +297,61 @@ namespace HYPERMAGE.Models
             {
                 foreach (Projectile p in ProjectileManager.projectiles.ToList())
                 {
-                    if (p.hitbox.IntersectsWith(hitbox) && p.friendly && !projectileImmunity.Contains(p))
+                    if (projectileImmunity.Count != 0)
                     {
-                        projectileImmunity.Add(p);
-
-                        HitByProj(p);
-                        p.HitEnemy();
-
-                        if (p.pierce == 0)
+                        foreach (Projectile p2 in projectileImmunity.ToList())
                         {
-                            p.Kill();
-                        }
+                            if (p != p2 && p.aiType == p2.aiType && p.immuneSameType)
+                            {
+                                break;
+                            }
 
-                        else if (p.pierce > 0)
+                            else
+                            {
+                                if (p.hitbox.IntersectsWith(hitbox) && p.friendly && !projectileImmunity.Contains(p))
+                                {
+                                    projectileImmunity.Add(p);
+
+                                    HitByProj(p);
+                                    p.HitEnemy();
+
+                                    if (p.pierce == 0)
+                                    {
+                                        p.Kill();
+                                    }
+
+                                    else if (p.pierce > 0)
+                                    {
+                                        p.pierce--;
+                                    }
+
+                                    health -= p.damage;
+                                }
+                            }
+                        }
+                    }
+
+                    else
+                    {
+                        if (p.hitbox.IntersectsWith(hitbox) && p.friendly && !projectileImmunity.Contains(p))
                         {
-                            p.pierce--;
-                        }
+                            projectileImmunity.Add(p);
 
-                        health -= p.damage;
+                            HitByProj(p);
+                            p.HitEnemy();
+
+                            if (p.pierce == 0)
+                            {
+                                p.Kill();
+                            }
+
+                            else if (p.pierce > 0)
+                            {
+                                p.pierce--;
+                            }
+
+                            health -= p.damage;
+                        }
                     }
                 }
 
@@ -441,7 +477,7 @@ namespace HYPERMAGE.Models
                         {
                             opacityStart = 1f,
                             opacityEnd = 0f,
-                            sizeStart = 2 * scale,
+                            sizeStart = Globals.RandomFloat(2, 4),
                             sizeEnd = 0,
                             colorStart = Color.Wheat,
                             colorEnd = Color.Gray,
@@ -483,7 +519,7 @@ namespace HYPERMAGE.Models
 
                             for (int i = 0; i < 5; i++)
                             {
-                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-50 + (i * 25))) * 65f;
+                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-25 + (i * 12.5f))) * 65f;
 
                                 Projectile projectile = new(center, -2, 1f, projVelocity, 10f, 0f);
                                 ProjectileManager.AddProjectile(projectile);
@@ -521,7 +557,7 @@ namespace HYPERMAGE.Models
 
                             for (int i = 0; i < 5; i++)
                             {
-                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-50 + (i * 25))) * 65f;
+                                Vector2 projVelocity = Vector2.Normalize(GameManager.GetPlayer().center - center).RotatedBy(MathHelper.ToRadians(-25 + (i * 12.5f))) * 65f;
 
                                 Projectile projectile = new(center, -2, 1f, projVelocity, 10f, 0f);
                                 ProjectileManager.AddProjectile(projectile);
@@ -1228,6 +1264,12 @@ namespace HYPERMAGE.Models
 
                         Projectile projectile = new(position, -5, 1f, position.DirectionTo(GameManager.GetPlayer().center) * 35, 10f);
                         ProjectileManager.AddProjectile(projectile);
+
+                        for (int i = 0; i < 5; i++)
+                        {
+                            Projectile projectile2 = new(center, -2, 1f, position.DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-15, 15))) * Globals.RandomFloat(30, 50), 10f, 0f);
+                            ProjectileManager.AddProjectile(projectile2);
+                        }
 
                         ai = 0;
                     }

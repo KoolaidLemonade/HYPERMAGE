@@ -37,27 +37,27 @@ namespace HYPERMAGE.Managers
                     {
                         case 1:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(1), Globals.Content.Load<Texture2D>("ui2"), new Vector2(160 - 16 / 2, 75) + new Vector2(-30 - shopSpellCount * 2, 0).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0 + shopSpellCount * 2, -180 - shopSpellCount * 2, i / (shopSpellCount - 1f))))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(1), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
                                 break;
                             }
                         case 2:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(2), Globals.Content.Load<Texture2D>("ui2"), new Vector2(160 - 16 / 2, 75) + new Vector2(-30 - shopSpellCount * 2, 0).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0 + shopSpellCount * 2, -180 - shopSpellCount * 2, i / (shopSpellCount - 1f))))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(2), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
                                 break;
                             }
                         case 3:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(3), Globals.Content.Load<Texture2D>("ui2"), new Vector2(160 - 16 / 2, 75) + new Vector2(-30 - shopSpellCount * 2, 0).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0 + shopSpellCount * 2, -180 - shopSpellCount * 2, i / (shopSpellCount - 1f))))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(3), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
                                 break;
                             }
                         case 4:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(4), Globals.Content.Load<Texture2D>("ui2"), new Vector2(160 - 16 / 2, 75) + new Vector2(-30 - shopSpellCount * 2, 0).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0 + shopSpellCount * 2, -180 - shopSpellCount * 2, i / (shopSpellCount - 1f))))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(4), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
                                 break;
                             }
                         case 5:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(5), Globals.Content.Load<Texture2D>("ui2"), new Vector2(160 - 16 / 2, 75) + new Vector2(-30 - shopSpellCount * 2, 0).RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(0 + shopSpellCount * 2, -180 - shopSpellCount * 2, i / (shopSpellCount - 1f))))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(5), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
                                 break;
                             }
                     }
