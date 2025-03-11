@@ -58,6 +58,9 @@ namespace HYPERMAGE.Managers
         public static float zoneSize = 1f;
 
         private static float timer;
+
+        public static bool drawLightOrangeScreenTint;
+        public static float drawLightOrangeScreenTintTime;
         public static void Init()
         {
             player = new Player(new(150, 100));
@@ -88,6 +91,16 @@ namespace HYPERMAGE.Managers
 
                     t = 0;
                 }
+            }
+
+            if (drawLightOrangeScreenTintTime > 0)
+            {
+                drawLightOrangeScreenTintTime -= Globals.TotalSeconds;
+            }
+
+            if (drawLightOrangeScreenTintTime <= 0)
+            {
+                drawLightOrangeScreenTint = false;
             }
 
             if (abberationPower > 1f)
@@ -231,6 +244,11 @@ namespace HYPERMAGE.Managers
             }
         }
 
+        public static void DrawLightOrangeScreenTint(float time)
+        {
+            drawLightOrangeScreenTint = true;
+            drawLightOrangeScreenTintTime = time;
+        }
         public static void DrawSpeedLines(Color color, Vector2 center)
         {
             for (int i = 0; i < Globals.Random.Next(5 + 3); i++)

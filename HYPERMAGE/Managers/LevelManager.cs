@@ -246,6 +246,26 @@ namespace HYPERMAGE.Managers
                         {
                             bgPos2.X = 0;
                         }
+
+                        if (bossSpawned && MobManager.mobs.Count == 0)
+                        {
+                            endLevel = true;
+                        }
+
+                        if (endLevel)
+                        {
+                            endLevelTimer += Globals.TotalSeconds;
+
+                            if (bgScrollTimer > 0)
+                            {
+                                bgScrollTimer -= Globals.TotalSeconds;
+                            }
+                        }
+
+                        if (endLevelTimer >= 5f)
+                        {
+                            GameManager.TransitionScene(new StageTransition());
+                        }
                         break;
                 }
             }
@@ -551,7 +571,7 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
                     song = Globals.Content.Load<Song>("asasa");
 
-                    GameManager.groundBounds = new(0, 80, 320, 180);
+                    GameManager.groundBounds = new(0, 100, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
 
                     levelCredits = 80;
@@ -578,7 +598,7 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
                     song = Globals.Content.Load<Song>("asasa");
 
-                    GameManager.groundBounds = new(0, 80, 320, 180);
+                    GameManager.groundBounds = new(0, 100, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
 
                     levelCredits = 80;
@@ -605,7 +625,7 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
                     song = Globals.Content.Load<Song>("asasa");
 
-                    GameManager.groundBounds = new(0, 80, 320, 180);
+                    GameManager.groundBounds = new(0, 100, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
 
                     levelCredits = 80;
@@ -632,7 +652,7 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
                     song = Globals.Content.Load<Song>("rgrgrg");
 
-                    GameManager.groundBounds = new(0, 80, 320, 180);
+                    GameManager.groundBounds = new(0, 100, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
 
                     validSpawns.Add(11);

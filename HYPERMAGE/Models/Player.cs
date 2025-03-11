@@ -33,6 +33,14 @@ public class Player
     public float immunityTimer;
     public bool immune;
 
+    public bool barrier;
+    public float barrierTime = 0.15f;
+    public float barrierTimer;
+
+    public float barrierCooldown = 2f;
+    public float nextBarrierCooldown;
+    public float barrierCooldownTimer;
+
     public bool flashing;
     public float flashingTimer;
     public Color flashColor;
@@ -69,6 +77,56 @@ public class Player
 
     public void Update()
     {
+        Debug.WriteLine(barrierCooldownTimer);
+
+        if (InputManager.RightMouseDown && !barrier && barrierCooldownTimer <= 0)
+        {
+            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("chirp"), 1, Globals.RandomFloat(-0.5f, 0f), 0);
+            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 1, Globals.RandomFloat(-0.5f, 0.5f), 0);
+
+            for (int i = 0; i < 35; i++)
+            {
+                Vector2 pos = center + (Vector2.One * 8).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360)));
+                ParticleData pd = new()
+                {
+                    opacityStart = 1f,
+                    opacityEnd = 1f,
+                    sizeStart = Globals.RandomFloat(2, 4),
+                    sizeEnd = 0,
+                    colorStart = Color.White,
+                    colorEnd = Color.White,
+                    velocity = Vector2.Zero,
+                    lifespan = Globals.RandomFloat(0.1f, 0.2f),
+                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                    resistance = 1.3f
+                };
+
+                Particle p = new(pos, pd);
+                ParticleManager.AddParticle(p);
+            }
+
+            barrier = true;
+            barrierTimer = barrierTime;
+
+            nextBarrierCooldown = barrierCooldown;
+        }
+
+        if (barrier)
+        {
+            barrierTimer -= Globals.TotalSeconds;
+
+            if (barrierTimer <= 0)
+            {
+                barrier = false;
+                barrierCooldownTimer = nextBarrierCooldown;
+            }
+        }
+
+        if (barrierCooldownTimer > 0)
+        {
+            barrierCooldownTimer -= Globals.TotalSeconds;
+        }
+
         if (InputManager.Moving)
         {
             velocity += Vector2.Normalize(InputManager.Direction) * acceleration * Globals.TotalSeconds;
@@ -215,12 +273,45 @@ public class Player
             Spellbook.CastFrontSpellPrimary();
         }
 
-        if (InputManager.RightMouseDown && !InputManager.buttonClicked)
-        {
-            Spellbook.CastFrontSpellSecondary();
-        }
-
         //
+
+        if (barrier)
+        {
+            foreach (Projectile projectile in ProjectileManager.projectiles)
+            {
+                if (projectile.hitbox.IntersectsWith(PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, 10, 10)) && !projectile.friendly && projectile.parryable)
+                {
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("parry"), 4f, Globals.RandomFloat(-0.2f, 0.2f), 0);
+                    GameScene.AddHitstop(6);
+                    GameManager.AddScreenShake(0.15f, 4f);
+                    GameManager.AddAbberationPowerForce(1000, 25f);
+
+                    for (int i = 0; i < 15; i++)
+                    {
+                        ParticleData pd = new()
+                        {
+                            opacityStart = 1f,
+                            opacityEnd = 1f,
+                            sizeStart = Globals.RandomFloat(2, 4),
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = new(Globals.RandomFloat(-500, 500), Globals.RandomFloat(-500, 500)),
+                            lifespan = Globals.RandomFloat(0.1f, 0.2f),
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                            resistance = 1.3f
+                        };
+
+                        Particle p = new(center, pd);
+                        ParticleManager.AddParticle(p);
+                    }
+
+                    nextBarrierCooldown = 0;
+
+                    projectile.Kill();
+                }
+            }
+        }
 
         if (!immune)
         {
@@ -351,7 +442,6 @@ public class Player
             case 1:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 20;
@@ -361,7 +451,6 @@ public class Player
             case 2:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 30;
@@ -371,7 +460,6 @@ public class Player
             case 3:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 40;
@@ -381,7 +469,6 @@ public class Player
             case 4:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 50;
@@ -391,7 +478,6 @@ public class Player
             case 5:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 60;
@@ -401,7 +487,6 @@ public class Player
             case 6:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 70;
@@ -411,7 +496,6 @@ public class Player
             case 7:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 80;
@@ -421,7 +505,6 @@ public class Player
             case 8:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 90;
@@ -431,7 +514,6 @@ public class Player
             case 9:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 100;
@@ -441,7 +523,6 @@ public class Player
             case 10:
                 {
                     Spellbook.spellCountPrimary++;
-                    Spellbook.spellCountSecondary++;
 
                     xp -= xpToLevel;
                     xpToLevel = 100;

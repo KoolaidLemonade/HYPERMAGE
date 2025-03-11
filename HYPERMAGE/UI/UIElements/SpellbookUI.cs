@@ -31,10 +31,14 @@ namespace HYPERMAGE.UI.UIElements
 
         public static List<SpellbookSpell> spellsPrimary = [];
         public static List<SpellbookSpell> spellsSecondary = [];
+        public static List<SpellbookSpell> spellsTertiary = [];
+
         public static List<SpellbookSpell> spellsMemory = [];
 
         public static List<SpellbookSpellBorder> spellsPrimaryBorders = [];
         public static List<SpellbookSpellBorder> spellsSecondaryBorders = [];
+        public static List<SpellbookSpellBorder> spellsTertiaryBorders = [];
+
         public static List<SpellbookSpellBorder> spellsMemoryBorders = [];
 
         public static bool init = false;
@@ -54,6 +58,11 @@ namespace HYPERMAGE.UI.UIElements
                     spellsSecondary.Add(new SpellbookSpell(i, 2, Spellbook.spellsSecondary[i], Spellbook.spellsSecondary[i].icon, new Vector2(-100, -100)));
                 }
 
+                for (int i = 0; i < Spellbook.spellsTertiary.Count; i++)
+                {
+                    spellsTertiary.Add(new SpellbookSpell(i, 4, Spellbook.spellsTertiary[i], Spellbook.spellsTertiary[i].icon, new Vector2(-100, -100)));
+                }
+
                 for (int i = 0; i < Spellbook.spellMemory.Count; i++)
                 {
                     spellsMemory.Add(new SpellbookSpell(i, 3, Spellbook.spellMemory[i], Spellbook.spellMemory[i].icon, new Vector2(-100, -100)));
@@ -69,6 +78,11 @@ namespace HYPERMAGE.UI.UIElements
                 for (int i = 0; i < Spellbook.spellCountSecondary; i++)
                 {
                     spellsSecondaryBorders.Add(new SpellbookSpellBorder(i, 2, Globals.Content.Load<Texture2D>("ui2"), new Vector2(-100, -100)));
+                }
+
+                for (int i = 0; i < Spellbook.spellCountTertiary; i++)
+                {
+                    spellsTertiaryBorders.Add(new SpellbookSpellBorder(i, 4, Globals.Content.Load<Texture2D>("ui2"), new Vector2(-100, -100)));
                 }
 
                 for (int i = 0; i < Spellbook.spellMemoryMax; i++)
@@ -96,6 +110,11 @@ namespace HYPERMAGE.UI.UIElements
                 UIManager.AddElement(spellsSecondary[i]);
             }
 
+            for (int i = 0; i < spellsTertiary.Count; i++)
+            {
+                UIManager.AddElement(spellsTertiary[i]);
+            }
+
             //
 
             for (int i = 0; i < spellsMemoryBorders.Count; i++)
@@ -111,6 +130,11 @@ namespace HYPERMAGE.UI.UIElements
             for (int i = 0; i < spellsSecondaryBorders.Count; i++)
             {
                 UIManager.AddElement(spellsSecondaryBorders[i]);
+            }
+
+            for (int i = 0; i < spellsTertiaryBorders.Count; i++)
+            {
+                UIManager.AddElement(spellsTertiaryBorders[i]);
             }
         }
         public override void Update()
@@ -162,6 +186,11 @@ namespace HYPERMAGE.UI.UIElements
                 spellsSecondary[i].position = new Vector2(1 + 8 + spellsSecondary[i].posIndex * 20, Globals.NonLerp(-32, (16 * 5) + 1, openingTimer));
             }
 
+            for (int i = 0; i < spellsTertiary.Count; i++)
+            {
+                spellsTertiary[i].position = new Vector2(1 + 48 + spellsTertiary[i].posIndex * 20, Globals.NonLerp(-32, (16 * 5) + 1, openingTimer));
+            }
+
             for (int i = 0; i < spellsMemory.Count; i++)
             {
                 spellsMemory[i].position = new Vector2(1 + 8 + spellsMemory[i].posIndex * 20, Globals.NonLerp(-16, (16 * 8) + 1, openingTimer));
@@ -179,6 +208,11 @@ namespace HYPERMAGE.UI.UIElements
                 spellsSecondaryBorders[i].position = new Vector2(8 + spellsSecondaryBorders[i].posIndex * 20, Globals.NonLerp(-32, (16 * 5), openingTimer));
             }
 
+            for (int i = 0; i < spellsTertiaryBorders.Count; i++)
+            {
+                spellsTertiaryBorders[i].position = new Vector2(48 + spellsTertiaryBorders[i].posIndex * 20, Globals.NonLerp(-32, (16 * 5), openingTimer));
+            }
+
             for (int i = 0; i < spellsMemoryBorders.Count; i++)
             {
                 spellsMemoryBorders[i].position = new Vector2(8 + spellsMemoryBorders[i].posIndex * 20, Globals.NonLerp(-16, (16 * 8), openingTimer));
@@ -191,7 +225,7 @@ namespace HYPERMAGE.UI.UIElements
         {
             if (open || closing)
             {
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("hand"), handPos - new Vector2(2, 0), null, Color.White * openingTimer, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("hand"), handPos - new Vector2(2, 0), null, Color.White * openingTimer, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.94f);
             }
 
             if (open || closing)
@@ -206,19 +240,6 @@ namespace HYPERMAGE.UI.UIElements
                         Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + k * 20, Globals.NonLerp(-48, 39 + 16, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
                         k++;
-                    }
-                }
-
-                int j = 0;
-
-                for (int i = 0; i < Spellbook.traitsSecondary.Count; i++)
-                {
-                    if (Spellbook.traitsSecondary[i] > 0)
-                    {
-                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsSecondary[i].ToString(), new(8 + j * 20, Globals.NonLerp(-48, 86 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
-                        Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + j * 20, Globals.NonLerp(-32, 87 + 16, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
-
-                        j++;
                     }
                 }
 
@@ -238,7 +259,9 @@ namespace HYPERMAGE.UI.UIElements
 
                 Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "PRIMARY", new(8, Globals.NonLerp(-48, 6 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
-                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "SECONDARY", new(8, Globals.NonLerp(-32, 54 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "BARRIER", new(8, Globals.NonLerp(-32, 54 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+
+                Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "DASH", new(48, Globals.NonLerp(-32, 54 + 16, openingTimer)), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
                 Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), "MEMORY", new(8, Globals.NonLerp(-16, 102 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
@@ -268,6 +291,12 @@ namespace HYPERMAGE.UI.UIElements
             if (spell.index == 3)
             {
                 spellsMemory.Add(spell);
+                UIManager.AddElement(spell);
+            }
+
+            if (spell.index == 4)
+            {
+                spellsTertiary.Add(spell);
                 UIManager.AddElement(spell);
             }
         }
@@ -306,6 +335,18 @@ namespace HYPERMAGE.UI.UIElements
                     if (i.spell == spell)
                     {
                         spellsMemory.Remove(i);
+                        UIManager.RemoveElement(i);
+                    }
+                }
+            }
+
+            if (spell.index == 4)
+            {
+                foreach (SpellbookSpell i in spellsTertiary.ToList())
+                {
+                    if (i.spell == spell)
+                    {
+                        spellsTertiary.Remove(i);
                         UIManager.RemoveElement(i);
                     }
                 }
@@ -355,6 +396,20 @@ namespace HYPERMAGE.UI.UIElements
                 }
             }
 
+            if (index == 4)
+            {
+                for (int i = 0; i < Spellbook.spellCountTertiary; i++)
+                {
+                    position.Add(i);
+                }
+
+                for (int i = 0; i < spellsTertiary.Count; i++)
+                {
+                    position.Remove(spellsTertiary[i].posIndex);
+                }
+            }
+
+
             if (position.Count != 0)
             {
                 return position.Min();
@@ -367,9 +422,6 @@ namespace HYPERMAGE.UI.UIElements
         {
             spellsPrimaryBorders.Add(new SpellbookSpellBorder(spellsPrimaryBorders.Count, 1, Globals.Content.Load<Texture2D>("ui2"), new(-100, -100)));
             UIManager.AddElement(spellsPrimaryBorders[spellsPrimaryBorders.Count - 1]);
-
-            spellsSecondaryBorders.Add(new SpellbookSpellBorder(spellsSecondaryBorders.Count, 1, Globals.Content.Load<Texture2D>("ui2"), new(-100, -100)));
-            UIManager.AddElement(spellsSecondaryBorders[spellsSecondaryBorders.Count - 1]);
         }
     }
 
@@ -489,6 +541,36 @@ namespace HYPERMAGE.UI.UIElements
                             SpellbookUI.spellsSecondary.Remove(this);
                         }
 
+
+                        if (index == 4)
+                        {
+
+                            for (int j = 0; j < SpellbookUI.spellsMemory.Count; j++)
+                            {
+                                if (SpellbookUI.spellsMemoryBorders[i].posIndex == SpellbookUI.spellsMemory[j].posIndex)
+                                {
+                                    SpellbookUI.spellsMemory[j].index = index;
+                                    SpellbookUI.spellsMemory[j].posIndex = posIndex;
+
+                                    Spellbook.AddSpellTertiary(SpellbookUI.spellsMemory[j].spell);
+                                    Spellbook.RemoveSpellMemory(SpellbookUI.spellsMemory[j].spell);
+
+                                    SpellbookUI.spellsTertiary.Add(SpellbookUI.spellsMemory[j]);
+                                    SpellbookUI.spellsMemory.Remove(SpellbookUI.spellsMemory[j]);
+                                }
+                            }
+
+                            posIndex = SpellbookUI.spellsMemoryBorders[i].posIndex;
+
+                            index = 3;
+
+                            Spellbook.AddSpellMemory(spell);
+                            Spellbook.RemoveSpellTertiary(spell);
+
+                            SpellbookUI.spellsMemory.Add(this);
+                            SpellbookUI.spellsTertiary.Remove(this);
+                        }
+
                         if (index == 3)
                         {
                             for (int j = 0; j < SpellbookUI.spellsMemory.Count; j++)
@@ -578,6 +660,34 @@ namespace HYPERMAGE.UI.UIElements
                             SpellbookUI.spellsPrimary.Add(this);
                             SpellbookUI.spellsMemory.Remove(this);
                         }
+
+                        if (index == 4)
+                        {
+                            for (int j = 0; j < SpellbookUI.spellsPrimary.Count; j++)
+                            {
+                                if (SpellbookUI.spellsPrimaryBorders[i].posIndex == SpellbookUI.spellsPrimary[j].posIndex)
+                                {
+                                    SpellbookUI.spellsPrimary[j].index = index;
+                                    SpellbookUI.spellsPrimary[j].posIndex = posIndex;
+
+                                    Spellbook.AddSpellTertiary(SpellbookUI.spellsPrimary[j].spell);
+                                    Spellbook.RemoveSpellPrimary(SpellbookUI.spellsPrimary[j].spell);
+
+                                    SpellbookUI.spellsTertiary.Add(SpellbookUI.spellsPrimary[j]);
+                                    SpellbookUI.spellsPrimary.Remove(SpellbookUI.spellsPrimary[j]);
+                                }
+                            }
+
+                            posIndex = SpellbookUI.spellsPrimaryBorders[i].posIndex;
+
+                            index = 1;
+
+                            Spellbook.AddSpellPrimary(spell);
+                            Spellbook.RemoveSpellTertiary(spell);
+
+                            SpellbookUI.spellsPrimary.Add(this);
+                            SpellbookUI.spellsTertiary.Remove(this);
+                        }
                     }
                 }
 
@@ -655,6 +765,140 @@ namespace HYPERMAGE.UI.UIElements
                             SpellbookUI.spellsSecondary.Add(this);
                             SpellbookUI.spellsMemory.Remove(this);
                         }
+
+                        if (index == 4)
+                        {
+                            for (int j = 0; j < SpellbookUI.spellsSecondary.Count; j++)
+                            {
+                                if (SpellbookUI.spellsSecondaryBorders[i].posIndex == SpellbookUI.spellsSecondary[j].posIndex)
+                                {
+                                    SpellbookUI.spellsSecondary[j].index = index;
+                                    SpellbookUI.spellsSecondary[j].posIndex = posIndex;
+
+                                    Spellbook.AddSpellTertiary(SpellbookUI.spellsSecondary[j].spell);
+                                    Spellbook.RemoveSpellSecondary(SpellbookUI.spellsSecondary[j].spell);
+
+                                    SpellbookUI.spellsTertiary.Add(SpellbookUI.spellsSecondary[j]);
+                                    SpellbookUI.spellsSecondary.Remove(SpellbookUI.spellsSecondary[j]);
+                                }
+                            }
+
+                            posIndex = SpellbookUI.spellsSecondaryBorders[i].posIndex;
+
+                            index = 2;
+
+                            Spellbook.AddSpellSecondary(spell);
+                            Spellbook.RemoveSpellTertiary(spell);
+
+                            SpellbookUI.spellsSecondary.Add(this);
+                            SpellbookUI.spellsTertiary.Remove(this);
+                        }
+                    }
+                }
+
+                for (int i = 0; i < SpellbookUI.spellsTertiaryBorders.Count; i++)
+                {
+                    if (new Rectangle((int)SpellbookUI.spellsTertiaryBorders[i].position.X, (int)SpellbookUI.spellsTertiaryBorders[i].position.Y, SpellbookUI.spellsTertiaryBorders[i].texture.Width, SpellbookUI.spellsTertiaryBorders[i].texture.Height).Contains(InputManager.MousePosition))
+                    {
+                        if (index == 1)
+                        {
+                            for (int j = 0; j < SpellbookUI.spellsTertiary.Count; j++)
+                            {
+                                if (SpellbookUI.spellsTertiaryBorders[i].posIndex == SpellbookUI.spellsTertiary[j].posIndex)
+                                {
+                                    SpellbookUI.spellsTertiary[j].index = index;
+                                    SpellbookUI.spellsTertiary[j].posIndex = posIndex;
+
+                                    Spellbook.AddSpellPrimary(SpellbookUI.spellsTertiary[j].spell);
+                                    Spellbook.RemoveSpellTertiary(SpellbookUI.spellsTertiary[j].spell);
+
+                                    SpellbookUI.spellsPrimary.Add(SpellbookUI.spellsTertiary[j]);
+                                    SpellbookUI.spellsTertiary.Remove(SpellbookUI.spellsTertiary[j]);
+                                }
+                            }
+
+                            posIndex = SpellbookUI.spellsTertiaryBorders[i].posIndex;
+
+                            index = 4;
+
+                            Spellbook.AddSpellTertiary(spell);
+                            Spellbook.RemoveSpellPrimary(spell);
+
+                            SpellbookUI.spellsTertiary.Add(this);
+                            SpellbookUI.spellsPrimary.Remove(this);
+                        }
+
+
+                        if (index == 2)
+                        {
+                            for (int j = 0; j < SpellbookUI.spellsTertiary.Count; j++)
+                            {
+                                if (SpellbookUI.spellsTertiaryBorders[i].posIndex == SpellbookUI.spellsTertiary[j].posIndex)
+                                {
+                                    SpellbookUI.spellsTertiary[j].index = index;
+                                    SpellbookUI.spellsTertiary[j].posIndex = posIndex;
+
+                                    Spellbook.AddSpellSecondary(SpellbookUI.spellsTertiary[j].spell);
+                                    Spellbook.RemoveSpellTertiary(SpellbookUI.spellsTertiary[j].spell);
+
+                                    SpellbookUI.spellsSecondary.Add(SpellbookUI.spellsTertiary[j]);
+                                    SpellbookUI.spellsTertiary.Remove(SpellbookUI.spellsTertiary[j]);
+                                }
+                            }
+
+                            posIndex = SpellbookUI.spellsTertiaryBorders[i].posIndex;
+
+                            index = 4;
+
+                            Spellbook.AddSpellTertiary(spell);
+                            Spellbook.RemoveSpellSecondary(spell);
+
+                            SpellbookUI.spellsTertiary.Add(this);
+                            SpellbookUI.spellsSecondary.Remove(this);
+                        }
+
+                        if (index == 3)
+                        {
+                            for (int j = 0; j < SpellbookUI.spellsTertiary.Count; j++)
+                            {
+                                if (SpellbookUI.spellsTertiaryBorders[i].posIndex == SpellbookUI.spellsTertiary[j].posIndex)
+                                {
+                                    SpellbookUI.spellsTertiary[j].index = index;
+                                    SpellbookUI.spellsTertiary[j].posIndex = posIndex;
+
+                                    Spellbook.AddSpellMemory(SpellbookUI.spellsTertiary[j].spell);
+                                    Spellbook.RemoveSpellTertiary(SpellbookUI.spellsTertiary[j].spell);
+
+                                    SpellbookUI.spellsMemory.Add(SpellbookUI.spellsTertiary[j]);
+                                    SpellbookUI.spellsTertiary.Remove(SpellbookUI.spellsTertiary[j]);
+                                }
+                            }
+
+                            posIndex = SpellbookUI.spellsTertiaryBorders[i].posIndex;
+
+                            index = 4;
+
+                            Spellbook.AddSpellTertiary(spell);
+                            Spellbook.RemoveSpellMemory(spell);
+
+                            SpellbookUI.spellsTertiary.Add(this);
+                            SpellbookUI.spellsMemory.Remove(this);
+                        }
+
+                        if (index == 4)
+                        {
+                            for (int j = 0; j < SpellbookUI.spellsTertiary.Count; j++)
+                            {
+                                if (SpellbookUI.spellsTertiaryBorders[i].posIndex == SpellbookUI.spellsTertiary[j].posIndex)
+                                {
+                                    SpellbookUI.spellsTertiary[j].posIndex = posIndex;
+                                }
+                            }
+
+                            posIndex = SpellbookUI.spellsTertiaryBorders[i].posIndex;
+
+                            Spellbook.UpdateSpellPositions(4);
+                        }
                     }
                 }
 
@@ -716,6 +960,14 @@ namespace HYPERMAGE.UI.UIElements
                         DrawHoverGlow(3, i);
                     }
                 }
+
+                for (int i = 0; i < SpellbookUI.spellsTertiaryBorders.Count; i++)
+                {
+                    if (new Rectangle((int)SpellbookUI.spellsTertiaryBorders[i].position.X, (int)SpellbookUI.spellsTertiaryBorders[i].position.Y, SpellbookUI.spellsTertiaryBorders[i].texture.Width, SpellbookUI.spellsTertiaryBorders[i].texture.Height).Contains(InputManager.MousePosition))
+                    {
+                        DrawHoverGlow(4, i);
+                    }
+                }
             }
 
             Globals.SpriteBatch.Draw(texture, position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
@@ -734,7 +986,7 @@ namespace HYPERMAGE.UI.UIElements
 
         private void DrawHoverGlow(int index, int posIndex)
         {
-            Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)8 + posIndex * 20, index == 1 ? 32 : index == 2 ? 16 * 5 : 16 * 8, 16, 16), null, Color.White * 0.5f, 0f, Vector2.Zero, SpriteEffects.None, 0.9925f);
+            Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)index == 4 ? 48 + posIndex * 20 : 8 + posIndex * 20, index == 1 ? 32 : index == 2 ? 16 * 5 : index == 3 ? 16 * 8 : 16 * 5, 16, 16), null, Color.White * 0.5f, 0f, Vector2.Zero, SpriteEffects.None, 0.9925f);
         }
     }
 

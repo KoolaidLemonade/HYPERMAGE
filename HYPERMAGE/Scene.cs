@@ -100,11 +100,10 @@ namespace HYPERMAGE
                 GameManager.player.Update();
                 ProjectileManager.Update();
                 MobManager.Update();
+                ParticleManager.Update();
             }
 
             Spellbook.Update();
-
-            ParticleManager.Update();
 
             LevelManager.Update();
 

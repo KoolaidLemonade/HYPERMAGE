@@ -27,7 +27,7 @@ namespace HYPERMAGE.UI.UIElements
 
         public Vector2 originalPos;
 
-        public float layerDepth = 0.99f;
+        public float layerDepth = 0.93f;
         public ShopSpell(SpriteFont spriteFont, Spell spell, Texture2D texture, Vector2 position) : base(texture, position)
         {
             this.spell = spell;

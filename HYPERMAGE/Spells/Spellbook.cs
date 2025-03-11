@@ -25,26 +25,24 @@ namespace HYPERMAGE.Spells
         public static int spellMemoryMax = 10;
         public static int spellCountPrimary = 1;
         public static int spellCountSecondary = 1;
+        public static int spellCountTertiary = 1;
 
         public static List<Spell> spellsPrimary = [];
         public static List<Spell> spellsSecondary = [];
+        public static List<Spell> spellsTertiary = [];
+
         public static List<Spell> spellMemory = [];
 
         public static List<Spell> totalSpellList = [];
 
         public static int spellCounterPrimary = 0;
-        public static int spellCounterSecondary = 0;
 
         public static float spellCooldown = 0;
 
         public static float spellsRechargePrimary = 0;
-        public static float spellsRechargeSecondary = 0;
-
         public static float spellsRechargePrimaryTime = 3f;
-        public static float spellsRechargeSecondaryTime = 3f;
 
         public static List<int> traitsPrimary = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        public static List<int> traitsSecondary = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         public static List<int> traitsMemory = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         public static void Init()
@@ -84,8 +82,12 @@ namespace HYPERMAGE.Spells
         }
         public static void Update()
         {
+            if (spellsTertiary.Count != 0)
+            {
+                Debug.WriteLine(spellsTertiary[0].spellType);
+
+            }
             spellsRechargePrimary -= Globals.TotalSeconds;
-            spellsRechargeSecondary -= Globals.TotalSeconds;
             spellCooldown -= Globals.TotalSeconds;
 
             CheckRankUp();
@@ -95,7 +97,7 @@ namespace HYPERMAGE.Spells
         {
             List<int> usedSpells = [];
 
-            if (index == 1)
+            if (index == 1 || index == 2 || index == 4)
             {
                 traitsPrimary = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -111,11 +113,6 @@ namespace HYPERMAGE.Spells
                         }
                     }
                 }
-            }
-
-            if (index == 2)
-            {
-                traitsSecondary = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
                 foreach (Spell spell in spellsSecondary)
                 {
@@ -125,7 +122,20 @@ namespace HYPERMAGE.Spells
 
                         for (int i = 0; i < spell.spellTraits.Count; i++)
                         {
-                            traitsSecondary[spell.spellTraits[i] - 1]++;
+                            traitsPrimary[spell.spellTraits[i] - 1]++;
+                        }
+                    }
+                }
+
+                foreach (Spell spell in spellsTertiary)
+                {
+                    if (!usedSpells.Contains(spell.spellType))
+                    {
+                        usedSpells.Add(spell.spellType);
+
+                        for (int i = 0; i < spell.spellTraits.Count; i++)
+                        {
+                            traitsPrimary[spell.spellTraits[i] - 1]++;
                         }
                     }
                 }
@@ -194,6 +204,9 @@ namespace HYPERMAGE.Spells
                                     case 3:
                                         RemoveSpellMemory(types[l]);
                                         break;
+                                    case 4:
+                                        RemoveSpellTertiary(types[l]);
+                                        break;
                                 }
                             }
                         }
@@ -249,6 +262,17 @@ namespace HYPERMAGE.Spells
             if (spell.index == 3)
             {
                 foreach (Spell i in spellMemory)
+                {
+                    if (i == spell)
+                    {
+                        i.RankUp();
+                    }
+                }
+            }
+
+            if (spell.index == 4)
+            {
+                foreach (Spell i in spellsTertiary)
                 {
                     if (i == spell)
                     {
@@ -331,6 +355,30 @@ namespace HYPERMAGE.Spells
             UpdateSpellPositions(3);
         }
 
+        public static void AddSpellTertiary(Spell spell)
+        {
+            spell.index = 4;
+
+            totalSpellList.Add(spell);
+
+            spellsTertiary.Add(spell);
+
+            SpellbookUI.AddSpell(new SpellbookSpell(SpellbookUI.GetFirstEmptyPosIndex(4), 4, spell, spell.icon, new Vector2(-100, -100)));
+
+            CheckTraits(4);
+            UpdateSpellPositions(4);
+        }
+        public static void RemoveSpellTertiary(Spell spell)
+        {
+            spellsTertiary.Remove(spell);
+
+            totalSpellList.Remove(spell);
+
+            SpellbookUI.RemoveSpell(spell);
+
+            CheckTraits(4);
+            UpdateSpellPositions(4);
+        }
         public static Color GetRarityColor(Spell spell)
         {
             switch (spell.cost)
@@ -403,8 +451,6 @@ namespace HYPERMAGE.Spells
 
             if (index == 2)
             {
-                spellCounterSecondary = 0;
-
                 for (int i = 0; i < spellsSecondary.Count; i++)
                 {
                     spellsSecondary[i].position = SpellbookUI.spellsSecondary[i].posIndex;
@@ -418,42 +464,13 @@ namespace HYPERMAGE.Spells
                     spellMemory[i].position = SpellbookUI.spellsMemory[i].posIndex;
                 }
             }
-        }
-        public static void CastFrontSpellSecondary()
-        {
-            if (spellsSecondary.Count == 0 || spellCooldown > 0 || spellsRechargeSecondary > 0)
+
+            if (index == 4)
             {
-                return;
-            }
-
-            List<int> positions = [];
-            int frontPos;
-
-            foreach (Spell spell in spellsSecondary)
-            {
-                positions.Add(spell.position);
-            }
-
-            positions.Sort();
-            frontPos = positions[spellCounterSecondary];
-
-            foreach (Spell spell in spellsSecondary)
-            {
-                if (spell.position == frontPos)
+                for (int i = 0; i < spellsTertiary.Count; i++)
                 {
-                    spell.Cast(GameManager.GetPlayer());
-                    spellCooldown = spell.cooldown;
+                    spellsTertiary[i].position = SpellbookUI.spellsTertiary[i].posIndex;
                 }
-            }
-
-            spellCounterSecondary++;
-
-            if (spellCounterSecondary > positions.Count - 1)
-            {
-                spellsRechargeSecondary = spellsRechargeSecondaryTime;
-                spellCounterSecondary = 0;
-
-                return;
             }
         }
     }

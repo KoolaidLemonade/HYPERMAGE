@@ -40,6 +40,7 @@ namespace HYPERMAGE.Models
         public float ai8;
         public float ai9;
         public float ai10;
+        public float ai11;
 
         public int aiType;
         public float speed = 1f;
@@ -73,6 +74,7 @@ namespace HYPERMAGE.Models
 
         public bool boss = false;
         public bool draw = true;
+        public bool dying = false;
 
         private List <Projectile> projectileImmunity = [];
         public Mob(Vector2 position, int aiType)
@@ -191,7 +193,7 @@ namespace HYPERMAGE.Models
                     contactDamage = false;
 
                     knockbackResist = 200f;
-                    health = 150f;
+                    health = 120f;
                     boss = true;
                     flying = true;
 
@@ -288,7 +290,7 @@ namespace HYPERMAGE.Models
                 }
             }
 
-            if (health <= 0)
+            if (health <= 0 && !dying)
             {
                 Kill();
             }
@@ -704,6 +706,184 @@ namespace HYPERMAGE.Models
                     velocity /= 1.2f;
 
                     ai8 += Globals.TotalSeconds;
+
+                    if (dying)
+                    {
+                        if (ai3 == 0)
+                        {
+                            GameScene.AddHitstop(20);
+
+                            GameManager.DrawLightOrangeScreenTint(0.2f);
+                            GameManager.AddScreenShake(0.3f, 10f);
+                            GameManager.AddAbberationPowerForce(1000, 100);
+
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.2f, 0.2f), 0f);
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 1f, Globals.RandomFloat(-0.2f, 0.2f), 0f);
+
+                            velocity += new Vector2(Globals.RandomFloat(-10, 10), Globals.RandomFloat(-10, 10)) + position.DirectionTo(new(160, 90)) * 10;
+                            for (int i = 0; i < 15; i++)
+                            {
+                                ParticleData pd = new()
+                                {
+                                    opacityStart = 1f,
+                                    opacityEnd = 1f,
+                                    sizeStart = Globals.RandomFloat(5, 20),
+                                    sizeEnd = 0,
+                                    colorStart = Color.White,
+                                    colorEnd = Color.White,
+                                    velocity = new(Globals.RandomFloat(-250, 250), Globals.RandomFloat(-250, 250)),
+                                    lifespan = Globals.RandomFloat(0.2f, 0.5f),
+                                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                };
+
+                                Particle p = new(position, pd);
+                                ParticleManager.AddParticle(p);
+                            }
+
+
+                            for (int i = 0; i < 15; i++)
+                            {
+                                ParticleData pd = new()
+                                {
+                                    opacityStart = 1f,
+                                    opacityEnd = 1f,
+                                    sizeStart = Globals.RandomFloat(2, 5),
+                                    sizeEnd = 0,
+                                    colorStart = Color.White,
+                                    colorEnd = Color.White,
+                                    velocity = new(Globals.RandomFloat(-700, 700), Globals.RandomFloat(-700, 700)),
+                                    lifespan = Globals.RandomFloat(0.1f, 0.3f),
+                                    rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                };
+
+                                Particle p = new(position, pd);
+                                ParticleManager.AddParticle(p);
+                            }
+
+                            ai3++;
+                        }
+
+                        ai2 += Globals.TotalSeconds;
+
+                        if (ai3 < 4 ? ai2 >= 0.3f : ai2 >= 0.6f)
+                        {
+                            if (ai3 < 4)
+                            {
+                                GameManager.AddScreenShake(0.1f, 5f);
+                                GameManager.AddAbberationPowerForce(1000, 100);
+
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.2f, 0.2f), 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 1f, Globals.RandomFloat(-0.2f, 0.2f), 0f);
+
+                                velocity += new Vector2(Globals.RandomFloat(-10, 10), Globals.RandomFloat(-10, 10)) + position.DirectionTo(new(160, 90)) * 10;
+
+                                for (int i = 0; i < 15; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = Globals.RandomFloat(5, 20),
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = new(Globals.RandomFloat(-250, 250), Globals.RandomFloat(-250, 250)),
+                                        lifespan = Globals.RandomFloat(0.2f, 0.5f),
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                    };
+
+                                    Particle p = new(position, pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+
+                                for (int i = 0; i < 15; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = Globals.RandomFloat(2, 5),
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = new(Globals.RandomFloat(-700, 700), Globals.RandomFloat(-700, 700)),
+                                        lifespan = Globals.RandomFloat(0.1f, 0.3f),
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                    };
+
+                                    Particle p = new(position, pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+                            }
+
+                            else
+                            {
+                                GameScene.AddHitstop(20);
+
+                                GameManager.DrawLightOrangeScreenTint(0.2f);
+                                GameManager.AddScreenShake(0.4f, 10f);
+                                GameManager.AddAbberationPowerForce(1000, 200);
+
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("cry"), 1f, -0.3f, 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("cry"), 1f, -0.9f, 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("wavy"), 2f, 0f, 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lowbass"), 2f, 0f, 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, Globals.RandomFloat(-0.2f, 0.2f), 0f);
+                                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 1f, Globals.RandomFloat(-0.2f, 0.2f), 0f);
+
+                                for (int i = 0; i < 40; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = Globals.RandomFloat(5, 20),
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = new(Globals.RandomFloat(-500, 500), Globals.RandomFloat(-500, 500)),
+                                        lifespan = Globals.RandomFloat(0.2f, 2f),
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                    };
+
+                                    Particle p = new(position, pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+
+
+                                for (int i = 0; i < 15; i++)
+                                {
+                                    ParticleData pd = new()
+                                    {
+                                        opacityStart = 1f,
+                                        opacityEnd = 1f,
+                                        sizeStart = Globals.RandomFloat(2, 5),
+                                        sizeEnd = 0,
+                                        colorStart = Color.White,
+                                        colorEnd = Color.White,
+                                        velocity = new(Globals.RandomFloat(-700, 700), Globals.RandomFloat(-700, 700)),
+                                        lifespan = Globals.RandomFloat(0.1f, 0.3f),
+                                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                                    };
+
+                                    Particle p = new(position, pd);
+                                    ParticleManager.AddParticle(p);
+                                }
+                            }
+
+                            ai2 = 0;
+
+                            ai3++;
+                        }
+
+                        if (ai3 > 4)
+                        {
+                            GameScene.AddHitstop(20);
+                            active = false;
+                        }
+                    }
+
+
 
                     if (ai == 1)
                     {
@@ -1326,6 +1506,8 @@ namespace HYPERMAGE.Models
         }
         public void Kill()
         {
+            dying = true;
+
             SoundManager.PlaySound(deathSound, 1f, 1f, 0f);
 
             for (int i = 0; i < 10; i++)
@@ -1374,6 +1556,19 @@ namespace HYPERMAGE.Models
                     Particle manaDrop = new(center, manaData);
                     ParticleManager.AddParticle(manaDrop);
                 }
+            }
+
+            if (aiType == 9)
+            {
+                ai = 5;
+
+                ai2 = 0;
+                ai3 = 0;
+                ai4 = 0;
+                ai5 = 0;
+                ai6 = 0;
+
+                return;
             }
 
             active = false;

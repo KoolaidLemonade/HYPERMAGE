@@ -298,6 +298,13 @@ namespace HYPERMAGE
             SceneManager.GetScene().DrawUI();
             spriteBatch.End();
 
+            if (GameManager.drawLightOrangeScreenTint)
+            {
+                spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, 180), new(Color.Orange * 1.5f, 0.7f));
+                spriteBatch.End();
+            }
+
             //
 
             GraphicsDevice.SetRenderTarget(renderTarget2);

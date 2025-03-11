@@ -50,6 +50,8 @@ namespace HYPERMAGE.Models
         public int pierce;
         public float knockback;
 
+        public bool parryable = true;
+
         private float ai;
         private float ai2;
 
@@ -136,6 +138,8 @@ namespace HYPERMAGE.Models
                     hitboxOffset = new(0, 0);
                     hitboxSize = new(9, 9);
 
+                    parryable = false;
+
                     break;
                 case -4:
                     texture = Globals.Content.Load<Texture2D>("enemybullet4");
@@ -146,6 +150,9 @@ namespace HYPERMAGE.Models
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
                     hitboxOffset = new(0, 0);
                     hitboxSize = new(9, 9);
+
+                    parryable = false;
+
                     break;
                 case -2:
                     texture = Globals.Content.Load<Texture2D>("enemybullet1");

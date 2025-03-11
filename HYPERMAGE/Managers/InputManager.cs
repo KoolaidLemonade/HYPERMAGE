@@ -33,6 +33,15 @@ namespace HYPERMAGE.Managers
         public static bool slow;
 
         public static float dashCooldown = 100;
+
+        public static Keys up = Keys.W;
+        public static Keys down = Keys.S;
+        public static Keys left = Keys.A;
+        public static Keys right = Keys.D;
+
+        public static Keys dash = Keys.Space;
+        public static Keys sneak = Keys.LeftShift;
+
         public static void Update()
         {
             var ms = Mouse.GetState();
@@ -51,10 +60,10 @@ namespace HYPERMAGE.Managers
 
             if (keyboardState.GetPressedKeyCount() > 0)
             {
-                if (keyboardState.IsKeyDown(Keys.A)) direction.X--;
-                if (keyboardState.IsKeyDown(Keys.D)) direction.X++;
-                if (keyboardState.IsKeyDown(Keys.W)) direction.Y--;
-                if (keyboardState.IsKeyDown(Keys.S)) direction.Y++;
+                if (keyboardState.IsKeyDown(left)) direction.X--;
+                if (keyboardState.IsKeyDown(right)) direction.X++;
+                if (keyboardState.IsKeyDown(up)) direction.Y--;
+                if (keyboardState.IsKeyDown(down)) direction.Y++;
 
                 if (direction != Vector2.Zero)
                 {
@@ -68,7 +77,7 @@ namespace HYPERMAGE.Managers
                 dashing = true;
             }
 
-            if (keyboardState.IsKeyDown(Keys.LeftShift))
+            if (keyboardState.IsKeyDown(sneak))
             {
                 slow = true;
             }

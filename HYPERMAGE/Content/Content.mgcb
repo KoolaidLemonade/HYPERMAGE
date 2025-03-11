@@ -73,6 +73,18 @@
 /processorParam:TextureFormat=Color
 /build:balllightningicon.png
 
+#begin barrier.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:barrier.png
+
 #begin barriericon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -937,6 +949,12 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:outline.fx
+
+#begin parry.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:parry.wav
 
 #begin particle.png
 /importer:TextureImporter

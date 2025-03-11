@@ -1017,16 +1017,16 @@ namespace HYPERMAGE.Spells
                         case 2:
                             size = 3.5f;
                             cooldown = 0.4f;
-                            damage = 2f;
+                            damage = 1.2f;
                             lifespan = 1.5f;
-                            speed = 1.5f;
+                            speed = 1.2f;
                             break;
                         case 3:
                             size = 4.5f;
                             cooldown = 0.1f;
-                            damage = 3f;
+                            damage = 2f;
                             lifespan = 2.5f;
-                            speed = 2f;
+                            speed = 1.5f;
                             break;
                     }
                     break;
