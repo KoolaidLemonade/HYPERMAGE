@@ -1,5 +1,6 @@
 ﻿using HYPERMAGE.Helpers;
 using HYPERMAGE.Managers;
+using HYPERMAGE.Spells;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -33,7 +34,6 @@ namespace HYPERMAGE
         private RenderTarget2D abberationTarget;
 
         private Effect blur;
-        private Effect waves;
         private Effect transition;
         private Effect shake;
         private Effect invert;
@@ -47,6 +47,9 @@ namespace HYPERMAGE
 
         private float time;
         private float time2;
+
+        public static int w;
+        public static int h;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -54,11 +57,15 @@ namespace HYPERMAGE
             graphics.HardwareModeSwitch = false;
 
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
         }
 
         protected override void Initialize()
         {
+
+            w = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            h = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
             vfxEnemy = new RenderTarget2D(GraphicsDevice, 320, 180);
             vfx = new RenderTarget2D(GraphicsDevice, 320, 180);
             game = new RenderTarget2D(GraphicsDevice, 320, 180);
@@ -68,16 +75,16 @@ namespace HYPERMAGE
             renderTarget2 = new RenderTarget2D(GraphicsDevice, 320, 180);
             renderTarget3 = new RenderTarget2D(GraphicsDevice, 320, 180);
             renderTarget4 = new RenderTarget2D(GraphicsDevice, 320, 180);
-            renderTarget5 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
-            renderTarget6 = new RenderTarget2D(GraphicsDevice, 1920, 1080);
+            renderTarget5 = new RenderTarget2D(GraphicsDevice, w, h);
+            renderTarget6 = new RenderTarget2D(GraphicsDevice, w, h);
 
             voroDisplacement = new RenderTarget2D(GraphicsDevice, 320, 180);
             zoneTarget = new RenderTarget2D(GraphicsDevice, 320, 180);
-            warpTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
-            abberationTarget = new RenderTarget2D(GraphicsDevice, 1920, 1080);
+            warpTarget = new RenderTarget2D(GraphicsDevice, w, h);
+            abberationTarget = new RenderTarget2D(GraphicsDevice, w, h);
 
-            graphics.PreferredBackBufferWidth = 1920;
-            graphics.PreferredBackBufferHeight = 1080;
+            graphics.PreferredBackBufferWidth = w;
+            graphics.PreferredBackBufferHeight = h;
             graphics.ApplyChanges();
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -96,7 +103,6 @@ namespace HYPERMAGE
         int scanlineThickness = 200;
         protected override void LoadContent()
         {
-            waves = Content.Load<Effect>("waves");
             blur = Content.Load<Effect>("blur");
             transition = Content.Load<Effect>("transition");
             shake = Content.Load<Effect>("shake");
@@ -115,7 +121,7 @@ namespace HYPERMAGE
 
             noise.Parameters["power"].SetValue(0.85f);
 
-            warp.Parameters["resolution"].SetValue(new Vector2(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
+            warp.Parameters["resolution"].SetValue(new Vector2(w, h));
 
             for (int i = 0; i < scanlineCount; i++)
             {
@@ -177,8 +183,6 @@ namespace HYPERMAGE
 
             time += Globals.TotalSeconds;
 
-            waves.Parameters["power"].SetValue(GameManager.wavesPower);
-            waves.Parameters["time"].SetValue(time);
             noise.Parameters["time"].SetValue(time);
             zone.Parameters["time"].SetValue(time);
             voro.Parameters["time"].SetValue(time);
@@ -200,10 +204,7 @@ namespace HYPERMAGE
             {
                 Matrix view = Matrix.CreateTranslation(Globals.RandomFloat(-GameManager.screenShakePower, GameManager.screenShakePower), Globals.RandomFloat(-GameManager.screenShakePower, GameManager.screenShakePower), 0);
 
-                int width = GraphicsDevice.Viewport.Width;
-                int height = GraphicsDevice.Viewport.Height;
-
-                Matrix projection = Matrix.CreateOrthographicOffCenter(0, width, height, 0, 0, 1);
+                Matrix projection = Matrix.CreateOrthographicOffCenter(0, w, h, 0, 0, 1);
 
                 shake.Parameters["WorldViewProjection"].SetValue(view * projection);
 
@@ -214,10 +215,7 @@ namespace HYPERMAGE
             {
                 Matrix view = Matrix.Identity;
 
-                int width = GraphicsDevice.Viewport.Width;
-                int height = GraphicsDevice.Viewport.Height;
-
-                Matrix projection = Matrix.CreateOrthographicOffCenter(0, width, height, 0, 0, 1);
+                Matrix projection = Matrix.CreateOrthographicOffCenter(0, w, h, 0, 0, 1);
 
                 shake.Parameters["WorldViewProjection"].SetValue(view * projection);
             }
@@ -305,6 +303,14 @@ namespace HYPERMAGE
                 spriteBatch.End();
             }
 
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+            for (int i = 0; i < 20; i++)
+            {
+                spriteBatch.Draw(Globals.GetBlankTexture(), new Vector2((int)InputManager.MousePosition.X, (int)InputManager.MousePosition.Y) + new Vector2(0, -3).RotatedBy(MathHelper.ToRadians(18 * i)), Spellbook.spellsRechargePrimary > 0 ? (Spellbook.spellsRechargePrimary / Spellbook.spellsRechargePrimaryTime) * 20 > i ? Color.Brown : Color.White : Color.White);
+            }
+
+            spriteBatch.End();
+
             //
 
             GraphicsDevice.SetRenderTarget(renderTarget2);
@@ -326,15 +332,15 @@ namespace HYPERMAGE
             GraphicsDevice.SetRenderTarget(renderTarget5);
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
-            spriteBatch.Draw(renderTarget4, new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0));
+            spriteBatch.Draw(renderTarget4, new Rectangle(0, 0, w, h), new Color(Color.White, 0));
             spriteBatch.End();
 
             spriteBatch.Begin(blendState: LightenBlend);
-            spriteBatch.Draw(renderTarget3, new Rectangle(0, 0, 1920, 1080), new Color(Color.SlateBlue, 0.5f) * 0.4f);
+            spriteBatch.Draw(renderTarget3, new Rectangle(0, 0, w, h), new Color(Color.SlateBlue, 0.5f) * 0.4f);
             spriteBatch.End();
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: shake);
-            spriteBatch.Draw(zoneTarget, new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0));
+            spriteBatch.Draw(zoneTarget, new Rectangle(0, 0, w, h), new Color(Color.White, 0));
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(renderTarget6);
@@ -346,7 +352,7 @@ namespace HYPERMAGE
             GraphicsDevice.SetRenderTarget(warpTarget);
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: noise);
-            spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 1920, 1080), Color.White);
+            spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, w, h), Color.White);
             spriteBatch.End();
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, effect: shake);
@@ -355,11 +361,11 @@ namespace HYPERMAGE
 
             for (int i = 0; i < scanlines.Count; i++)
             {
-                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, (int)scanlines[i], 1920, scanlineThickness), new Color(Color.Black, 0.08f));
+                spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, (int)scanlines[i], w, scanlineThickness), new Color(Color.Black, 0.08f));
 
             }
 
-            spriteBatch.Draw(Content.Load<Texture2D>("crt"), new Rectangle(0, 0, 1920, 1080), new Color(Color.White, 0.5f) * 0.7f);
+            spriteBatch.Draw(Content.Load<Texture2D>("crt"), new Rectangle(0, 0, w, h), new Color(Color.White, 0.5f) * 0.7f);
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(abberationTarget);

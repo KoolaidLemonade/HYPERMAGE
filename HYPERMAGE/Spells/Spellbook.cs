@@ -1,6 +1,7 @@
 ﻿using HYPERMAGE.Helpers;
 using HYPERMAGE.Managers;
 using HYPERMAGE.UI.UIElements;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -40,7 +41,8 @@ namespace HYPERMAGE.Spells
         public static float spellCooldown = 0;
 
         public static float spellsRechargePrimary = 0;
-        public static float spellsRechargePrimaryTime = 3f;
+        public static float spellsRechargePrimaryTime = 1.75f;
+        public static bool spellsRechargePrimaryComplete;
 
         public static List<int> traitsPrimary = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         public static List<int> traitsMemory = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -87,7 +89,21 @@ namespace HYPERMAGE.Spells
                 Debug.WriteLine(spellsTertiary[0].spellType);
 
             }
-            spellsRechargePrimary -= Globals.TotalSeconds;
+
+            if (spellsRechargePrimary > 0)
+            {
+                spellsRechargePrimaryComplete = false;
+
+                spellsRechargePrimary -= Globals.TotalSeconds;
+
+                if (spellsRechargePrimary <= 0 && !spellsRechargePrimaryComplete)
+                {
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("spellcooldown"), 0.5f, Globals.RandomFloat(-0.5f, 0.3f), 0);
+
+                    spellsRechargePrimaryComplete = true;
+                }
+            }
+
             spellCooldown -= Globals.TotalSeconds;
 
             CheckRankUp();

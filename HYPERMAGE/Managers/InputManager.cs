@@ -1,4 +1,7 @@
-﻿using HYPERMAGE.Spells;
+﻿using HYPERMAGE.Helpers;
+using HYPERMAGE.Particles;
+using HYPERMAGE.Spells;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -29,10 +32,8 @@ namespace HYPERMAGE.Managers
         public static bool buttonClicked;
         public static bool buttonClickedHold;
 
-        public static bool dashing;
+        public static bool dashKey;
         public static bool slow;
-
-        public static float dashCooldown = 100;
 
         public static Keys up = Keys.W;
         public static Keys down = Keys.S;
@@ -51,7 +52,7 @@ namespace HYPERMAGE.Managers
 
             Clicked = oldMouse.LeftButton == ButtonState.Released && ms.LeftButton == ButtonState.Pressed;
             RightClicked = oldMouse.RightButton == ButtonState.Released && ms.RightButton == ButtonState.Pressed;
-            MousePosition = new Vector2(ms.Position.X, ms.Position.Y) / new Vector2(1920 / 320, 1080 / 180);
+            MousePosition = new Vector2(ms.Position.X, ms.Position.Y) / new Vector2(Game1.w / 320, Game1.h / 180);
 
             oldMouse = ms;
 
@@ -71,10 +72,14 @@ namespace HYPERMAGE.Managers
                 }
             }
 
-            if (keyboardState.IsKeyDown(Keys.Space) && dashCooldown > 100f)
+            if (keyboardState.IsKeyDown(Keys.Space))
             {
-                dashCooldown = 0;
-                dashing = true;
+                dashKey = true;
+            }
+
+            else
+            {
+                dashKey = false;
             }
 
             if (keyboardState.IsKeyDown(sneak))
@@ -102,8 +107,6 @@ namespace HYPERMAGE.Managers
                 buttonClicked = false;
                 buttonClickedHold = false;
             }
-
-            dashCooldown++;
         }
     }
 }

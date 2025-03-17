@@ -37,27 +37,27 @@ namespace HYPERMAGE.Managers
                     {
                         case 1:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(1), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(1), Globals.Content.Load<Texture2D>("ui2"), new Vector2(252, -60) + new Vector2(0, -35).RotatedBy(MathHelper.ToRadians(i * 72))));
                                 break;
                             }
                         case 2:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(2), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(2), Globals.Content.Load<Texture2D>("ui2"), new Vector2(252, -60) + new Vector2(0, -35).RotatedBy(MathHelper.ToRadians(i * 72))));
                                 break;
                             }
                         case 3:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(3), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(3), Globals.Content.Load<Texture2D>("ui2"), new Vector2(252, -60) + new Vector2(0, -35).RotatedBy(MathHelper.ToRadians(i * 72))));
                                 break;
                             }
                         case 4:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(4), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(4), Globals.Content.Load<Texture2D>("ui2"), new Vector2(252, -60) + new Vector2(0, -35).RotatedBy(MathHelper.ToRadians(i * 72))));
                                 break;
                             }
                         case 5:
                             {
-                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(5), Globals.Content.Load<Texture2D>("ui2"), new Vector2(216, -20 * (i + 1))));
+                                shopSpells.Add(new ShopSpell(Globals.GetPixelFont(), Spellbook.GetRandomSpell(5), Globals.Content.Load<Texture2D>("ui2"), new Vector2(252, -60) + new Vector2(0, -35).RotatedBy(MathHelper.ToRadians(i * 72))));
                                 break;
                             }
                     }
@@ -72,7 +72,7 @@ namespace HYPERMAGE.Managers
             {
                 for (int i = 0; i < shopSpells.Count; i++)
                 {
-                    shopSpells[i].position = new(Globals.NonLerp(shopSpells[i].originalPos.X, 215, SpellbookUI.openingTimer), Globals.NonLerp(shopSpells[i].originalPos.Y, 26 + i * 20, SpellbookUI.openingTimer));
+                    shopSpells[i].position = new(shopSpells[i].originalPos.X, Globals.NonLerp(shopSpells[i].originalPos.Y, shopSpells[i].originalPos.Y + 128, SpellbookUI.openingTimer));
                 }
             }
         }

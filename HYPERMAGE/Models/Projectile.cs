@@ -60,6 +60,10 @@ namespace HYPERMAGE.Models
 
 
         private double angle = 0;
+
+        private float layerDepth = 0.99f;
+        private float layerDepthFriendly = 0.8f;
+
         public Projectile(Vector2 position, int aiType, float speed, Vector2 velocity, float lifespan) : this(position, aiType, speed, 1, -1, 0f, velocity, lifespan, 60, 0f, 1f, false, 0, 0)
         {
 
@@ -133,6 +137,14 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 // enemy projectiles
+                case -6:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
+                    hitboxOffset = new(0, 0);
+                    hitboxSize = new(9, 9);
+
+                    parryable = false;
+
+                    break;
                 case -5:
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
                     hitboxOffset = new(0, 0);
@@ -228,33 +240,33 @@ namespace HYPERMAGE.Models
         {
             if (aiType == 5 && ai == 1)
             {
-                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 20 + Globals.Random.Next(3), 0, 40 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0.8f);
-                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 25 + Globals.Random.Next(3), 0, 50 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 0.699f);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 20 + Globals.Random.Next(3), 0, 40 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, layerDepthFriendly);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 25 + Globals.Random.Next(3), 0, 50 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.Red, 0f, Vector2.Zero, SpriteEffects.None, 0.6f);
                 return;
             }
 
             if (aiType == 7)
             {
-                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, (int)(width - ai), (int)(height - ai)), null, Color.White, rotation + Globals.RandomFloat(0, 10), new Vector2(0.5f, 0.5f), SpriteEffects.None, 0.8f);
-                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, (int)(width - ai), (int)(height - ai)), null, Color.White, -rotation + Globals.RandomFloat(0, -10), new Vector2(0.5f, 0.5f), SpriteEffects.None, 0.8f);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, (int)(width - ai), (int)(height - ai)), null, Color.White, rotation + Globals.RandomFloat(0, 10), new Vector2(0.5f, 0.5f), SpriteEffects.None, layerDepthFriendly);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, (int)(width - ai), (int)(height - ai)), null, Color.White, -rotation + Globals.RandomFloat(0, -10), new Vector2(0.5f, 0.5f), SpriteEffects.None, layerDepthFriendly);
 
                 return;
             }
 
             if (aiType == 8)
             {
-                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, 10, (int)(ai2 - ai)), null, Color.White, rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, 0.8f);
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, 10, (int)(ai2 - ai)), null, Color.White, rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, layerDepthFriendly);
                 return;
             }
 
             if (anim != null)
             {
-                anim.Draw(new((int)position.X, (int)position.Y), Color.White, rotation, origin, scale, SpriteEffects.None, 1f);
+                anim.Draw(new((int)position.X, (int)position.Y), Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? layerDepthFriendly : layerDepth);
             }
 
             else if (texture != null)
             {
-                Globals.SpriteBatch.Draw(texture, new(position.X, position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? 0.8f : 1f);
+                Globals.SpriteBatch.Draw(texture, new(position.X, position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? layerDepthFriendly : layerDepth);
             }
         }
 
@@ -287,6 +299,36 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 //enemy projectiles
+                case -6:
+                    position += velocity * Globals.TotalSeconds * speed;
+
+
+                    ai += Globals.TotalSeconds;
+
+                    velocity /= 1 + Globals.TotalSeconds * 2;
+
+                    if (ai > 0.1f)
+                    {
+                        ParticleData ParticleData = new()
+                        {
+                            sizeStart = 5f,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = new(Globals.RandomFloat(-50, 50), Globals.RandomFloat(-50, 50)),
+                            lifespan = 0.25f,
+                            rotationSpeed = 1f,
+                            resistance = 1.2f,
+                            friendly = false
+                        };
+
+                        Particle particle = new(position, ParticleData);
+                        ParticleManager.AddParticle(particle);
+
+                        ai = 0;
+                    }
+
+                    break;
                 case -5:
                     position += velocity * Globals.TotalSeconds * speed;
 
@@ -832,6 +874,26 @@ namespace HYPERMAGE.Models
 
             switch (aiType)
             {
+                case -6:
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 0.7f, Globals.RandomFloat(-0.3f, 0.3f), 0f);
+
+                    for (int i = 0; i < Globals.Random.Next(5) + 5; i++)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            sizeStart = 4,
+                            sizeEnd = 0,
+                            velocity = (Vector2.One * Globals.RandomFloat(50, 100)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(0, 360))),
+                            lifespan = Globals.RandomFloat(0.2f, 0.5f),
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                            friendly = false
+                        };
+
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+                    }
+
+                    break;
                 case -3: //sorcerer
                     for (int i = 0; i < Globals.Random.Next(5) + 5; i++)
                     {

@@ -157,6 +157,30 @@
 /processorParam:TextureFormat=Color
 /build:bg4.png
 
+#begin bg5.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bg5.png
+
+#begin bg6.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bg6.png
+
 #begin bgbgbg.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -325,6 +349,12 @@
 /processorParam:Quality=Best
 /build:cry.wav
 
+#begin dashcooldown.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:dashcooldown.wav
+
 #begin death.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -450,6 +480,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:enemybullet4.png
+
+#begin enemybullet5.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet5.png
 
 #begin enemyspawning.wav
 /importer:WavImporter
@@ -956,6 +998,12 @@
 /processorParam:Quality=Best
 /build:parry.wav
 
+#begin parrycooldown.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:parrycooldown.wav
+
 #begin particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1100,6 +1148,18 @@
 /processorParam:Quality=Best
 /build:shop.mp3
 
+#begin shopbg.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:shopbg.png
+
 #begin shopkeep.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1214,6 +1274,12 @@
 /processorParam:TextureFormat=Color
 /build:spellbookicon.png
 
+#begin spellcooldown.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:spellcooldown.wav
+
 #begin stage3.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
@@ -1243,6 +1309,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:stars2.png
+
+#begin stars3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:stars3.png
 
 #begin sundermindicon.png
 /importer:TextureImporter
@@ -1358,6 +1436,12 @@
 /processorParam:DebugMode=Auto
 /build:voro.fx
 
+#begin voro2.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:voro2.fx
+
 #begin voropalette.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1369,6 +1453,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:voropalette.png
+
+#begin wall.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:wall.png
+
+#begin wall2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:wall2.png
+
+#begin walleye.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:walleye.png
 
 #begin walloficeicon.png
 /importer:TextureImporter
@@ -1387,12 +1507,6 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:warp.fx
-
-#begin waves.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:waves.fx
 
 #begin wavy.wav
 /importer:WavImporter

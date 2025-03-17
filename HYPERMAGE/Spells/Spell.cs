@@ -328,7 +328,7 @@ namespace HYPERMAGE.Spells
                     spellTraits.Add(15);
 
                     icon = Globals.Content.Load<Texture2D>("magicmissileicon");
-                    description = "CASTS AN MISSILE OF ARCANE ENERGY";
+                    description = "CASTS A MISSILE OF ARCANE ENERGY";
                     name = "MAGICK MISSILE";
 
                     return;

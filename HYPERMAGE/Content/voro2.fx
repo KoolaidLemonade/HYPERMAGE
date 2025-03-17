@@ -8,6 +8,7 @@
 #endif
 
 float time;
+matrix WorldViewProjection;
 
 Texture2D DisplacementTexture;
 sampler2D DisplacementTextureSampler = sampler_state
@@ -15,18 +16,28 @@ sampler2D DisplacementTextureSampler = sampler_state
     Texture = <DisplacementTexture>;
 };
 
-Texture2D PaletteTexture;
-sampler2D PaletteTextureSampler = sampler_state
+struct VertexShaderInput
 {
-    Texture = <PaletteTexture>;
+	float4 Position : POSITION0;
+	float4 Color : COLOR0;
 };
 
 struct VertexShaderOutput
 {
 	float4 Position : SV_POSITION;
 	float4 Color : COLOR0;
-	float2 UV : TEXCOORD0;
+    float2 UV : TEXCOORD0;
 };
+
+VertexShaderOutput MainVS(in VertexShaderInput input)
+{
+	VertexShaderOutput output = (VertexShaderOutput)0;
+
+	output.Position = mul(input.Position, WorldViewProjection);
+	output.Color = input.Color;
+
+	return output;
+}
 
 float2 random2(float2 p)
 {
@@ -41,7 +52,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
     float2 displacedUV = input.UV;
    
-    displacedUV.xy += (tex2D(DisplacementTextureSampler, input.UV).rg) / 2;  
+    displacedUV.xy += (tex2D(DisplacementTextureSampler, input.UV).rg) / 2;
     displacedUV.xy += (tex2D(DisplacementTextureSampler, displacedUV).rg) / 4;
 
     //
@@ -76,48 +87,15 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     displacedUV /= 2;
            
     color -= m_dist;
-
-    if (m_dist > (sin(time / 4 + displacedUV.y * 4) / 12) + 0.2)
-    {
-        color *= 2;
-    }
-    
-    // dither
-    
-    if (color.r + color.g + color.b <= 1.5 && int(input.UV.x * 320) % 2 == 0 && int(input.UV.y * 180) % 2 == 0)
-    {
-        color -= float4(1, 1, 1, 1);
-    }
-    
-    else if (color.r + color.g + color.b <= 1.8 && int(input.UV.x * 320) % 2 == int(input.UV.y * 180) % 2 == 0 ? 1 : 0)
-    {
-        color -= float4(1, 1, 1, 1);
-    }
-    
-    // quantization
-    
-    color.rgb /= 3;
-    
-    color.r = clamp(color.r, 0, 1);
-    color.g = clamp(color.g, 0, 1);
-    color.b = clamp(color.b, 0, 1);
-
-    color = tex2D(PaletteTextureSampler, float2(color.r + color.g + color.b + 0.01, 0.5 + sin(time / 4 + displacedUV.y) / 2));
-       
-    //
-        
-    color.rgb -= sqrt(pow(abs(input.UV.x - 0.5), 2) + pow(abs(input.UV.y - 0.5), 2)) * 0.8;
-    
-    color.rgb *= 0.25 + sin(time / 3) / 10;
     
     return color;
-    
 }
 
-technique SpriteDrawing
+technique BasicColorDrawing
 {
 	pass P0
 	{
+		VertexShader = compile VS_SHADERMODEL MainVS();
 		PixelShader = compile PS_SHADERMODEL MainPS();
 	}
 };

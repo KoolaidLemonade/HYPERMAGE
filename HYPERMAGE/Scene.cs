@@ -43,8 +43,6 @@ namespace HYPERMAGE
 
         public static void RemoveScene()
         {
-            GameManager.wavesPower = 0.0f;
-            GameManager.waves = false;
             GameManager.fadeout = false;
 
             UIManager.Clear();
@@ -83,9 +81,6 @@ namespace HYPERMAGE
             UIManager.AddElement(mana);
 
             GameManager.GetPlayer().position = new(160 - 5.5f, 150);
-
-            GameManager.waves = true;
-            GameManager.wavesPower = 1f;
 
             LevelManager.NextLevel();
         }
@@ -185,9 +180,6 @@ namespace HYPERMAGE
             UIManager.AddElement(exitButton);
             UIManager.AddElement(logo);
 
-            GameManager.waves = true;
-            GameManager.wavesPower = 1f;
-
             GameManager.bounds = new(0, 0, 320, 180);
 
             SoundManager.PlaySong(Globals.Content.Load<Song>("title"), 0.5f);
@@ -282,43 +274,10 @@ namespace HYPERMAGE
         }
         public void Load()
         {
-            spriteFont = Globals.Content.Load<SpriteFont>("font");
-
-            GameManager.waves = true;
         }
         public void Update()
         {
-            introTimer += Globals.TotalSeconds;
-
-            GameManager.wavesPower = (float)Math.Pow((introTimer / 15), 2);
-
-            InputManager.Update();
-
-            if (introTimer >= introStep * 5)
-            {
-                if (GameManager.waves)
-                {
-                    GameManager.AddScreenShake(0.1f, 10f);
-                    GameManager.AddAbberationPowerForce(600, 50);
-
-                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lowbass"), 1f, 0f, 0f);
-                }
-
-                GameManager.wavesPower = 0.0f;
-                GameManager.waves = false;
-            }
-
-            if (introTimer >= (introStep * 5) + 0.8 || InputManager.Clicked)
-            {
-                GameManager.wavesPower = 0.0f;
-                GameManager.waves = false;
-
-                UIManager.Clear();
-                SoundManager.ClearSounds();
-
-                SceneManager.RemoveScene();
-                SceneManager.AddScene(new Shop());
-            }
+           
         }
         public void DrawEnemyVFX()
         {
@@ -337,43 +296,7 @@ namespace HYPERMAGE
         }
         public void Draw()
         {
-            if (introTimer >= introStep)
-            {
-                if (!voice)
-                {
-                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("introvoice"), 1f, 0f, 0f);
-                    voice = true;
-                }
-
-                Globals.SpriteBatch.DrawString(spriteFont, text1, new(235 - spriteFont.MeasureString(text1).X / 2, 60), Color.White);
-            }
-
-            if (introTimer >= introStep * 2)
-            {
-                Globals.SpriteBatch.DrawString(spriteFont, text2, new(235 - spriteFont.MeasureString(text1).X / 2, 80), Color.White);
-            }
-
-            if (introTimer >= introStep * 3)
-            {
-                Globals.SpriteBatch.DrawString(spriteFont, text3, new(235 - spriteFont.MeasureString(text1).X / 2, 100), Color.White);
-            }
-
-            if (introTimer >= introStep * 4)
-            {
-                Globals.SpriteBatch.DrawString(spriteFont, text4, new(235 - spriteFont.MeasureString(text1).X / 2, 120), Color.White);
-            }
-
-            if (introTimer <= introStep * 5)
-            {
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye1"), new Vector2(30 + Globals.RandomFloat(-1f, 1f) * introTimer / 18, 85 + Globals.RandomFloat(-1f, 1f) * introTimer / 18), null, Color.White * (introTimer / 10), 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye1"), new Vector2((150 - 42) + Globals.RandomFloat(-1f, 1f) * introTimer / 18, 85 + Globals.RandomFloat(-1f, 1f) * introTimer / 18), null, Color.White * (introTimer / 10), 0f, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 1f);
-            }
-
-            else
-            {
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye2"), new Vector2(30, 88), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("eye2"), new Vector2(150 - 40, 88), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 1f);
-            }
+            
         }
     }
 
@@ -419,9 +342,6 @@ namespace HYPERMAGE
             UIManager.AddElement(xp);
             UIManager.AddElement(mana);
             UIManager.AddElement(heart);
-
-            GameManager.waves = true;
-            GameManager.wavesPower = 1f;
 
             GameManager.player.position = new Vector2(160 - 5, 140);
             GameManager.player.center = new Vector2(160, 140 + 5);
@@ -483,7 +403,7 @@ namespace HYPERMAGE
             timer += Globals.TotalSeconds;
             sealrot += Globals.TotalSeconds;
 
-            if (GameManager.GetPlayer().center.X > 160 - 20 && GameManager.GetPlayer().center.X < 160 + 20 && GameManager.GetPlayer().center.Y > 85 - 15 && GameManager.GetPlayer().center.Y < 85 + 15)
+            if (GameManager.GetPlayer().center.X > 160 - 30 && GameManager.GetPlayer().center.X < 160 + 30 && GameManager.GetPlayer().center.Y > 85 - 25 && GameManager.GetPlayer().center.Y < 85 + 25)
             {
                 SpellbookUI.open = true;
 
@@ -562,8 +482,8 @@ namespace HYPERMAGE
                 xp.position = new(266, Globals.NonLerp(-20, 134, SpellbookUI.openingTimer));
                 mana.position = new(215, Globals.NonLerp(-20, 145, SpellbookUI.openingTimer));
                 heart.position = new(276, Globals.NonLerp(-20, 147, SpellbookUI.openingTimer));
-                rerollButton.position = new(250, Globals.NonLerp(-20, 29, SpellbookUI.openingTimer));
-                lockButton.position = new(238, Globals.NonLerp(-20, 41, SpellbookUI.openingTimer));
+                rerollButton.position = new(261, Globals.NonLerp(-20, 69, SpellbookUI.openingTimer));
+                lockButton.position = new(256, Globals.NonLerp(-20, 98, SpellbookUI.openingTimer));
             }
 
 
@@ -677,9 +597,6 @@ namespace HYPERMAGE
         {
             falling = new Animation(Globals.Content.Load<Texture2D>("falling"), 3, 1, 0.3f, 1);
 
-            GameManager.waves = true;
-            GameManager.wavesPower = 0f;
-
             lines.Add(GetPoemLine(5));
             lines.Add(GetPoemLine(6));
             lines.Add(GetPoemLine(7));
@@ -759,11 +676,6 @@ namespace HYPERMAGE
             foreach (var upgrade in upgrades)
             {
                 upgrade.opacity = upgradeFadeIn;
-            }
-
-            if (!Upgrade.choiceMade)
-            {
-                GameManager.wavesPower = fadeIn;
             }
 
             fallingVel += fallingPos.DirectionTo(new Vector2(15, Upgrade.choiceMade ? 180 : 40) + new Vector2(Globals.RandomFloat(-5, 5), Globals.RandomFloat(-5, 5))) * (Upgrade.choiceMade ? 3.5f : 1);

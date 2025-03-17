@@ -5,6 +5,7 @@ using HYPERMAGE.Spells;
 using HYPERMAGE.UI.UIElements;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
 
@@ -40,6 +41,8 @@ public class Player
     public float barrierCooldown = 2f;
     public float nextBarrierCooldown;
     public float barrierCooldownTimer;
+    public bool barrierCooldownComplete;
+
 
     public bool flashing;
     public float flashingTimer;
@@ -59,6 +62,12 @@ public class Player
     private float dashTimer;
     private float oldSpeed;
     public float dashLength = 0.15f;
+    private bool dashCooldownComplete;
+    private float dashCooldown = 1.5f;
+
+    private float dashCooldownTimer;
+    private bool dashing;
+
     public Player(Vector2 pos)
     {
         texture ??= Globals.Content.Load<Texture2D>("player");
@@ -77,10 +86,10 @@ public class Player
 
     public void Update()
     {
-        Debug.WriteLine(barrierCooldownTimer);
-
         if (InputManager.RightMouseDown && !barrier && barrierCooldownTimer <= 0)
         {
+            barrierCooldownComplete = false;
+
             SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("chirp"), 1, Globals.RandomFloat(-0.5f, 0f), 0);
             SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit"), 1, Globals.RandomFloat(-0.5f, 0.5f), 0);
 
@@ -125,6 +134,32 @@ public class Player
         if (barrierCooldownTimer > 0)
         {
             barrierCooldownTimer -= Globals.TotalSeconds;
+
+            if (barrierCooldownTimer <= 0 && !barrierCooldownComplete)
+            {
+                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("parrycooldown"), 0.5f, -0.2f, 0);
+
+                for (int i = 0; i < 8; i++)
+                {
+                    ParticleData spawnParticleData = new()
+                    {
+                        opacityStart = 1f,
+                        opacityEnd = 1f,
+                        sizeStart = 2,
+                        sizeEnd = 0,
+                        colorStart = Color.White,
+                        colorEnd = Color.White,
+                        velocity = new(Globals.RandomFloat(-150, 150), Globals.RandomFloat(-150, 150)),
+                        lifespan = 0.2f,
+                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                    };
+
+                    Particle spawnParticle = new(center, spawnParticleData);
+                    ParticleManager.AddParticle(spawnParticle);
+                }
+
+                barrierCooldownComplete = true;
+            }
         }
 
         if (InputManager.Moving)
@@ -132,7 +167,45 @@ public class Player
             velocity += Vector2.Normalize(InputManager.Direction) * acceleration * Globals.TotalSeconds;
         }
 
-        if (InputManager.dashing == true)
+        if (dashCooldownTimer > 0)
+        {
+            dashCooldownTimer -= Globals.TotalSeconds;
+
+            if (dashCooldownTimer <= 0 && !dashCooldownComplete)
+            {
+                SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("dashcooldown"), 0.7f, 0, 0);
+
+                for (int i = 0; i < 8; i++)
+                {
+                    ParticleData spawnParticleData = new()
+                    {
+                        opacityStart = 1f,
+                        opacityEnd = 1f,
+                        sizeStart = 2,
+                        sizeEnd = 0,
+                        colorStart = Color.White,
+                        colorEnd = Color.White,
+                        velocity = new(Globals.RandomFloat(-150, 150), Globals.RandomFloat(-150, 150)),
+                        lifespan = 0.2f,
+                        rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                    };
+
+                    Particle spawnParticle = new(GameManager.GetPlayer().center, spawnParticleData);
+                    ParticleManager.AddParticle(spawnParticle);
+                }
+
+                dashCooldownComplete = true;
+            }
+        }
+
+        if (InputManager.dashKey && dashCooldownTimer <= 0)
+        {
+            dashCooldownComplete = false;
+            dashCooldownTimer = dashCooldown;
+            dashing = true;
+        }
+
+        if (dashing)
         {
             if (dashTimer <= 0)
             {
@@ -233,7 +306,7 @@ public class Player
 
                 speed = oldSpeed;
                 dashTimer = 0;
-                InputManager.dashing = false;
+                dashing = false;
             }
         }
 
@@ -284,7 +357,7 @@ public class Player
                     SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("parry"), 4f, Globals.RandomFloat(-0.2f, 0.2f), 0);
                     GameScene.AddHitstop(6);
                     GameManager.AddScreenShake(0.15f, 4f);
-                    GameManager.AddAbberationPowerForce(1000, 25f);
+                    GameManager.AddAbberationPowerForce(1000, 35f);
 
                     for (int i = 0; i < 15; i++)
                     {

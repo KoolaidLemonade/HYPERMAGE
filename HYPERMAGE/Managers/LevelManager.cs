@@ -16,7 +16,7 @@ namespace HYPERMAGE.Managers
 {
     public static class LevelManager
     {
-        public static int level = 4;
+        public static int level = 7;
         public static int stage = 0;
 
         public static List<Mob> spawnWave = [];
@@ -58,6 +58,11 @@ namespace HYPERMAGE.Managers
 
         private static float nextZoneSize;
         private static float zoneSizeTimer;
+
+        private static float ai1;
+        private static float ai2;
+        private static float ai3;
+        private static float ai4;
         public static void DrawBG()
         {
             Globals.SpriteBatch.Draw(bg3, Vector2.Zero, Color.White);
@@ -204,25 +209,39 @@ namespace HYPERMAGE.Managers
             else
             {
                 bossSpawnTimer += Globals.TotalSeconds;
-
-                if (bossSpawnTimer >= 6f && !bossSpawned)
+                Vector2 spawnPos;
+                switch (bossID)
                 {
-                    nextZoneSize = 0.4f;
+                    case 9:
+                        spawnPos = new Vector2(160, 40);
 
-                    bossSpawned = true;
+                        if (bossSpawnTimer >= 6f && !bossSpawned)
+                        {
+                            nextZoneSize = 0.4f;
 
-                    Vector2 spawnPos = Vector2.Zero;
+                            bossSpawned = true;
 
-                    switch (bossID)
-                    {
-                        case 9: 
-                            spawnPos = new Vector2(160, 40);  
+                            Mob boss = new(spawnPos, bossID);
+                            boss.Spawn();
+                        }
+                        break;
+                    case 11:
+                        spawnPos = new Vector2(40, 68);
 
-                            break;
-                    }
+                        if (bossSpawnTimer >= 6f && !bossSpawned)
+                        {
+                            nextZoneSize = 0.4f;
 
-                    Mob boss = new(spawnPos, bossID);
-                    boss.Spawn();
+                            bossSpawned = true;
+
+                            for (int i = 0; i < 5; i++)
+                            {
+                                Mob boss = new(spawnPos + new Vector2(i * 64, 0), bossID);
+
+                                boss.Spawn();
+                            }
+                        }
+                        break;
                 }
 
                 switch (bossID)
@@ -266,6 +285,188 @@ namespace HYPERMAGE.Managers
                         {
                             GameManager.TransitionScene(new StageTransition());
                         }
+
+                        break;
+                    case 11:
+                        if (bossSpawned && !endLevel)
+                        {
+                            ai1 += Globals.TotalSeconds;
+
+                            if (ai1 >= Math.Pow(MobManager.mobs.Count, 2.3f) / 5)
+                            {
+                                if (ai2 == 0)
+                                {
+                                    GameManager.AddScreenShake(0.1f, 5f);
+                                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 0.8f, 0f, 0f);
+
+                                    ai4 = Globals.Random.Next(4);
+
+                                    Vector2 pos = Vector2.Zero;
+                                    Vector2 vel = Vector2.Zero;
+
+                                    for (int i = 0; i < 50; i++)
+                                    {
+                                        if (ai4 == 0)
+                                        {
+                                            pos = new(Globals.RandomFloat(0, 320), 0);
+                                            vel = new(Globals.RandomFloat(-20, 20), Globals.RandomFloat(200, 400));
+                                        }
+                                        if (ai4 == 1)
+                                        {
+                                            pos = new(Globals.RandomFloat(0, 320), 180);
+                                            vel = new(Globals.RandomFloat(-20, 20), Globals.RandomFloat(-200, -400));
+                                        }
+                                        if (ai4 == 2)
+                                        {
+                                            pos = new(0, Globals.RandomFloat(0, 180));
+                                            vel = new(Globals.RandomFloat(200, 500), Globals.RandomFloat(-20, -20));
+
+                                        }
+                                        if (ai4 == 3)
+                                        {
+                                            pos = new(320, Globals.RandomFloat(0, 180));
+                                            vel = new(Globals.RandomFloat(-200, -500), Globals.RandomFloat(-20, -20));
+
+                                        }
+
+                                        ParticleData pd2 = new()
+                                        {
+                                            opacityStart = 1f,
+                                            opacityEnd = 1f,
+                                            sizeStart = 8,
+                                            sizeEnd = 0,
+                                            colorStart = Color.White,
+                                            colorEnd = Color.White,
+                                            velocity = vel,
+                                            lifespan = Globals.RandomFloat(0.2f, 1f),
+                                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                            friendly = false
+                                        };
+
+                                        Particle p2 = new(pos, pd2);
+                                        ParticleManager.AddParticle(p2);
+                                    }
+
+
+                                    ai2 = 1;
+                                }
+                            }
+
+                            if (ai2 == 1)
+                            {
+                                ai3 += Globals.TotalSeconds;
+
+                                if (ai3 >= 1f)
+                                {
+                                    GameManager.AddScreenShake(0.2f, 10f);
+                                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lastingexplosion"), 0.8f, 0f, 0f);
+
+                                    if (ai4 == 0)
+                                    {
+                                        for (int i = 0; i < 30; i++)
+                                        {
+                                            Projectile proj = new(new(i * (320 / 30), 0), -2, 1f, new(0, Globals.RandomFloat(80, 90)), 10f);
+                                            ProjectileManager.AddProjectile(proj);
+                                        }
+
+                                        for (int i = 0; i < 10; i++)
+                                        {
+                                            Projectile proj = new(new(i * (320 / 10), 0), -6, 1f, new Vector2(0, Globals.RandomFloat(120, 160)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-30, 30))), Globals.RandomFloat(1.7f, 2.3f));
+                                            ProjectileManager.AddProjectile(proj);
+                                        }
+                                    }
+                                    if (ai4 == 1)
+                                    {
+                                        for (int i = 0; i < 30; i++)
+                                        {
+                                            Projectile proj = new(new(i * (320 / 30), 180), -2, 1f, new(0, -Globals.RandomFloat(80, 90)), 10f);
+                                            ProjectileManager.AddProjectile(proj);
+                                        }
+
+                                        for (int i = 0; i < 10; i++)
+                                        {
+                                            Projectile proj = new(new(i * (320 / 10), 180), -6, 1f, new Vector2(0, Globals.RandomFloat(-120, -160)).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-30, 30))), Globals.RandomFloat(1.7f, 2.3f));
+                                            ProjectileManager.AddProjectile(proj);
+                                        }
+                                    }
+                                    if (ai4 == 2)
+                                    {
+                                        for (int i = 0; i < 20; i++)
+                                        {
+                                            Projectile proj = new(new(0, i * (180 / 20)), -2, 1f, new(Globals.RandomFloat(80, 90), 0), 10f);
+                                            ProjectileManager.AddProjectile(proj);
+                                        }
+
+                                        for (int i = 0; i < 6; i++)
+                                        {
+                                            Projectile proj = new(new(0, i * (180 / 6)), -6, 1f, new Vector2(Globals.RandomFloat(120, 160), 0).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-30, 30))), Globals.RandomFloat(1.7f, 2.3f));
+                                            ProjectileManager.AddProjectile(proj);
+                                        }
+                                    }
+                                    if (ai4 == 3)
+                                    {
+                                        for (int i = 0; i < 20; i++)
+                                        {
+                                            Projectile proj = new(new(320, i * (180 / 20)), -2, 1f, new(-Globals.RandomFloat(80, 90), 0), 10f);
+                                            ProjectileManager.AddProjectile(proj);
+                                        }
+
+                                        for (int i = 0; i < 6; i++)
+                                        {
+                                            Projectile proj = new(new(320, i * (180 / 6)), -6, 1f, new Vector2(Globals.RandomFloat(-120, -160), 0).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-30, 30))), Globals.RandomFloat(1.7f, 2.3f));
+                                            ProjectileManager.AddProjectile(proj);
+                                        }
+                                    }
+
+
+                                    ai1 = 0;
+                                    ai2 = 0;
+                                    ai3 = 0;
+                                    ai4 = 0;
+                                }
+                            }
+                        }
+
+
+                        if (bgScrollTimer < 4 && !endLevel)
+                        {
+                            bgScrollTimer += Globals.TotalSeconds;
+                        }
+
+                        bgPos.X -= bgScrollTimer / 15;
+
+                        if (bgPos.X < -bg.Width)
+                        {
+                            bgPos.X = 0;
+                        }
+
+                        bgPos2.X -= bgScrollTimer / 10;
+
+                        if (bgPos2.X < -bg2.Width)
+                        {
+                            bgPos2.X = 0;
+                        }
+
+                        if (bossSpawned && MobManager.mobs.Count == 0)
+                        {
+                            endLevel = true;
+                        }
+
+                        if (endLevel)
+                        {
+                            endLevelTimer += Globals.TotalSeconds;
+
+                            if (bgScrollTimer > 0)
+                            {
+                                bgScrollTimer -= Globals.TotalSeconds;
+                            }
+                        }
+
+                        if (endLevelTimer >= 5f)
+                        {
+                            GameManager.TransitionScene(new StageTransition());
+                        }
+
                         break;
                 }
             }
@@ -467,6 +668,23 @@ namespace HYPERMAGE.Managers
 
             switch (level)
             {
+                case 0:
+                    stage = 1;
+
+                    bg = Globals.Content.Load<Texture2D>("bg");
+                    bg2 = Globals.Content.Load<Texture2D>("bg2");
+                    bg3 = Globals.Content.Load<Texture2D>("stars");
+                    song = Globals.Content.Load<Song>("stage3");
+
+                    GameManager.groundBounds = new(0, 90, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 20;
+                    validSpawns.Add(1);
+
+                    bossStage = false;
+
+                    break;
                 case 1:
                     stage = 1;
 
@@ -647,8 +865,8 @@ namespace HYPERMAGE.Managers
                 case 8:
                     stage = 2;
 
-                    bg = Globals.Content.Load<Texture2D>("wall");
-                    bg2 = Globals.Content.Load<Texture2D>("wall2");
+                    bg = Globals.Content.Load<Texture2D>("wall2");
+                    bg2 = Globals.Content.Load<Texture2D>("wall");
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
                     song = Globals.Content.Load<Song>("rgrgrg");
 
@@ -657,7 +875,93 @@ namespace HYPERMAGE.Managers
 
                     validSpawns.Add(11);
 
+                    bossID = validSpawns[Globals.Random.Next(validSpawns.Count)];
+
+                    GameManager.AddBigText(GetBossName(bossID));
+
                     bossStage = true;
+
+                    break;
+
+                case 9:
+                    stage = 3;
+
+                    bg = Globals.Content.Load<Texture2D>("bg6");
+                    bg2 = Globals.Content.Load<Texture2D>("bg5");
+                    bg3 = Globals.Content.Load<Texture2D>("stars3");
+                    song = Globals.Content.Load<Song>("asasa");
+
+                    GameManager.groundBounds = new(0, 100, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 80;
+
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+                    validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    validSpawns.Add(8);
+                    validSpawns.Add(9);
+
+                    bossStage = false;
+
+                    break;
+                case 10:
+                    stage = 3;
+
+                    bg = Globals.Content.Load<Texture2D>("bg6");
+                    bg2 = Globals.Content.Load<Texture2D>("bg5");
+                    bg3 = Globals.Content.Load<Texture2D>("stars3");
+                    song = Globals.Content.Load<Song>("asasa");
+
+                    GameManager.groundBounds = new(0, 100, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 80;
+
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+                    validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    validSpawns.Add(8);
+                    validSpawns.Add(9);
+
+                    bossStage = false;
+
+                    break;
+                case 11:
+                    stage = 3;
+
+                    bg = Globals.Content.Load<Texture2D>("bg6");
+                    bg2 = Globals.Content.Load<Texture2D>("bg5");
+                    bg3 = Globals.Content.Load<Texture2D>("stars3");
+                    song = Globals.Content.Load<Song>("asasa");
+
+                    GameManager.groundBounds = new(0, 100, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    levelCredits = 80;
+
+                    validSpawns.Add(0);
+                    validSpawns.Add(1);
+                    validSpawns.Add(2);
+                    validSpawns.Add(3);
+                    validSpawns.Add(4);
+                    validSpawns.Add(5);
+                    validSpawns.Add(6);
+                    validSpawns.Add(7);
+                    validSpawns.Add(8);
+                    validSpawns.Add(9);
+
+                    bossStage = false;
 
                     break;
             }
@@ -679,6 +983,12 @@ namespace HYPERMAGE.Managers
                 case 9:
                     words.Add("empyrean");
                     words.Add("wisp");
+                    break;
+                case 11:
+                    words.Add("wall");
+                    words.Add("of");
+                    words.Add("magick");
+
                     break;
             }
 

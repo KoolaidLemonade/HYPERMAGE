@@ -19,9 +19,6 @@ namespace HYPERMAGE.Managers
     {
         public static Player player;
 
-        public static bool waves;
-        public static float wavesPower;
-
         public static Vector4 bounds;
         public static Vector4 groundBounds;
 
@@ -68,6 +65,16 @@ namespace HYPERMAGE.Managers
             SceneManager.AddScene(new Shop());
 
             Spellbook.Init();
+
+            GetPlayer().LevelUp();
+            GetPlayer().LevelUp();
+            GetPlayer().LevelUp();
+
+            Spellbook.AddSpellPrimary(new(7, 2));
+            Spellbook.AddSpellPrimary(new(6, 2));
+            Spellbook.AddSpellPrimary(new(1, 2));
+            Spellbook.AddSpellPrimary(new(2, 1));
+
         }
 
         public static void Update()

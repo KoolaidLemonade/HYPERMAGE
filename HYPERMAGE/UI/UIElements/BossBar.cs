@@ -12,26 +12,48 @@ namespace HYPERMAGE.UI.UIElements
 {
     public class BossBar : UIElement
     {
-        Mob mob;
+        public static List<Mob> mobs = [];
+
         public int length = 200;
 
         public float health;
-        public float maxHealth;
+        public static float maxHealth;
         public BossBar(Texture2D texture, Vector2 position, Mob mob) : base(texture, position)
         {
-            this.mob = mob;
+            mobs.Add(mob);    
+            maxHealth += mob.health;
 
-            health = mob.health;
-            maxHealth = mob.health;
+            foreach (UIElement bar in UIManager.uiList.ToList())
+            {
+                if (bar is BossBar && bar != this)
+                {
+                    UIManager.RemoveElement(this);
+                }
+            }
         }
 
         public override void Update()
         {
-            health = mob.health;
+            health = 0f;
+
+            foreach (Mob mob in mobs.ToList())
+            {
+                if (mob.health <= 0)
+                {
+                    mobs.Remove(mob);
+                }
+
+                else
+                {
+                    health += mob.health;
+                }
+            }
 
             if (health <= 0)
             {
                 UIManager.RemoveElement(this);
+                mobs.Clear();
+                maxHealth = 0f;
             }
         }
         public override void Draw()

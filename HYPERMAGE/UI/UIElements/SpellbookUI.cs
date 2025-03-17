@@ -26,6 +26,8 @@ namespace HYPERMAGE.UI.UIElements
 
         public static Vector2 handVelocity = Vector2.Zero;
         public static Vector2 handPos = Vector2.Zero;
+        public static float handRot;
+        public static float rotTimer;
 
         private Vector2 originalPosition;
 
@@ -141,6 +143,26 @@ namespace HYPERMAGE.UI.UIElements
         {
             timer += Globals.TotalSeconds;
 
+            if (handPos.X >= 150)
+            {
+                if (rotTimer <= 0.5f)
+                {
+                    rotTimer += Globals.TotalSeconds;
+                }
+
+                handRot = MathHelper.ToRadians(Globals.NonLerp(0, 20, -rotTimer * 2f));
+            }
+
+            else
+            {
+                if (rotTimer > 0)
+                {
+                    rotTimer -= Globals.TotalSeconds;
+                }
+
+                handRot = MathHelper.ToRadians(Globals.NonLerp(0, 20, rotTimer * 2f));
+            }
+
             if (open || closing)
             {
                 if (Globals.Distance(handPos, InputManager.MousePosition) > 5)
@@ -225,7 +247,7 @@ namespace HYPERMAGE.UI.UIElements
         {
             if (open || closing)
             {
-                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("hand"), handPos - new Vector2(2, 0), null, Color.White * openingTimer, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.94f);
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("hand"), new Vector2((int)handPos.X, (int)handPos.Y) + new Vector2(2, 4), null, Color.White * openingTimer, handRot, Vector2.Zero, 1f, SpriteEffects.None, 0.94f);
             }
 
             if (open || closing)
@@ -268,6 +290,8 @@ namespace HYPERMAGE.UI.UIElements
                 Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, (int)Globals.NonLerp(0, 180, openingTimer )), null, Color.Black * 0.93f, 0f, Vector2.Zero, SpriteEffects.None, 0.91f);
 
                 Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, (int)Globals.NonLerp(0, 180, openingTimer), 320, 1), Color.White);
+
+                Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("shopbg"), new(260, Globals.NonLerp(-85, 75, openingTimer)), null, Color.White * openingTimer * 0.2f, 0f, new Vector2(40, 40), 1f + (float)Math.Cos(timer) / 30, SpriteEffects.None, 0.911f);
 
                 Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("brain"), new(90 + (float)Math.Sin(timer) * 3, Globals.NonLerp(-120, 88, openingTimer) + (float)Math.Cos(timer)), null, Color.White * openingTimer * 0.2f, 0f + (float)Math.Sin(timer) / 20, new(170 / 2, 138 / 2), 1f + (float)Math.Cos(timer) / 30, SpriteEffects.None, 0.911f);
 

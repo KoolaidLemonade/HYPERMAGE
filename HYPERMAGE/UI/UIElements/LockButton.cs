@@ -3,6 +3,7 @@ using HYPERMAGE.Managers;
 using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace HYPERMAGE.UI.UIElements
                 Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 1, (int)position.Y - 1, (int)texture.Width / 2 + 2, (int)texture.Height + 2), null, Color.White * 0.5f, 0f, Vector2.Zero, SpriteEffects.None, 0.93f);
             }
 
-            Globals.SpriteBatch.Draw(texture, new Vector2((int)position.X, (int)position.Y), new Rectangle(ShopManager.locked ? 0 : 7, 0, 7, 8), color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
+            Globals.SpriteBatch.Draw(texture, new Vector2((int)position.X, (int)position.Y), new Rectangle(ShopManager.locked ? 7 : 0, 0, 7, 8), color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.93f);
         }
 
         public override void UpdateButtonHitbox()
