@@ -16,7 +16,7 @@ namespace HYPERMAGE.Managers
 {
     public static class LevelManager
     {
-        public static int level = 7;
+        public static int level = 11;
         public static int stage = 0;
 
         public static List<Mob> spawnWave = [];
@@ -44,11 +44,13 @@ namespace HYPERMAGE.Managers
         private static Texture2D bg;
         private static Texture2D bg2;
         private static Texture2D bg3;
+        private static Texture2D bg4;
 
         private static Vector2 bgPos = Vector2.Zero;
         private static Vector2 bgPos2 = Vector2.Zero;
+        private static Vector2 bgPos3 = Vector2.Zero;
 
-        private static float bgScrollTimer;
+        public static float bgScrollTimer;
 
         public static bool bossStage;
         private static float bossSpawnTimer;
@@ -63,15 +65,25 @@ namespace HYPERMAGE.Managers
         private static float ai2;
         private static float ai3;
         private static float ai4;
-        public static void DrawBG()
+
+        public static void DrawBG2()
         {
-            Globals.SpriteBatch.Draw(bg3, Vector2.Zero, Color.White);
+            if (bg4 != null)
+            {
+                Globals.SpriteBatch.Draw(bg4, bgPos3, Color.White);
+                Globals.SpriteBatch.Draw(bg4, bgPos3 + new Vector2(bg4.Width, 0), Color.White);
+            }
 
             Globals.SpriteBatch.Draw(bg, bgPos, Color.White);
             Globals.SpriteBatch.Draw(bg, bgPos + new Vector2(bg.Width, 0), Color.White);
 
             Globals.SpriteBatch.Draw(bg2, bgPos2, Color.White);
             Globals.SpriteBatch.Draw(bg2, bgPos2 + new Vector2(bg2.Width, 0), Color.White);
+
+        }
+        public static void DrawBG()
+        {
+            Globals.SpriteBatch.Draw(bg3, Vector2.Zero, Color.White);
         }
         public static void Draw()
         {
@@ -154,6 +166,15 @@ namespace HYPERMAGE.Managers
                     bgPos2.X = 0;
                 }
 
+                bgPos3.X -= bgScrollTimer / 20;
+
+                if (bg4 != null)
+                {
+                    if (bgPos3.X < -bg4.Width)
+                    {
+                        bgPos3.X = 0;
+                    }
+                }
 
                 if (MobManager.mobs.Count == 0)
                 {
@@ -240,6 +261,18 @@ namespace HYPERMAGE.Managers
 
                                 boss.Spawn();
                             }
+                        }
+                        break;
+                    case 12:
+                        spawnPos = new Vector2(-40, 65);
+
+                        if (bossSpawnTimer >= 6f && !bossSpawned)
+                        {
+
+                            bossSpawned = true;
+
+                            Mob boss = new(spawnPos, bossID);
+                            boss.Spawn();
                         }
                         break;
                 }
@@ -446,6 +479,82 @@ namespace HYPERMAGE.Managers
                         {
                             bgPos2.X = 0;
                         }
+
+                        if (bossSpawned && MobManager.mobs.Count == 0)
+                        {
+                            endLevel = true;
+                        }
+
+                        if (endLevel)
+                        {
+                            endLevelTimer += Globals.TotalSeconds;
+
+                            if (bgScrollTimer > 0)
+                            {
+                                bgScrollTimer -= Globals.TotalSeconds;
+                            }
+                        }
+
+                        if (endLevelTimer >= 5f)
+                        {
+                            GameManager.TransitionScene(new StageTransition());
+                        }
+
+                        break;
+
+                    case 12:
+                        if (bossSpawned)
+                        {
+                            if (bgScrollTimer < 4 && !endLevel)
+                            {
+                                bgScrollTimer += Globals.TotalSeconds;
+                            }
+
+                            foreach (Mob boss in MobManager.mobs)
+                            {
+                                if (boss.ai6 == 3 && boss.ai10 < 120)
+                                {
+                                    if (bgScrollTimer < 15)
+                                    {
+                                        bgScrollTimer += Globals.TotalSeconds * 2;
+                                    }
+                                }
+
+                                else
+                                {
+                                    if (bgScrollTimer > 4 && !endLevel)
+                                    {
+                                        bgScrollTimer -= Globals.TotalSeconds * 3;
+                                    }
+                                }
+                            }
+                        }
+
+                        bgPos.X -= bgScrollTimer / 15;
+
+                        if (bgPos.X < -bg.Width)
+                        {
+                            bgPos.X = 0;
+                        }
+
+                        bgPos2.X -= bgScrollTimer / 10;
+
+                        if (bgPos2.X < -bg2.Width)
+                        {
+                            bgPos2.X = 0;
+                        }
+
+                        bgPos3.X -= bgScrollTimer / 20;
+
+
+                        if (bg4 != null)
+                        {
+                            if (bgPos3.X < -bg4.Width)
+                            {
+                                bgPos3.X = 0;
+                            }
+                        }
+
 
                         if (bossSpawned && MobManager.mobs.Count == 0)
                         {
@@ -683,6 +792,7 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(1);
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
                 case 1:
@@ -691,6 +801,8 @@ namespace HYPERMAGE.Managers
                     bg = Globals.Content.Load<Texture2D>("bg");
                     bg2 = Globals.Content.Load<Texture2D>("bg2");
                     bg3 = Globals.Content.Load<Texture2D>("stars");
+                    bg4 = null;
+
                     song = Globals.Content.Load<Song>("stage3");
 
                     GameManager.groundBounds = new(0, 90, 320, 180);
@@ -711,12 +823,15 @@ namespace HYPERMAGE.Managers
 
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
                 case 2:
                     bg = Globals.Content.Load<Texture2D>("bg");
                     bg2 = Globals.Content.Load<Texture2D>("bg2");
                     bg3 = Globals.Content.Load<Texture2D>("stars");
+                    bg4 = null;
+
                     song = Globals.Content.Load<Song>("stage3");
 
                     GameManager.groundBounds = new(0, 90, 320, 180);
@@ -735,12 +850,15 @@ namespace HYPERMAGE.Managers
                     //validSpawns.Add(8);
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
                 case 3:
                     bg = Globals.Content.Load<Texture2D>("bg");
                     bg2 = Globals.Content.Load<Texture2D>("bg2");
                     bg3 = Globals.Content.Load<Texture2D>("stars");
+                    bg4 = null;
+
                     song = Globals.Content.Load<Song>("stage3");
 
                     GameManager.groundBounds = new(0, 90, 320, 180);
@@ -759,6 +877,7 @@ namespace HYPERMAGE.Managers
                     //validSpawns.Add(8);
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
 
@@ -769,6 +888,8 @@ namespace HYPERMAGE.Managers
                     bg = Globals.Content.Load<Texture2D>("bg");
                     bg2 = Globals.Content.Load<Texture2D>("bg2");
                     bg3 = Globals.Content.Load<Texture2D>("stars");
+                    bg4 = null;
+
                     song = Globals.Content.Load<Song>("rgrgrg");
 
                     GameManager.groundBounds = new(0, 90, 320, 180);
@@ -779,6 +900,7 @@ namespace HYPERMAGE.Managers
                     bossID = validSpawns[Globals.Random.Next(validSpawns.Count)];
 
                     GameManager.AddBigText(GetBossName(bossID));
+                    GameManager.fog = true;
 
                     break;
                 case 5:
@@ -787,6 +909,8 @@ namespace HYPERMAGE.Managers
                     bg = Globals.Content.Load<Texture2D>("bg3");
                     bg2 = Globals.Content.Load<Texture2D>("bg4");
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
+                    bg4 = null;
+
                     song = Globals.Content.Load<Song>("asasa");
 
                     GameManager.groundBounds = new(0, 100, 320, 180);
@@ -806,6 +930,7 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(9);
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
                 case 6:
@@ -814,6 +939,8 @@ namespace HYPERMAGE.Managers
                     bg = Globals.Content.Load<Texture2D>("bg3");
                     bg2 = Globals.Content.Load<Texture2D>("bg4");
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
+                    bg4 = null;
+
                     song = Globals.Content.Load<Song>("asasa");
 
                     GameManager.groundBounds = new(0, 100, 320, 180);
@@ -833,6 +960,7 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(9);
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
                 case 7:
@@ -841,6 +969,8 @@ namespace HYPERMAGE.Managers
                     bg = Globals.Content.Load<Texture2D>("bg3");
                     bg2 = Globals.Content.Load<Texture2D>("bg4");
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
+                    bg4 = null;
+
                     song = Globals.Content.Load<Song>("asasa");
 
                     GameManager.groundBounds = new(0, 100, 320, 180);
@@ -860,6 +990,7 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(9);
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
                 case 8:
@@ -868,6 +999,8 @@ namespace HYPERMAGE.Managers
                     bg = Globals.Content.Load<Texture2D>("wall2");
                     bg2 = Globals.Content.Load<Texture2D>("wall");
                     bg3 = Globals.Content.Load<Texture2D>("stars2");
+                    bg4 = null;
+
                     song = Globals.Content.Load<Song>("rgrgrg");
 
                     GameManager.groundBounds = new(0, 100, 320, 180);
@@ -880,6 +1013,7 @@ namespace HYPERMAGE.Managers
                     GameManager.AddBigText(GetBossName(bossID));
 
                     bossStage = true;
+                    GameManager.fog = true;
 
                     break;
 
@@ -890,6 +1024,8 @@ namespace HYPERMAGE.Managers
                     bg2 = Globals.Content.Load<Texture2D>("bg5");
                     bg3 = Globals.Content.Load<Texture2D>("stars3");
                     song = Globals.Content.Load<Song>("asasa");
+                    bg4 = Globals.Content.Load<Texture2D>("bg7");
+
 
                     GameManager.groundBounds = new(0, 100, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
@@ -908,6 +1044,7 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(9);
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
                 case 10:
@@ -917,6 +1054,8 @@ namespace HYPERMAGE.Managers
                     bg2 = Globals.Content.Load<Texture2D>("bg5");
                     bg3 = Globals.Content.Load<Texture2D>("stars3");
                     song = Globals.Content.Load<Song>("asasa");
+                    bg4 = Globals.Content.Load<Texture2D>("bg7");
+
 
                     GameManager.groundBounds = new(0, 100, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);
@@ -935,6 +1074,7 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(9);
 
                     bossStage = false;
+                    GameManager.fog = true;
 
                     break;
                 case 11:
@@ -943,6 +1083,8 @@ namespace HYPERMAGE.Managers
                     bg = Globals.Content.Load<Texture2D>("bg6");
                     bg2 = Globals.Content.Load<Texture2D>("bg5");
                     bg3 = Globals.Content.Load<Texture2D>("stars3");
+                    bg4 = Globals.Content.Load<Texture2D>("bg7");
+
                     song = Globals.Content.Load<Song>("asasa");
 
                     GameManager.groundBounds = new(0, 100, 320, 180);
@@ -962,6 +1104,30 @@ namespace HYPERMAGE.Managers
                     validSpawns.Add(9);
 
                     bossStage = false;
+                    GameManager.fog = true;
+
+                    break;
+                case 12:
+                    stage = 3;
+
+                    bg = Globals.Content.Load<Texture2D>("bg6");
+                    bg2 = Globals.Content.Load<Texture2D>("bg5");
+                    bg3 = Globals.Content.Load<Texture2D>("stars3");
+                    bg4 = Globals.Content.Load<Texture2D>("bg7");
+
+                    song = Globals.Content.Load<Song>("rgrgrg");
+
+                    GameManager.groundBounds = new(0, 100, 320, 180);
+                    GameManager.bounds = new(0, 0, 320, 180);
+
+                    validSpawns.Add(12);
+
+                    bossID = validSpawns[Globals.Random.Next(validSpawns.Count)];
+
+                    GameManager.AddBigText(GetBossName(bossID));
+
+                    bossStage = true;
+                    GameManager.fog = true;
 
                     break;
             }
@@ -989,6 +1155,10 @@ namespace HYPERMAGE.Managers
                     words.Add("of");
                     words.Add("magick");
 
+                    break;
+                case 12:
+                    words.Add("enchanted");
+                    words.Add("beasthound");
                     break;
             }
 

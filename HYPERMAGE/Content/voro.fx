@@ -40,7 +40,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     lerp(input.UV, float2(0.5, 0.5), -0.05);
 
     float2 displacedUV = input.UV;
-   
+      
     displacedUV.xy += (tex2D(DisplacementTextureSampler, input.UV).rg) / 2;  
     displacedUV.xy += (tex2D(DisplacementTextureSampler, displacedUV).rg) / 4;
 
@@ -109,7 +109,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     color.rgb -= sqrt(pow(abs(input.UV.x - 0.5), 2) + pow(abs(input.UV.y - 0.5), 2)) * 0.8;
     
     color.rgb *= 0.25 + sin(time / 3) / 10;
-    
+        
     return color;
     
 }

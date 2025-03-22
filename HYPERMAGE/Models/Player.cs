@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace HYPERMAGE.Models;
 public class Player
@@ -21,7 +22,7 @@ public class Player
     public Vector2 position;
     public Vector2 velocity;
 
-    public Polygon hitbox;
+    public Hitbox hitbox;
 
     public int width;
     public int height;
@@ -50,9 +51,9 @@ public class Player
     public Color flashColor1;
     public Color flashColor2;
 
-    public int mana = 400;
+    public int mana = 8;
     public int maxHealth = 3;
-    public int health = 3;
+    public int health = 444;
     public int lives = 3;
 
     public int xp = 0;
@@ -81,11 +82,12 @@ public class Player
 
         center = position + origin;
 
-        hitbox = PolygonFactory.CreateRectangle((int)center.X - 1, (int)center.Y - 1, 1, 1);
+        hitbox = new(center, 1f, Vector2.Zero, Vector2.Zero);
     }
 
     public void Update()
     {
+
         if (InputManager.RightMouseDown && !barrier && barrierCooldownTimer <= 0)
         {
             barrierCooldownComplete = false;
@@ -352,36 +354,41 @@ public class Player
         {
             foreach (Projectile projectile in ProjectileManager.projectiles)
             {
-                if (projectile.hitbox.IntersectsWith(PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, 10, 10)) && !projectile.friendly && projectile.parryable)
+                foreach (Hitbox h in projectile.hitbox)
                 {
-                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("parry"), 4f, Globals.RandomFloat(-0.2f, 0.2f), 0);
-                    GameScene.AddHitstop(6);
-                    GameManager.AddScreenShake(0.15f, 4f);
-                    GameManager.AddAbberationPowerForce(1000, 35f);
-
-                    for (int i = 0; i < 15; i++)
+                    if (h.Intersects(new Hitbox(center, 8, Vector2.Zero, center)) && !projectile.friendly && projectile.parryable)
                     {
-                        ParticleData pd = new()
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("parry"), 4f, Globals.RandomFloat(-0.2f, 0.2f), 0);
+                        GameScene.AddHitstop(6);
+                        GameManager.AddScreenShake(0.15f, 4f);
+                        GameManager.AddAbberationPowerForce(1000, 35f);
+
+                        for (int i = 0; i < 15; i++)
                         {
-                            opacityStart = 1f,
-                            opacityEnd = 1f,
-                            sizeStart = Globals.RandomFloat(2, 4),
-                            sizeEnd = 0,
-                            colorStart = Color.White,
-                            colorEnd = Color.White,
-                            velocity = new(Globals.RandomFloat(-500, 500), Globals.RandomFloat(-500, 500)),
-                            lifespan = Globals.RandomFloat(0.1f, 0.2f),
-                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
-                            resistance = 1.3f
-                        };
+                            ParticleData pd = new()
+                            {
+                                opacityStart = 1f,
+                                opacityEnd = 1f,
+                                sizeStart = Globals.RandomFloat(2, 4),
+                                sizeEnd = 0,
+                                colorStart = Color.White,
+                                colorEnd = Color.White,
+                                velocity = new(Globals.RandomFloat(-500, 500), Globals.RandomFloat(-500, 500)),
+                                lifespan = Globals.RandomFloat(0.1f, 0.2f),
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                resistance = 1.3f
+                            };
 
-                        Particle p = new(center, pd);
-                        ParticleManager.AddParticle(p);
+                            Particle p = new(center, pd);
+                            ParticleManager.AddParticle(p);
+                        }
+
+                        nextBarrierCooldown = 0;
+
+                        projectile.Kill();
+
+                        break;
                     }
-
-                    nextBarrierCooldown = 0;
-
-                    projectile.Kill();
                 }
             }
         }
@@ -390,18 +397,24 @@ public class Player
         {
             foreach (Mob mob in MobManager.mobs)
             {
-                if (mob.hitbox.IntersectsWith(hitbox) && mob.contactDamage && !immune && !mob.spawning)
+                foreach (Hitbox h in mob.hitbox)
                 {
-                    Damage(1);
-                } 
+                    if (h.Intersects(hitbox) && mob.contactDamage && !immune && !mob.spawning)
+                    {
+                        Damage(1);
+                    }
+                }
             }
 
             foreach (Projectile projectile in ProjectileManager.projectiles)
             {
-                if (projectile.hitbox.IntersectsWith(hitbox) && !projectile.friendly && !immune)
+                foreach (Hitbox h in projectile.hitbox)
                 {
-                    Damage((int)projectile.damage);
-                    projectile.HitPlayer();
+                    if (h.Intersects(hitbox) && !projectile.friendly && !immune)
+                    {
+                        Damage((int)projectile.damage);
+                        projectile.HitPlayer();
+                    }
                 }
             }
         }
@@ -435,12 +448,13 @@ public class Player
                 flashingTimer = 0;
                 flashColor = flashColor2;
             }
+        
         }
-
 
         center = position + origin;
 
-        hitbox = PolygonFactory.CreateRectangle((int)center.X, (int)center.Y, 1, 1);
+        hitbox.position = center;
+        hitbox.origin = center;
 
         //
 

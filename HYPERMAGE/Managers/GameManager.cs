@@ -58,11 +58,13 @@ namespace HYPERMAGE.Managers
 
         public static bool drawLightOrangeScreenTint;
         public static float drawLightOrangeScreenTintTime;
+
+        public static bool fog;
         public static void Init()
         {
             player = new Player(new(150, 100));
 
-            SceneManager.AddScene(new Shop());
+            SceneManager.AddScene(new GameScene());
 
             Spellbook.Init();
 
@@ -160,6 +162,7 @@ namespace HYPERMAGE.Managers
                 transitionTimer = 0;
 
                 zoneSize = 2f;
+                fog = false;
 
                 SceneManager.RemoveScene();
                 SceneManager.AddScene(nextScene);

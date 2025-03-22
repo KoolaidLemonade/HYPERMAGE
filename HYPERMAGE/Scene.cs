@@ -29,6 +29,7 @@ namespace HYPERMAGE
         public void DrawEnemyVFX();
         public void DrawVFX();
         public void DrawBG();
+        public void DrawBG2();
         public void DrawUI();
     }
 
@@ -127,6 +128,10 @@ namespace HYPERMAGE
         public void DrawBG()
         {
             LevelManager.DrawBG();
+        }
+        public void DrawBG2()
+        {
+            LevelManager.DrawBG2();
         }
         public void DrawUI()
         {
@@ -254,6 +259,10 @@ namespace HYPERMAGE
         {
 
         }
+
+        public void DrawBG2()
+        {
+        }
     }
 
     public class IntroCutscene : IScene
@@ -293,6 +302,9 @@ namespace HYPERMAGE
         public void DrawBG()
         {
 
+        }
+        public void DrawBG2()
+        {
         }
         public void Draw()
         {
@@ -530,6 +542,9 @@ namespace HYPERMAGE
         {
 
         }
+        public void DrawBG2()
+        {
+        }
         public void DrawUI()
         {
             UIManager.Draw();
@@ -563,6 +578,9 @@ namespace HYPERMAGE
         public void DrawBG()
         {
 
+        }
+        public void DrawBG2()
+        {
         }
 
         public void DrawUI()
@@ -700,6 +718,9 @@ namespace HYPERMAGE
         public void DrawBG()
         {
 
+        }
+        public void DrawBG2()
+        {
         }
         public void Draw()
         {

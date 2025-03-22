@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,10 +29,7 @@ namespace HYPERMAGE.Models
         public int width;
         public int height;
 
-        public Polygon hitbox;
-        public Vector2 hitboxOffset;
-        public Vector2 hitboxSize;
-        public Vector2 hitboxOrigin;
+        public List<Hitbox> hitbox = [];
 
         public Vector2 center;
 
@@ -54,6 +52,7 @@ namespace HYPERMAGE.Models
 
         private float ai;
         private float ai2;
+        private float ai3;
 
         public bool explosify;
         public float explosifyDamage;
@@ -137,44 +136,61 @@ namespace HYPERMAGE.Models
             switch (aiType)
             {
                 // enemy projectiles
+                case -10:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet2");
+
+                    parryable = false;
+
+                    break;
+                case -9:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet8");
+                    hitbox.Add(new(position, 2, new(0, -3), position));
+                    hitbox.Add(new(position, 2, new(0, -1), position));
+                    hitbox.Add(new(position, 2, new(0, 1), position));
+                    hitbox.Add(new(position, 2, new(0, 3), position));
+
+
+                    break;
+                case -8:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet7");
+                    hitbox.Add(new(position, 4, new(0, 2), position));
+                    hitbox.Add(new(position, 4, new(0, -2), position));
+
+
+                    break;
+                case -7:
+                    texture = Globals.Content.Load<Texture2D>("enemybullet6");
+
+                    parryable = false;
+
+                    break;
                 case -6:
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
-                    hitboxOffset = new(0, 0);
-                    hitboxSize = new(9, 9);
 
                     parryable = false;
 
                     break;
                 case -5:
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
-                    hitboxOffset = new(0, 0);
-                    hitboxSize = new(9, 9);
 
                     parryable = false;
 
                     break;
                 case -4:
                     texture = Globals.Content.Load<Texture2D>("enemybullet4");
-                    hitboxOffset = new(0, 0);
-                    hitboxSize = new(3, 3);
+
                     break;
                 case -3:
                     texture = Globals.Content.Load<Texture2D>("enemybullet2");
-                    hitboxOffset = new(0, 0);
-                    hitboxSize = new(9, 9);
 
                     parryable = false;
 
                     break;
                 case -2:
                     texture = Globals.Content.Load<Texture2D>("enemybullet1");
-                    hitboxOffset = new(0, 0);
-                    hitboxSize = new(4, 4);
                     break;
                 case -1:
                     texture = Globals.Content.Load<Texture2D>("enemybullet4");
-                    hitboxOffset = new(0, 0);
-                    hitboxSize = new(3, 3);
                     break;
                 case 0:
                     break;
@@ -201,7 +217,6 @@ namespace HYPERMAGE.Models
                     texture = null;
                     break;
                 case 8: // ray of light
-                    hitboxSize = new(10, ai2);
                     immuneSameType = true;
                     texture = null;
                     break;
@@ -225,19 +240,18 @@ namespace HYPERMAGE.Models
 
             center = position + origin;
 
-
-            if (hitboxOffset == Vector2.Zero && hitboxSize == Vector2.Zero)
+            if (hitbox.Count == 0)
             {
-                hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
-            }
-
-            else
-            {
-                hitbox = PolygonFactory.CreateRectangle((int)position.X + (int)hitboxOffset.X, (int)position.Y + (int)hitboxOffset.Y, (int)(hitboxSize.X * scale), (int)(hitboxSize.Y * scale), rotation);
+                hitbox.Add(new(position, width / 2, Vector2.Zero, center));
             }
         }
         public void Draw()
         {
+            foreach(Hitbox h in hitbox)
+            {
+                Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), h.position, Color.Red);
+            }
+
             if (aiType == 5 && ai == 1)
             {
                 Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X - 20 + Globals.Random.Next(3), 0, 40 + Globals.Random.Next(3), (int)position.Y + 2), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, layerDepthFriendly);
@@ -253,7 +267,7 @@ namespace HYPERMAGE.Models
                 return;
             }
 
-            if (aiType == 8)
+            if (aiType == 8) 
             {
                 Globals.SpriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle((int)position.X, (int)position.Y, 10, (int)(ai2 - ai)), null, Color.White, rotation, new Vector2(0.5f, 0.5f), SpriteEffects.None, layerDepthFriendly);
                 return;
@@ -266,7 +280,7 @@ namespace HYPERMAGE.Models
 
             else if (texture != null)
             {
-                Globals.SpriteBatch.Draw(texture, new(position.X, position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? layerDepthFriendly : layerDepth);
+                Globals.SpriteBatch.Draw(texture, new(position.X, position.Y), null, Color.White, rotation, origin, scale, SpriteEffects.None, friendly ? layerDepthFriendly : parryable ? layerDepth - 0.01f : layerDepth); 
             }
         }
 
@@ -279,17 +293,14 @@ namespace HYPERMAGE.Models
                 anim.Update();
             }
 
-            if (hitboxOffset == Vector2.Zero && hitboxSize == Vector2.Zero)
-            {
-                hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
-            }
-
-            else
-            {
-                hitbox = PolygonFactory.CreateRectangle((int)position.X + (int)hitboxOffset.X, (int)position.Y + (int)hitboxOffset.Y, (int)(hitboxSize.X * scale), (int)(hitboxSize.Y * scale), rotation);
-            }
-
             center = position + origin;
+
+            foreach (Hitbox h in hitbox)
+            {
+                h.position = position + h.offset;
+                h.origin = position;
+                h.SetRotation(rotation);
+            }
 
             if (lifespan <= 0)
             {
@@ -298,7 +309,93 @@ namespace HYPERMAGE.Models
 
             switch (aiType)
             {
+
                 //enemy projectiles
+                case -10:
+                    speed = ai;
+
+                    position += velocity * Globals.TotalSeconds * speed;
+
+                    if (ai < 5)
+                    {
+                        ai += Globals.TotalSeconds;
+                    }
+
+                    ai3 += Globals.TotalSeconds;
+
+                    if (ai3 > 0.1f)
+                    {
+                        ParticleData ParticleData = new()
+                        {
+                            sizeStart = 5f,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = new(Globals.RandomFloat(-50, 50), Globals.RandomFloat(-50, 50)),
+                            lifespan = 0.25f,
+                            rotationSpeed = 1f,
+                            resistance = 1.2f,
+                            friendly = false
+                        };
+
+                        Particle particle = new(position, ParticleData);
+                        ParticleManager.AddParticle(particle);
+
+                        ai3 = 0;
+                    }
+
+                    break;
+
+                case -9:
+                    speed = ai;
+
+                    position += velocity * Globals.TotalSeconds * speed;
+                    rotation = velocity.ToRotation() + MathHelper.ToRadians(90);
+
+                    if (ai < 5)
+                    {
+                        ai += Globals.TotalSeconds;
+                    }
+                    break;
+                case -8:
+                    speed = ai;
+
+                    position += velocity * Globals.TotalSeconds * speed;
+                    rotation = velocity.ToRotation() + MathHelper.ToRadians(90);
+
+                    if (ai < 5)
+                    {
+                        ai += Globals.TotalSeconds;
+                    }
+
+                    break;
+                case -7:
+                    position += velocity * Globals.TotalSeconds * speed;
+                    rotation = velocity.ToRotation() + MathHelper.ToRadians(90);
+
+                    ai += Globals.TotalSeconds;
+
+                    if (ai > 0.1f)
+                    {
+                        ParticleData ParticleData = new()
+                        {
+                            sizeStart = 5f,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.White,
+                            velocity = new(Globals.RandomFloat(-50, 50), Globals.RandomFloat(-50, 50)),
+                            lifespan = 0.25f,
+                            rotationSpeed = 1f,
+                            resistance = 1.2f,
+                            friendly = false
+                        };
+
+                        Particle particle = new(position, ParticleData);
+                        ParticleManager.AddParticle(particle);
+
+                        ai = 0;
+                    }
+                    break;
                 case -6:
                     position += velocity * Globals.TotalSeconds * speed;
 
@@ -406,7 +503,6 @@ namespace HYPERMAGE.Models
                         ParticleData ParticleData = new()
                         {
                             opacityStart = 1f,
-                            opacityEnd = 0f,
                             sizeStart = 2f,
                             sizeEnd = 0,
                             colorStart = Color.White,
@@ -452,11 +548,6 @@ namespace HYPERMAGE.Models
                         ParticleManager.AddParticle(projParticle);
                     }
 
-                    if (!Globals.InBounds(hitbox))
-                    {
-                        Kill();
-                    }
-
                     break;
 
                 case 2: //fireball
@@ -497,11 +588,6 @@ namespace HYPERMAGE.Models
 
                         Particle projParticle2 = new(position, projParticleData2);
                         ParticleManager.AddParticle(projParticle2);
-                    }
-
-                    if (!Globals.InBounds(hitbox))
-                    {
-                        Kill();
                     }
 
                     break;

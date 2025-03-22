@@ -91,27 +91,6 @@ public static class Globals
         return result;
     }
 
-    public static bool InBounds(Polygon hitbox)
-    {
-
-        float sizeX = hitbox.GetVerticesX().Max<float>() - hitbox.GetVerticesX().Min<float>();
-        float sizeY = hitbox.GetVerticesY().Max<float>() - hitbox.GetVerticesY().Min<float>();
-
-        if (hitbox.IntersectsWith(PolygonFactory.CreateRectangle((int)(0 + sizeX), (int)(sizeY), (int)(320 - sizeX * 2), (int)(180 - sizeY * 2), 0, Vector2.Zero)))
-        {
-            return true;
-        }
-
-        return false;
-    }
-    public static Polygon GetBounds(Polygon hitbox)
-    {
-
-        float sizeX = hitbox.GetVerticesX().Max<float>() - hitbox.GetVerticesX().Min<float>();
-        float sizeY = hitbox.GetVerticesY().Max<float>() - hitbox.GetVerticesY().Min<float>();
-
-        return PolygonFactory.CreateRectangle((int)(0 + sizeX), (int)(sizeY), (int)(320 - sizeX * 2), (int)(180 - sizeY * 2), 0, Vector2.Zero);
-    }
     public static float NonLerp(float value1, float value2, float amount)
     {
         double t = Math.Pow(amount, 2);

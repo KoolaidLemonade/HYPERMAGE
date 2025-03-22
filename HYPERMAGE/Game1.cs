@@ -32,6 +32,10 @@ namespace HYPERMAGE
         private RenderTarget2D zoneTarget;
         private RenderTarget2D warpTarget;
         private RenderTarget2D abberationTarget;
+        private RenderTarget2D fogDisplacement;
+
+        private float fogDisplaceX;
+        private Texture2D fogDisplaceTexture;
 
         private Effect blur;
         private Effect transition;
@@ -44,6 +48,7 @@ namespace HYPERMAGE
         private Effect voro;
         private Effect perlin;
         private Effect outline;
+        private Effect fog; 
 
         private float time;
         private float time2;
@@ -80,6 +85,7 @@ namespace HYPERMAGE
 
             voroDisplacement = new RenderTarget2D(GraphicsDevice, 320, 180);
             zoneTarget = new RenderTarget2D(GraphicsDevice, 320, 180);
+            fogDisplacement = new RenderTarget2D(GraphicsDevice, 320, 180);
             warpTarget = new RenderTarget2D(GraphicsDevice, w, h);
             abberationTarget = new RenderTarget2D(GraphicsDevice, w, h);
 
@@ -114,8 +120,11 @@ namespace HYPERMAGE
             voro = Content.Load<Effect>("voro");
             perlin = Content.Load<Effect>("perlin");
             outline = Content.Load<Effect>("outline");
+            fog = Content.Load<Effect>("fog");
+            fogDisplaceTexture = Content.Load<Texture2D>("epicnoise");
 
             voro.Parameters["PaletteTexture"].SetValue(Globals.Content.Load<Texture2D>("voropalette"));
+            fog.Parameters["PaletteTexture"].SetValue(Globals.Content.Load<Texture2D>("fogpalette"));
 
             zone.Parameters["center"].SetValue(new Vector2(0.5f, 0.5f));
 
@@ -135,6 +144,12 @@ namespace HYPERMAGE
         {
             t += Globals.TotalSeconds;
             tt++;
+
+            fogDisplaceX -= Globals.TotalSeconds * LevelManager.bgScrollTimer * 8;
+            if (fogDisplaceX < 0 - 320)
+            {
+                fogDisplaceX = 0;
+            }
 
             zone.Parameters["range"].SetValue(GameManager.zoneSize);
 
@@ -179,15 +194,13 @@ namespace HYPERMAGE
 
             GameManager.Update();
 
-            base.Update(gameTime);
-
             time += Globals.TotalSeconds;
 
             noise.Parameters["time"].SetValue(time);
             zone.Parameters["time"].SetValue(time);
             voro.Parameters["time"].SetValue(time);
             perlin.Parameters["time"].SetValue(time);
-            //outline.Parameters["time"].SetValue(time);
+            fog.Parameters["time"].SetValue(time);
 
             if (GameManager.fadeout)
             {
@@ -219,6 +232,8 @@ namespace HYPERMAGE
 
                 shake.Parameters["WorldViewProjection"].SetValue(view * projection);
             }
+
+            base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -248,6 +263,16 @@ namespace HYPERMAGE
             spriteBatch.Draw(Globals.GetBlankTexture(), new Rectangle(0, 0, 320, 180), new Color(Color.White, 0));
             spriteBatch.End();
 
+            if (GameManager.fog)
+            {
+                GraphicsDevice.SetRenderTarget(fogDisplacement);
+
+                spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+                spriteBatch.Draw(fogDisplaceTexture, new Rectangle((int)fogDisplaceX, 0, 320, 180), new Color(Color.White, 0));
+                spriteBatch.Draw(fogDisplaceTexture, new Rectangle((int)fogDisplaceX + 320, 0, 320, 180), new Color(Color.White, 0));
+                spriteBatch.End();
+            }
+
             GraphicsDevice.SetRenderTarget(renderTarget);
 
             voro.Parameters["DisplacementTexture"].SetValue(voroDisplacement);
@@ -256,8 +281,22 @@ namespace HYPERMAGE
             spriteBatch.Draw(voroDisplacement, new Rectangle(0, 0, 320, 180), new Color(Color.White, 0));
             spriteBatch.End();
 
+
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
             SceneManager.GetScene().DrawBG();
+            spriteBatch.End();
+
+            if (GameManager.fog)
+            {
+                fog.Parameters["DisplacementTexture"].SetValue(fogDisplacement);
+
+                spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack, effect: fog);
+                spriteBatch.Draw(fogDisplacement, new Rectangle(0, 0, 320, 50), null, new Color(Color.White, 0), 0f, Vector2.Zero, SpriteEffects.FlipVertically, 1f);
+                spriteBatch.End();
+            }
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
+            SceneManager.GetScene().DrawBG2();
             spriteBatch.End();
 
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack);
@@ -281,6 +320,14 @@ namespace HYPERMAGE
             spriteBatch.Draw(vfxEnemy, Vector2.Zero, new Color(Color.White, 0));
             spriteBatch.End();
 
+            if (GameManager.fog)
+            {
+                fog.Parameters["DisplacementTexture"].SetValue(fogDisplacement);
+
+                spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.FrontToBack, effect: fog);
+                spriteBatch.Draw(fogDisplacement, new Rectangle(0, 90, 320, 90), new Color(Color.White, 0));
+                spriteBatch.End();
+            }
 
             GraphicsDevice.SetRenderTarget(zoneTarget);
 

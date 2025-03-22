@@ -109,6 +109,42 @@
 /processorParam:TextureFormat=Color
 /build:bat.png
 
+#begin beasthound.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:beasthound.png
+
+#begin beasthoundpaw.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:beasthoundpaw.png
+
+#begin beasthoundpaw2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:beasthoundpaw2.png
+
 #begin bg.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -180,6 +216,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:bg6.png
+
+#begin bg7.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:bg7.png
 
 #begin bgbgbg.png
 /importer:TextureImporter
@@ -349,6 +397,12 @@
 /processorParam:Quality=Best
 /build:cry.wav
 
+#begin danger.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:danger.wav
+
 #begin dashcooldown.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -492,6 +546,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:enemybullet5.png
+
+#begin enemybullet6.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet6.png
+
+#begin enemybullet7.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet7.png
+
+#begin enemybullet8.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:enemybullet8.png
 
 #begin enemyspawning.wav
 /importer:WavImporter
@@ -637,6 +727,24 @@
 /processorParam:TextureFormat=Color
 /build:flaskicon.png
 
+#begin fog.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:fog.fx
+
+#begin fogpalette.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:fogpalette.png
+
 #begin font.spritefont
 /importer:FontDescriptionImporter
 /processor:LocalizedFontProcessor
@@ -751,6 +859,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:hit2.wav
+
+#begin howl.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:howl.wav
 
 #begin icebeamicon.png
 /importer:TextureImporter
@@ -1021,6 +1135,18 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:perlin.fx
+
+#begin perlinpng.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:perlinpng.png
 
 #begin philosophoraicon.png
 /importer:TextureImporter
@@ -1435,12 +1561,6 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:voro.fx
-
-#begin voro2.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:voro2.fx
 
 #begin voropalette.png
 /importer:TextureImporter

@@ -40,7 +40,7 @@ namespace HYPERMAGE.Particles
         private int height;
 
         private Vector2 center;
-        private Polygon hitbox;
+        private Hitbox hitbox;
         public Particle(Vector2 pos, ParticleData data)
         {
             this.data = data;
@@ -85,7 +85,7 @@ namespace HYPERMAGE.Particles
 
             center = position + origin;
 
-            hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
+            hitbox = new(center, width / 2, Vector2.Zero, Vector2.Zero);
         }
         public void Update()
         {
@@ -139,15 +139,14 @@ namespace HYPERMAGE.Particles
 
             if (manaDrop)
             {
-                Debug.WriteLine(origin);
-                hitbox = PolygonFactory.CreateRectangle((int)position.X, (int)position.Y, (int)(width * scale), (int)(height * scale), rotation);
+                hitbox.position = center;
 
                 if (Globals.Distance(GameManager.GetPlayer().center, position) < 25f)
                 {
                     velocity += Vector2.Normalize(position.DirectionTo(GameManager.GetPlayer().center)) * Globals.TotalSeconds * 350f;
                 }
 
-                if (hitbox.IntersectsWith(GameManager.GetPlayer().hitbox))
+                if (hitbox.Intersects(GameManager.GetPlayer().hitbox))
                 {
                     SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("ding"), 1f, Globals.RandomFloat(-0.5f, 0f), 0f);
                     GameManager.GetPlayer().mana++;
