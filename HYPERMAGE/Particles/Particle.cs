@@ -85,7 +85,10 @@ namespace HYPERMAGE.Particles
 
             center = position + origin;
 
-            hitbox = new(center, width / 2, Vector2.Zero, Vector2.Zero);
+            if (manaDrop)
+            {
+                hitbox = new(position, 8, Vector2.Zero, Vector2.Zero);
+            }
         }
         public void Update()
         {
@@ -118,7 +121,7 @@ namespace HYPERMAGE.Particles
                 scale = MathHelper.Lerp(data.sizeEnd, data.sizeStart, lifespanAmount);
             }
 
-            velocity /= resistance;
+            velocity /= 1 + Globals.TotalSeconds * resistance;
 
             rotation += rotationSpeed;
 

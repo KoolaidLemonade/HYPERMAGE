@@ -51,9 +51,9 @@ public class Player
     public Color flashColor1;
     public Color flashColor2;
 
-    public int mana = 8;
-    public int maxHealth = 3;
-    public int health = 444;
+    public int mana = 8111;
+    public int maxHealth = 5;
+    public int health = 25;
     public int lives = 3;
 
     public int xp = 0;
@@ -360,8 +360,8 @@ public class Player
                     {
                         SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("parry"), 4f, Globals.RandomFloat(-0.2f, 0.2f), 0);
                         GameScene.AddHitstop(6);
-                        GameManager.AddScreenShake(0.15f, 4f);
-                        GameManager.AddAbberationPowerForce(1000, 35f);
+                        GameManager.AddScreenShake(0.1f, 3f);
+                        GameManager.AddAbberationPowerForce(1000, 20f);
 
                         for (int i = 0; i < 15; i++)
                         {

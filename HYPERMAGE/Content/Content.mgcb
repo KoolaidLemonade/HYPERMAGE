@@ -19,6 +19,12 @@
 /processorParam:DebugMode=Auto
 /build:abberation.fx
 
+#begin aewfgeg.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:aewfgeg.mp3
+
 #begin alchemizeicon.png
 /importer:TextureImporter
 /processor:TextureProcessor

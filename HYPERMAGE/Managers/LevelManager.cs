@@ -527,6 +527,14 @@ namespace HYPERMAGE.Managers
                                         bgScrollTimer -= Globals.TotalSeconds * 3;
                                     }
                                 }
+
+                                if (boss.ai == 3)
+                                {
+                                    if (bgScrollTimer < 15)
+                                    {
+                                        bgScrollTimer += Globals.TotalSeconds * 5;
+                                    }
+                                }
                             }
                         }
 
@@ -1115,7 +1123,7 @@ namespace HYPERMAGE.Managers
                     bg3 = Globals.Content.Load<Texture2D>("stars3");
                     bg4 = Globals.Content.Load<Texture2D>("bg7");
 
-                    song = Globals.Content.Load<Song>("rgrgrg");
+                    song = Globals.Content.Load<Song>("aewfgeg");
 
                     GameManager.groundBounds = new(0, 100, 320, 180);
                     GameManager.bounds = new(0, 0, 320, 180);

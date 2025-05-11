@@ -697,6 +697,19 @@ namespace HYPERMAGE.Spells
                     return;
                 case 10: //ice bolt
 
+                    Projectile icebolt = new(player.center, 11, speed, castDamage, 0, knockback, Vector2.Normalize(InputManager.MousePosition - player.center) * 200, lifespan, size);
+
+                    if (explosify)
+                    {
+                        icebolt.explosify = true;
+                        icebolt.explosifyDamage = explosifyDamage;
+
+                        explosify = false;
+                    }
+
+                    ProjectileManager.AddProjectile(icebolt);
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0.6f, 0);
                     return;
                 case 11: //frost wave
 
@@ -738,15 +751,112 @@ namespace HYPERMAGE.Spells
 
                     return;
                 case 24: //force bolt
+                    Projectile forcebolt = new(player.center, 10, 1f, castDamage, 0, knockback, player.center.DirectionTo(InputManager.MousePosition) * 130, lifespan, 60, 0f, size, true, 0, 0);
+
+                    if (explosify)
+                    {
+                        forcebolt.explosify = true;
+                        forcebolt.explosifyDamage = explosifyDamage;
+                    }
+
+                    ProjectileManager.AddProjectile(forcebolt);
+
+                    for (int i = 0; i < 5; i++)
+                    {
+                        ParticleData pd = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 5,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.Purple,
+                            velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200)),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle p = new(player.center, pd);
+                        ParticleManager.AddParticle(p);
+                    }
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0.6f, 0);
 
                     return;
                 case 25: //magic missile
+                    Projectile mm = new(player.center, 9, 1f, castDamage, 0, knockback, player.center.DirectionTo(InputManager.MousePosition).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-70, 70))) * 80, lifespan, 60, 0f, size, true, 0, 0);
+
+                    if (explosify)
+                    {
+                        mm.explosify = true;
+                        mm.explosifyDamage = explosifyDamage;
+                    }
+
+                    ProjectileManager.AddProjectile(mm);
+
+                    for (int i = 0; i < 5; i++)
+                    {
+                        ParticleData pd = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 5,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.Purple,
+                            velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200)),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle p = new(player.center, pd);
+                        ParticleManager.AddParticle(p);
+                    }
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0.6f, 0);
 
                     return;
                 case 26: //push
 
                     return;
                 case 27: //magic missiles
+
+                    for (int i = 0; i < 2 + rank; i++)
+                    {
+
+                        Projectile mms = new(player.center, 9, 1f, castDamage, 0, knockback, player.center.DirectionTo(InputManager.MousePosition).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-120, 120))) * Globals.RandomFloat(40, 100), lifespan, 60, 0f, size, true, 0, 0);
+
+                        if (explosify)
+                        {
+                            mms.explosify = true;
+                            mms.explosifyDamage = explosifyDamage / (2 + rank);
+                        }
+
+                        ProjectileManager.AddProjectile(mms);
+                    }
+
+
+                    for (int i = 0; i < 5; i++)
+                    {
+                        ParticleData pd = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 5,
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.Purple,
+                            velocity = new(Globals.RandomFloat(-200, 200), Globals.RandomFloat(-200, 200)),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle p = new(player.center, pd);
+                        ParticleManager.AddParticle(p);
+                    }
+
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, 0.6f, 0);
+                    SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("shoot"), 1, -0.8f, 0);
 
                     return;
                 case 28: //barrier
@@ -1079,13 +1189,24 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-
+                            cooldown = 0.25f;
+                            damage = 3f;
+                            knockback = 1f;
+                            size = 2f;
                             break;
                         case 2:
-
+                            cooldown = 0.2f;
+                            damage = 5f;
+                            speed = 1.5f;
+                            knockback = 1.25f;
+                            size = 3f;
                             break;
                         case 3:
-
+                            cooldown = 0.15f;
+                            damage = 10f;
+                            speed = 2.5f;
+                            knockback = 1.5f;
+                            size = 4f;
                             break;
                     }
                     break;
@@ -1275,13 +1396,24 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-
+                            cooldown = 0.25f;
+                            damage = 1.5f;
+                            knockback = 4f;
+                            size = 2f;
                             break;
                         case 2:
-
+                            cooldown = 0.2f;
+                            damage = 3f;
+                            speed = 1.5f;
+                            knockback = 7f;
+                            size = 3f;
                             break;
                         case 3:
-
+                            cooldown = 0.15f;
+                            damage = 5f;
+                            speed = 2.5f;
+                            knockback = 10f;
+                            size = 4f;
                             break;
                     }
                     break;
@@ -1289,13 +1421,24 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-
+                            cooldown = 0.25f;
+                            damage = 3f;
+                            knockback = 1f;
+                            size = 2f;
                             break;
                         case 2:
-
+                            cooldown = 0.2f;
+                            damage = 5f;
+                            speed = 1.5f;
+                            knockback = 1.25f;
+                            size = 3f;
                             break;
                         case 3:
-
+                            cooldown = 0.15f;
+                            damage = 10f;
+                            speed = 2.5f;
+                            knockback = 1.5f;
+                            size = 4f;
                             break;
                     }
                     break;
@@ -1317,13 +1460,24 @@ namespace HYPERMAGE.Spells
                     switch (rank)
                     {
                         case 1:
-
+                            cooldown = 0.25f;
+                            damage = 3f;
+                            knockback = 1f;
+                            size = 2f;
                             break;
                         case 2:
-
+                            cooldown = 0.2f;
+                            damage = 5f;
+                            speed = 1.5f;
+                            knockback = 1.25f;
+                            size = 3f;
                             break;
                         case 3:
-
+                            cooldown = 0.15f;
+                            damage = 10f;
+                            speed = 2.5f;
+                            knockback = 1.5f;
+                            size = 4f;
                             break;
                     }
                     break;

@@ -17,7 +17,7 @@ namespace HYPERMAGE.Particles
         public float sizeStart = 1;
         public float sizeEnd = 1;
         public Vector2 velocity = Vector2.Zero;
-        public float resistance = 1.15f;
+        public float resistance = 10f;
         public float rotation = 0f;
         public float rotationSpeed = 0f;
         public bool flashing = false;

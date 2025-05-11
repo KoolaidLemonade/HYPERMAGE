@@ -44,6 +44,7 @@ namespace HYPERMAGE.Models
         public float ai12;
         public float ai13;
         public float ai14;
+        public float ai15;
 
         public int aiType;
         public float speed = 1f;
@@ -242,9 +243,11 @@ namespace HYPERMAGE.Models
                     hitSound = Globals.Content.Load<SoundEffect>("hit");
                     deathSound = Globals.Content.Load<SoundEffect>("hit2");
 
-                    anims.AddAnimation(0, new(Globals.Content.Load<Texture2D>("beasthound"), 2, 3, 0.5f, 2));
-                    anims.AddAnimation(1, new(Globals.Content.Load<Texture2D>("beasthound"), 2, 3, 0.5f, 1));
-                    anims.AddAnimation(2, new(Globals.Content.Load<Texture2D>("beasthound"), 2, 3, 0.5f, 3));
+                    anims.AddAnimation(0, new(Globals.Content.Load<Texture2D>("beasthound"), 3, 4, 0.5f, 2));
+                    anims.AddAnimation(1, new(Globals.Content.Load<Texture2D>("beasthound"), 3, 4, 0.5f, 1));
+                    anims.AddAnimation(2, new(Globals.Content.Load<Texture2D>("beasthound"), 3, 4, 0.5f, 3));
+                    anims.AddAnimation(3, new(Globals.Content.Load<Texture2D>("beasthound"), 3, 4, 0.2f, 4));
+
 
 
                     width = 70;
@@ -1816,6 +1819,26 @@ namespace HYPERMAGE.Models
                         ai4 = 0;
                     }
 
+                    if (ai != 0 && ai != 3 && Globals.Random.Next(3) == 0)
+                    {
+                        ParticleData pd3 = new()
+                        {
+                            opacityStart = 1f,
+                            opacityEnd = 0f,
+                            sizeStart = Globals.RandomFloat(1, 3),
+                            sizeEnd = 0,
+                            colorStart = Color.Cyan,
+                            colorEnd = Color.Cyan,
+                            velocity = new Vector2(-1, -1).RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-40, 0))) * Globals.RandomFloat(80, 140),
+                            lifespan = Globals.RandomFloat(0.2f, 3f),
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                            resistance = Globals.RandomFloat(1, 2f)
+                        };
+
+                        Particle p3 = new(position + new Vector2(20, -13), pd3);
+                        ParticleManager.AddParticle(p3);
+                    }
+
 
                     if (ai2 == 0)
                     {
@@ -1855,6 +1878,48 @@ namespace HYPERMAGE.Models
 
                     ai14 += Globals.TotalSeconds;
 
+                    if (health < 499 && ai15 == 0)
+                    {
+                        ai15 = 1;
+
+                        ai6 = 8;
+
+                        velocity.X -= 35;
+
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("cry"), 2f, 0f, 0f);
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lastingexplosion"), 2f, 0f, 0f);
+                        SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 2f, 0f, 0f);
+
+                        GameManager.AddScreenShake(0.3f, 5f);
+                        GameManager.AddAbberationPowerForce(500, 200);
+                        GameScene.AddHitstop(10);
+                        
+                        for (int i = 0; i < 30; i++)
+                        {
+                            ParticleData pd2 = new()
+                            {
+                                opacityStart = 1f,
+                                opacityEnd = 1f,
+                                sizeStart = 10,
+                                sizeEnd = 0,
+                                colorStart = Color.White,
+                                colorEnd = Color.White,
+                                velocity = new(Globals.RandomFloat(-700, 700), Globals.RandomFloat(-700, 700)),
+                                lifespan = Globals.RandomFloat(0.5f, 2f),
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                            };
+
+                            Particle p2 = new(position, pd2);
+                            ParticleManager.AddParticle(p2);
+                        }
+
+                    }
+
+                    if (ai6 == 8)
+                    {
+                        ai = 3;
+                    }
+
                     if (ai6 == 1)
                     {
                         ai7 += Globals.TotalSeconds;
@@ -1886,9 +1951,17 @@ namespace HYPERMAGE.Models
 
                             else
                             {
-                                while (ai6 == 3 || ai6 == 1)
+                                if (GameManager.GetPlayer().center.X < 80)
                                 {
-                                    ai6 = Globals.Random.Next(5) + 2;
+                                    ai6 = 5;
+                                }
+
+                                else
+                                {
+                                    while (ai6 == 3 || ai6 == 1 || ai6 == 4)
+                                    {
+                                        ai6 = Globals.Random.Next(5) + 2;
+                                    }
                                 }
 
                                 ai7 = 0;
@@ -1992,15 +2065,15 @@ namespace HYPERMAGE.Models
                             SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 0.8f, Globals.RandomFloat(-1, 0f), 0f);
 
 
-                            Projectile proj = new(position + new Vector2(40, 15), -7, 1f, (position + new Vector2(40, 15)).DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians((float)Math.Sin(timer * 2.5f - 1.5f) * 25))  * 80, 10f);
+                            Projectile proj = new(position + new Vector2(40, 15), -7, 1f, (position + new Vector2(40, 15)).DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians((float)Math.Sin(timer * 2.5f - 1.5f) * 30))  * 80, 10f);
                             ProjectileManager.AddProjectile(proj);
 
-                            Projectile proj2 = new(position + new Vector2(40, 15), -7, 1f, (position + new Vector2(40, 15)).DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians((float)Math.Cos(timer * 2.5f) * 25)) * 80, 10f);
+                            Projectile proj2 = new(position + new Vector2(40, 15), -7, 1f, (position + new Vector2(40, 15)).DirectionTo(GameManager.GetPlayer().center).RotatedBy(MathHelper.ToRadians((float)Math.Cos(timer * 2.5f) * 30)) * 80, 10f);
                             ProjectileManager.AddProjectile(proj2);
 
                             if (ai10 >= 30)
                             {
-                                ai6 = 1;
+                                ai6 = Globals.Random.Next(2) == 0 ? 1 : 4;
 
                                 ai7 = 0;
                                 ai8 = 0;
@@ -2054,7 +2127,8 @@ namespace HYPERMAGE.Models
 
                         if (ai11 == 0 && ai10 >= 60)
                         {
-                            GameManager.AddScreenShake(0.5f, 7f);
+                            GameManager.AddScreenShake(1f, 12f);
+                            GameManager.AddAbberationPowerForce(100, 100);
 
                             SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lastingexplosion"), 1f, 0, 0f);
                             SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("howl"), 4f, 0, 0f);
@@ -2210,6 +2284,13 @@ namespace HYPERMAGE.Models
                                 ProjectileManager.AddProjectile(proj);
                             }
 
+                            for (int i = 0; i < 10; i++)
+                            {
+                                Vector2 pos = new(-10, Globals.RandomFloat(0, 180));
+                                Projectile proj = new(pos, -6, 1f, new Vector2(Globals.RandomFloat(20, 40) * pos.Distance(new(-10, 90)) / 10, Globals.RandomFloat(-10, 10)), Globals.RandomFloat(0.8f, 1.2f));
+                                ProjectileManager.AddProjectile(proj);
+                            }
+
                             ai6 = 1;
 
                             ai7 = 0;
@@ -2286,14 +2367,47 @@ namespace HYPERMAGE.Models
 
                         if (ai7 >= 1f)
                         {
+                            velocity.X -= 15;
 
-                            ai6 = 1;
+                            GameManager.AddScreenShake(0.3f, 10f);
+                            GameManager.AddAbberationPowerForce(3000, 100);
+
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("lastingexplosion"), 1f, 0, 0f);
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("bigexplosion"), 1f, 0, 0f);
+                            SoundManager.PlaySound(Globals.Content.Load<SoundEffect>("hit2"), 1f, 0, 0f);
+
+                            ai10 = Globals.RandomFloat(0, 360);
+
+                            for (int i = 0; i < 120; i++)
+                            {
+                                ai9++;
+
+                                Projectile proj = new(position + new Vector2(45, 15), ai9 > 4 ? -2 : -7, 1f, Vector2.One.RotatedBy(MathHelper.ToRadians(i * 360 / 120)).RotatedBy(MathHelper.ToRadians(ai10)) * Globals.RandomFloat(95, 102), 5f);
+                                ProjectileManager.AddProjectile(proj);
+
+                                if (ai9 >= 8)
+                                {
+                                    ai9 = 0;
+                                }
+                            }
+
+                            if (Globals.Random.Next(3) == 0 || ai11 > 4)
+                            {
+                                ai6 = Globals.Random.Next(2) == 0 ? 1 : 4;
+
+                                ai11 = 0;
+                            }
+
+                            else
+                            {
+                                ai6 = 5;
+                                ai11++;
+                            }
 
                             ai7 = 0;
                             ai8 = 0;
                             ai9 = 0;
                             ai10 = 0;
-                            ai11 = 0;
                             ai12 = 0;
                             ai13 = 0;
                         }
@@ -2302,7 +2416,17 @@ namespace HYPERMAGE.Models
 
                     if (ai6 == 6)
                     {
-                        ai6 = 1;
+                        if (Globals.Random.Next(2) == 0 || ai7 > 3)
+                        {
+                            ai6 = Globals.Random.Next(2) == 0 ? 1 : 4;
+                            ai7 = 0;
+                        }
+
+                        else
+                        {
+                            ai6 = 6;
+                            ai7++;
+                        }
                     }
 
                     if (position.Distance(new Vector2(22, 75)) > 5)
@@ -2311,8 +2435,8 @@ namespace HYPERMAGE.Models
 
                     }
 
-                    velocity.X += (float)Math.Sin(timer * 2) * Globals.TotalSeconds * 2;
-                    velocity.Y += (float)Math.Sin(timer * 2) * Globals.TotalSeconds * 2;
+                    velocity.X += (float)Math.Sin(timer * ((int)ai == 3 ? 7 : 2)) * Globals.TotalSeconds * ((int)ai == 3 ? 12 : 2);
+                    velocity.Y += (float)Math.Sin(timer * ((int)ai == 3 ? 4 : 2)) * Globals.TotalSeconds * ((int)ai == 3 ? 7 : 2);
                     velocity /= 1 + Globals.TotalSeconds * 10;
                     break;
             }
@@ -2349,11 +2473,11 @@ namespace HYPERMAGE.Models
                         GameManager.DrawSpeedLines(Color.LightBlue, position);
                     }
 
-                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("beasthoundpaw"), new((int)22+ (float)Math.Sin(ai5 * 3) * 30, (int)75 + 35 - ((float)Math.Cos(ai5 * 3) > 0 ? (float)Math.Cos(ai5 * 3) * 30 : 0)), null, Color.White, MathHelper.ToRadians((float)Math.Cos(ai5 * 3) > 0 ? (float)Math.Cos(ai5 * 3) * 50 : 0), Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("beasthoundpaw"), new((int)22 + (float)Math.Cos(ai5 * 3 + 2) * 30, (int)75 + 60 + ((float)Math.Sin(ai5 * 3 + 2) < 0 ? (float)Math.Sin(ai5 * 3 + 2) * 30 : 0)), null, Color.White, MathHelper.ToRadians((float)Math.Sin(ai5 * 3 + 2) < 0 ? (float)Math.Sin(ai5 * 3 + 2) * -50 : 0), Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("beasthoundpaw"), new((int)22+ (float)Math.Sin(ai5 * 3) * 30, (int)75 + 35 - ((float)Math.Cos(ai5 * 3) > 0 ? (float)Math.Cos(ai5 * 3) * 30 : 0)), null, Color.White, MathHelper.ToRadians((float)Math.Cos(ai5 * 3) > 0 ? (float)Math.Cos(ai5 * 3) * 50 : 0), Vector2.Zero, 1f, SpriteEffects.None, 0.8f - 0.01f);
+                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("beasthoundpaw"), new((int)22 + (float)Math.Cos(ai5 * 3 + 2) * 30, (int)75 + 60 + ((float)Math.Sin(ai5 * 3 + 2) < 0 ? (float)Math.Sin(ai5 * 3 + 2) * 30 : 0)), null, Color.White, MathHelper.ToRadians((float)Math.Sin(ai5 * 3 + 2) < 0 ? (float)Math.Sin(ai5 * 3 + 2) * -50 : 0), Vector2.Zero, 1f, SpriteEffects.None, 0.8f - 0.01f);
 
-                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("beasthoundpaw2"), new((int)22 + (float)Math.Sin(ai5 * 3) * 30 - 60, (int)75 + 22 - ((float)Math.Cos(ai5 * 3) > 0 ? (float)Math.Cos(ai5 * 3) * 30 : 0)), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("beasthoundpaw2"), new((int)22+ (float)Math.Cos(ai5 * 3 + 2) * 30 - 60, (int)75 + 47 + ((float)Math.Sin(ai5 * 3 + 2)  < 0 ? (float)Math.Sin(ai5 * 3 + 2) * 30 : 0)), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("beasthoundpaw2"), new((int)22 + (float)Math.Sin(ai5 * 3) * 30 - 60, (int)75 + 22 - ((float)Math.Cos(ai5 * 3) > 0 ? (float)Math.Cos(ai5 * 3) * 30 : 0)), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0.8f - 0.01f);
+                    Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("beasthoundpaw2"), new((int)22+ (float)Math.Cos(ai5 * 3 + 2) * 30 - 60, (int)75 + 47 + ((float)Math.Sin(ai5 * 3 + 2)  < 0 ? (float)Math.Sin(ai5 * 3 + 2) * 30 : 0)), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0.8f - 0.01f);
                     break;
             }
 

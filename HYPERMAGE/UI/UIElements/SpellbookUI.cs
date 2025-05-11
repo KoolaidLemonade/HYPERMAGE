@@ -258,7 +258,7 @@ namespace HYPERMAGE.UI.UIElements
                 {
                     if (Spellbook.traitsPrimary[i] > 0)
                     {
-                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsPrimary[i].ToString(), new(8 + k * 20, Globals.NonLerp(-48, 38 + 16, openingTimer )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
+                        Globals.SpriteBatch.DrawString(Globals.GetPixelFont(), Spellbook.traitsPrimary[i].ToString(), new(8 + k * 20, Globals.NonLerp(-48, 38 + 16, openingTimer    )), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
                         Globals.SpriteBatch.Draw(Globals.Content.Load<Texture2D>("traiticons"), new(13 + k * 20, Globals.NonLerp(-48, 39 + 16, openingTimer )), new Rectangle(i * 7, 0, 7, 7), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.92f);
 
                         k++;

@@ -64,19 +64,13 @@ namespace HYPERMAGE.Managers
         {
             player = new Player(new(150, 100));
 
-            SceneManager.AddScene(new GameScene());
+            SceneManager.AddScene(new Shop());
 
             Spellbook.Init();
 
             GetPlayer().LevelUp();
             GetPlayer().LevelUp();
             GetPlayer().LevelUp();
-
-            Spellbook.AddSpellPrimary(new(7, 2));
-            Spellbook.AddSpellPrimary(new(6, 2));
-            Spellbook.AddSpellPrimary(new(1, 2));
-            Spellbook.AddSpellPrimary(new(2, 1));
-
         }
 
         public static void Update()

@@ -12,12 +12,15 @@ namespace HYPERMAGE.Helpers
         public Vector2 position;
         public Vector2 offset;
         public float size;
+        public float originalSize;
         public Hitbox(Vector2 pos, float size, Vector2 offset, Vector2 origin)
         {
             this.position = pos;
             this.size = size;
             this.offset = offset;
             this.origin = origin;
+
+            originalSize = size;
         }
 
         public bool Intersects(Hitbox other)

@@ -11,8 +11,8 @@ namespace HYPERMAGE.Managers
 {
     public static class SoundManager
     {
-        public static float musicVolume = 1f;
-        public static float soundVolume = 1f;
+        public static float musicVolume = 2f;
+        public static float soundVolume = 0.8f;
         public static float globalVolume = 0.1f;
 
         public static List<SoundEffectInstance> sounds = [];

@@ -53,6 +53,9 @@ namespace HYPERMAGE.Models
         private float ai;
         private float ai2;
         private float ai3;
+        private float ai4;
+        private float ai5;
+        private float ai6;
 
         public bool explosify;
         public float explosifyDamage;
@@ -220,6 +223,17 @@ namespace HYPERMAGE.Models
                     immuneSameType = true;
                     texture = null;
                     break;
+
+                case 9: //magic missile
+                    texture = Globals.Content.Load<Texture2D>("particle");
+                    break;
+
+                case 10: //forcebolt
+                    texture = Globals.Content.Load<Texture2D>("particle");
+                    break;
+                case 11: //icebolt
+                    texture = Globals.Content.Load<Texture2D>("particle");
+                    break;
             }
 
             if (anim != null)
@@ -300,6 +314,8 @@ namespace HYPERMAGE.Models
                 h.position = position + h.offset;
                 h.origin = position;
                 h.SetRotation(rotation);
+
+                h.size = h.originalSize * scale;
             }
 
             if (lifespan <= 0)
@@ -860,6 +876,167 @@ namespace HYPERMAGE.Models
 
                         break;
                     }
+                case 9: //magic missile
+                    {
+                        ai3 += Globals.TotalSeconds;
+
+                        rotation += Globals.TotalSeconds * 20;
+
+                        if (ai3 >= 0.02f)
+                        {
+                            ParticleData projParticleData = new()
+                            {
+                                opacityStart = 1f,
+                                sizeStart = 3 * scale / 2,
+                                sizeEnd = 0,
+                                colorStart = Color.White,
+                                colorEnd = Color.White,
+                                velocity = new Vector2(Globals.RandomFloat(-100, 100), 0) + velocity,
+                                lifespan = Globals.RandomFloat(0.2f, 0.2f),
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                resistance = 0
+                            };
+
+                            Particle projParticle = new(position, projParticleData);
+                            ParticleManager.AddParticle(projParticle);
+
+                            ParticleData projParticleData2 = new()
+                            {
+                                opacityStart = 1f,
+                                sizeStart = 3 * scale / 2,
+                                sizeEnd = 0,
+                                colorStart = Color.White,
+                                colorEnd = Color.White,
+                                velocity = new Vector2(0, Globals.RandomFloat(-100, 100)) + velocity,
+                                lifespan = Globals.RandomFloat(0.2f, 0.2f),
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                resistance = 0
+                            };
+
+                            Particle projParticle2 = new(position, projParticleData2);
+                            ParticleManager.AddParticle(projParticle2);
+
+                            ParticleData projParticleData3 = new()
+                            {
+                                opacityStart = 1f,
+                                opacityEnd = 0f,
+                                sizeStart = Globals.RandomFloat(0.5f, 2f) * scale / 2,
+                                sizeEnd = 0,
+                                colorStart = Color.White,
+                                colorEnd = Color.Purple,
+                                velocity = new Vector2(Globals.RandomFloat(-20, 20), Globals.RandomFloat(-20, 20)),
+                                lifespan = Globals.RandomFloat(0.2f, 0.8f),
+                                rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f),
+                                resistance = 1
+                            };
+
+                            Particle projParticle3 = new(position, projParticleData3);
+                            ParticleManager.AddParticle(projParticle3);
+                        }
+
+                        if (ai2 == 0)
+                        {
+                            while (ai2 == 0)
+                            {
+                                ai2 = Globals.RandomFloat(-20, 20);
+                            }
+                        }
+
+
+                        if (ai < 0.6f)
+                        {
+                            ai += Globals.TotalSeconds;
+
+                            ai4 = position.X;
+                            ai5 = position.Y;
+
+                            position.X = Globals.NonLerp(position.X + (float)Math.Sin(ai * Math.PI / 2) * ai2, InputManager.MousePosition.X, ai);
+                            position.Y = Globals.NonLerp(position.Y + (float)Math.Sin(ai * Math.PI / 2) * ai2, InputManager.MousePosition.Y, ai);
+                        }
+
+                        else
+                        {
+                            if (ai6 == 0)
+                            {
+                                velocity = Vector2.Normalize(new Vector2(position.X - ai4, position.Y - ai5)) * 100;
+
+                                ai6 = 1;
+                            }
+
+                            position += velocity * Globals.TotalSeconds * speed;
+                        }
+
+                        break;
+                    }
+                case 10: //forcebolt
+                    position += velocity * Globals.TotalSeconds * speed;
+
+                    rotation += Globals.TotalSeconds * 40;
+
+                    ai += Globals.TotalSeconds;
+                    ai2 += Globals.TotalSeconds;
+
+                    if (ai > 0.02f)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            sizeStart = scale * Globals.RandomFloat(0.8f, 1.2f),
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.Purple,
+                            velocity = -velocity.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(-50, -40))) * Globals.RandomFloat(0.8f, 1.2f) * (float)Math.Sin(ai2 * 10),
+                            lifespan = Globals.RandomFloat(0.15f, 0.3f),
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+
+                        ParticleData projParticleData2 = new()
+                        {
+                            sizeStart = scale * Globals.RandomFloat(0.8f, 1.2f),
+                            sizeEnd = 0,
+                            colorStart = Color.White,
+                            colorEnd = Color.Purple,
+                            velocity = -velocity.RotatedBy(MathHelper.ToRadians(Globals.RandomFloat(50, 40))) * Globals.RandomFloat(0.8f, 1.2f) * (float)Math.Sin(ai2 * 10),
+                            lifespan = Globals.RandomFloat(0.15f, 0.3f),
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle projParticle2 = new(position, projParticleData2);
+                        ParticleManager.AddParticle(projParticle2);
+
+                        ai = 0;
+                    }
+
+                    break;
+
+                case 11: //icebolt
+
+                    position += velocity * Globals.TotalSeconds * speed;
+
+                    rotation += 1.05f;
+
+                    if (Globals.Random.Next(3) == 0)
+                    {
+                        ParticleData projParticleData = new()
+                        {
+                            opacityStart = .8f,
+                            opacityEnd = 0.1f,
+                            sizeStart = 1 * scale,
+                            sizeEnd = 0,
+                            colorStart = Color.Cyan,
+                            colorEnd = Color.Blue,
+                            velocity = new(Globals.RandomFloat(-50, 50), Globals.RandomFloat(-50, 50)),
+                            lifespan = 0.5f,
+                            rotationSpeed = Globals.RandomFloat(-0.5f, 0.5f)
+                        };
+
+                        Particle projParticle = new(position, projParticleData);
+                        ParticleManager.AddParticle(projParticle);
+                    }
+
+                    break;
             }
 
             lifespan -= Globals.TotalSeconds;
